@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Candidate Portal - Urava S4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;600;700;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Anek Malayalam', sans-serif; background-color: #020617; color: #f8fafc; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        .num-font { font-family: 'Outfit', sans-serif; }
+        .nav-active { color: #38bdf8; }
+        .nav-inactive { color: #64748b; }
+        .toast-slide { animation: slideDown 0.4s ease forwards; }
+        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* Hide scrollbar for clean mobile look */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-slate-950 pb-20 relative min-h-screen">
+
+    <!-- Background Watermark -->
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
+        <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%204-01.png" class="w-full h-auto object-cover scale-150">
+    </div>
+
+    <!-- Header -->
+    <header class="bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/80 p-4 sticky top-0 z-40 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_191200.png" class="h-10 w-10 rounded-xl shadow-md border border-slate-700/50">
+            <div>
+                <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_183322.png" class="h-5 w-auto mb-1 drop-shadow-md brightness-200">
+                <p class="text-[9px] text-sky-400 font-bold uppercase tracking-widest leading-none">Live Results Portal</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5 px-2 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
+            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
+            <span class="text-[9px] text-red-400 font-bold uppercase tracking-widest">Live</span>
+        </div>
+    </header>
+
+    <!-- Custom Toast Notification for Live Results -->
+    <div id="liveToast" class="fixed top-20 left-4 right-4 bg-gradient-to-r from-sky-600 to-indigo-600 text-white p-4 rounded-2xl shadow-2xl z-50 hidden border border-sky-400/50 flex-col gap-1 cursor-pointer" onclick="this.style.display='none'">
+        <span class="text-[10px] font-black uppercase tracking-widest text-sky-200 flex items-center gap-1"><span>✨</span> New Result Published!</span>
+        <span id="toastProg" class="font-bold text-sm leading-tight">Program Name</span>
+        <span class="text-xs text-sky-100 opacity-80 mt-1">Tap to dismiss</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="p-4 relative z-10" id="appContent">
+        <div class="flex justify-center items-center h-40 text-slate-500 text-sm">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Syncing Live Data...
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 p-2 pb-safe flex justify-around items-center z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+        <button onclick="switchTab('home')" class="flex flex-col items-center p-2 w-20 transition-transform active:scale-95" id="nav-home">
+            <span class="text-2xl mb-1 drop-shadow-md">📊</span><span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+        </button>
+        <button onclick="switchTab('results')" class="flex flex-col items-center p-2 w-20 transition-transform active:scale-95" id="nav-results">
+            <span class="text-2xl mb-1 drop-shadow-md">🏆</span><span class="text-[10px] font-bold uppercase tracking-wider">Results</span>
+        </button>
+        <button onclick="switchTab('search')" class="flex flex-col items-center p-2 w-20 transition-transform active:scale-95" id="nav-search">
+            <span class="text-2xl mb-1 drop-shadow-md">🔍</span><span class="text-[10px] font-bold uppercase tracking-wider">Search</span>
+        </button>
+    </nav>
+
+    <!-- Hidden Canvas for Certificate Generation -->
+    <canvas id="certCanvas" style="display:none;"></canvas>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Connects directly to the user's specific Firebase project
+        const firebaseConfig = {
+            apiKey: "AIzaSyCIbvk4teIJ6AlfaXbFgDMgCWpnekNwmx8",
+            authDomain: "pullani-6a39b.firebaseapp.com",
+            projectId: "pullani-6a39b",
+            storageBucket: "pullani-6a39b.firebasestorage.app",
+            messagingSenderId: "617480764841",
+            appId: "1:617480764841:web:c22959689a7003a31498b8"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const festId = 'urava-s4-fest';
+
+        let state = { programs: [], candidates: [], results: [], tab: 'home', searchQuery: '' };
+        let initialLoad = true;
+
+        window.switchTab = (tab) => { state.tab = tab; renderApp(); window.scrollTo(0,0); };
+        window.updateSearch = (val) => { 
+            state.searchQuery = val; 
+            renderApp(); 
+            const s = document.getElementById('searchInp'); 
+            if(s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } 
+        };
+
+        signInAnonymously(auth).catch(console.error);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
+                    snap.docs.forEach(d => { if(d.id === 'config') state.programs = d.data().programs || []; }); renderApp();
+                });
+                onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
+                    state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderApp();
+                });
+                onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
+                    state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); renderApp();
+                    
+                    if(!initialLoad) {
+                        snap.docChanges().forEach((change) => {
+                            if (change.type === "added") {
+                                const prog = state.programs.find(p => p.id === change.doc.data().progId);
+                                if(prog) {
+                                    const toast = document.getElementById('liveToast');
+                                    document.getElementById('toastProg').innerText = prog.name;
+                                    toast.style.display = 'flex'; toast.classList.add('toast-slide');
+                                    setTimeout(()=> { toast.style.display = 'none'; }, 6000);
+                                }
+                            }
+                        });
+                    }
+                    setTimeout(() => { initialLoad = false; }, 2000);
+                });
+            }
+        });
+
+        window.downloadCertificate = (candName, candTeam, candCat, progName, positionStr) => {
+            const canvas = document.getElementById('certCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set A4 Dimensions (150 DPI)
+            canvas.width = 1240; 
+            canvas.height = 1754;
+
+            // 1. Draw Background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Draw Decorative Borders
+            ctx.lineWidth = 15;
+            ctx.strokeStyle = '#0284c7'; // Sky Blue border
+            ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
+            
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#38bdf8';
+            ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
+
+            // 3. Draw Header Texts
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#0ea5e9';
+            ctx.font = 'bold 75px sans-serif';
+            ctx.fillText('AAWAAZE FUNOON S4', canvas.width / 2, 350);
+
+            ctx.fillStyle = '#334155';
+            ctx.font = 'bold 35px sans-serif';
+            ctx.letterSpacing = "5px";
+            ctx.fillText('CERTIFICATE OF ACHIEVEMENT', canvas.width / 2, 450);
+            ctx.letterSpacing = "0px"; // reset
+
+            // 4. Draw Content Text
+            ctx.fillStyle = '#64748b';
+            ctx.font = '35px sans-serif';
+            ctx.fillText('This is proudly presented to', canvas.width / 2, 650);
+
+            // Candidate Name
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 85px sans-serif';
+            ctx.fillText(candName, canvas.width / 2, 780);
+            
+            // Name Underline
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2 - 400, 810);
+            ctx.lineTo(canvas.width / 2 + 400, 810);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.stroke();
+
+            // Details
+            ctx.fillStyle = '#64748b';
+            ctx.font = '35px sans-serif';
+            ctx.fillText(`of team ${candTeam} (${candCat})`, canvas.width / 2, 900);
+            ctx.fillText('for securing', canvas.width / 2, 1000);
+
+            // Position (Gold/Silver/Bronze Color logic)
+            if(positionStr.includes('First')) ctx.fillStyle = '#d97706'; // Amber/Gold
+            else if(positionStr.includes('Second')) ctx.fillStyle = '#64748b'; // Slate/Silver
+            else ctx.fillStyle = '#b45309'; // Bronze
+            
+            ctx.font = 'bold 60px sans-serif';
+            ctx.fillText(positionStr, canvas.width / 2, 1100);
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '35px sans-serif';
+            ctx.fillText('in the event', canvas.width / 2, 1200);
+
+            // Program Name
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 50px sans-serif';
+            ctx.fillText(progName, canvas.width / 2, 1300);
+
+            // 5. Signatures area
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 25px sans-serif';
+            
+            // Left Sig
+            ctx.beginPath(); ctx.moveTo(200, 1550); ctx.lineTo(500, 1550); ctx.stroke();
+            ctx.fillText('Fest Coordinator', 350, 1590);
+            
+            // Right Sig
+            ctx.beginPath(); ctx.moveTo(canvas.width - 500, 1550); ctx.lineTo(canvas.width - 200, 1550); ctx.stroke();
+            ctx.fillText('Principal', canvas.width - 350, 1590);
+
+            // Trigger Download
+            const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `Certificate_${candName}_${progName}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            alert('Certificate Downloaded Successfully! Check your gallery/downloads.');
+        };
+
+        window.renderApp = () => {
+            // Update Nav Colors
+            ['home', 'results', 'search'].forEach(t => {
+                const el = document.getElementById('nav-' + t);
+                if(el) el.className = `flex flex-col items-center p-2 w-20 transition-colors ${state.tab === t ? 'nav-active' : 'nav-inactive'}`;
+            });
+
+            const content = document.getElementById('appContent');
+            let stats = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
+            let candTotalPts = {};
+            
+            state.results.forEach(res => {
+                const addPts = (ids, pts) => {
+                    (Array.isArray(ids)?ids:[]).forEach(id => {
+                        const c = state.candidates.find(x => x.id === id);
+                        if(c) {
+                            if(stats[c.team] !== undefined) stats[c.team] += pts;
+                            candTotalPts[c.id] = (candTotalPts[c.id] || 0) + pts;
+                        }
+                    });
+                };
+                addPts(res.first, res.pts1); addPts(res.second, res.pts2); addPts(res.third, res.pts3);
+            });
+
+            if (state.tab === 'home') {
+                content.innerHTML = `
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 text-center mb-6 shadow-xl relative overflow-hidden backdrop-blur-md">
+                        <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="absolute -right-10 -bottom-10 h-40 opacity-20 object-contain pointer-events-none">
+                        <h2 class="text-white font-black text-2xl mb-1 tracking-tight">Live Leaderboard</h2>
+                        <p class="text-[10px] text-sky-400 font-bold uppercase tracking-widest mb-6">Aawaaze Funoon S4</p>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-sky-400 p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
+                                <h3 class="text-sky-400 font-black text-xs tracking-widest uppercase mb-1">Al-Masūdi</h3>
+                                <div class="text-4xl font-black text-white num-font relative z-10">${stats['Al-Masūdi']}</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-emerald-400 p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
+                                <h3 class="text-emerald-400 font-black text-xs tracking-widest uppercase mb-1">Al-Qazwini</h3>
+                                <div class="text-4xl font-black text-white num-font relative z-10">${stats['Al-Qazwini']}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-xl border border-indigo-500/50">🔍</div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Download Your Certificate</h4>
+                                <p class="text-xs text-slate-400">Head to the Search tab, enter your Chest No, and download certificates for your winning events!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (state.tab === 'results') {
+                let html = `<div class="flex justify-between items-center mb-6"><h2 class="text-white font-black text-2xl tracking-tight">Latest Results</h2><span class="bg-sky-500/20 text-sky-400 text-[10px] px-3 py-1 rounded-full font-bold border border-sky-500/30 uppercase tracking-widest">${state.results.length} Pub</span></div><div class="space-y-4">`;
+                
+                if(state.results.length === 0) html += `<div class="text-center bg-slate-900/50 p-10 rounded-3xl border border-slate-800 text-slate-500 text-sm mt-10">No results published yet. Check back soon!</div>`;
+                
+                const getNameHtml = (ids) => {
+                    let arr = Array.isArray(ids) ? ids : [];
+                    if(arr.length === 0) return '<div class="text-white/50 italic text-sm">-</div>';
+                    return arr.map(id => {
+                        const c = state.candidates.find(x => x.id === id);
+                        return c ? `<div class="font-bold text-white text-sm leading-tight flex justify-between items-end">${c.name} <span class="text-[9px] font-bold text-black/60 bg-white/30 px-1.5 py-0.5 rounded uppercase tracking-wider">#${c.regNo}</span></div>` : '';
+                    }).join('<div class="h-px w-full bg-white/10 my-1.5"></div>');
+                };
+
+                state.results.forEach(res => {
+                    const prog = state.programs.find(p => p.id === res.progId); if(!prog) return;
+                    html += `
+                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/80 p-5 rounded-3xl relative shadow-lg overflow-hidden">
+                        <div class="mb-4">
+                            <h4 class="font-black text-white text-lg leading-tight mb-1">${prog.progNo ? `<span class="text-sky-400 font-mono">#${prog.progNo}</span> ` : ''}${prog.name}</h4>
+                            <div class="inline-block bg-slate-950 px-2.5 py-1 rounded text-[9px] font-bold text-slate-400 uppercase tracking-widest border border-slate-800">${prog.cat} • ${prog.type}</div>
+                        </div>
+                        <div class="space-y-2.5">
+                            <div class="bg-gradient-to-r from-yellow-600/90 to-yellow-500/80 border border-yellow-400/50 p-3 rounded-2xl flex gap-3 shadow-md">
+                                <div class="text-2xl drop-shadow-md bg-white/20 h-10 w-10 rounded-xl flex items-center justify-center border border-white/30 shrink-0">🥇</div><div class="flex-1 self-center">${getNameHtml(res.first)}</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-slate-600/90 to-slate-500/80 border border-slate-400/50 p-3 rounded-2xl flex gap-3 shadow-md">
+                                <div class="text-2xl drop-shadow-md bg-white/20 h-10 w-10 rounded-xl flex items-center justify-center border border-white/30 shrink-0">🥈</div><div class="flex-1 self-center">${getNameHtml(res.second)}</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-amber-700/90 to-amber-600/80 border border-amber-500/50 p-3 rounded-2xl flex gap-3 shadow-md">
+                                <div class="text-2xl drop-shadow-md bg-white/20 h-10 w-10 rounded-xl flex items-center justify-center border border-white/30 shrink-0">🥉</div><div class="flex-1 self-center">${getNameHtml(res.third)}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                content.innerHTML = html + `</div>`;
+            }
+
+            if (state.tab === 'search') {
+                let html = `
+                    <h2 class="text-white font-black text-2xl mb-4 tracking-tight">Candidate Profile</h2>
+                    <div class="relative mb-6">
+                        <input type="text" id="searchInp" placeholder="Enter Chest No..." value="${state.searchQuery}" oninput="window.updateSearch(this.value)" class="w-full bg-slate-900 border-2 border-slate-700 rounded-2xl pl-6 pr-12 py-4 text-white outline-none focus:border-sky-500 num-font text-xl shadow-inner transition-colors">
+                        <div class="absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xl pointer-events-none">🔍</div>
+                    </div>
+                `;
+                
+                const c = state.candidates.find(x => String(x.regNo).trim() === state.searchQuery.trim());
+                if(c) {
+                    const tPts = candTotalPts[c.id] || 0;
+                    html += `
+                    <div class="bg-gradient-to-br from-indigo-900/80 to-slate-900/80 border border-sky-500/40 p-6 rounded-[2rem] shadow-2xl mb-6 text-center relative overflow-hidden backdrop-blur-sm">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl"></div>
+                        <div class="text-xs font-black text-sky-400 uppercase tracking-widest mb-1 font-mono">Chest No. ${c.regNo}</div>
+                        <h3 class="text-3xl font-black text-white mb-2 leading-tight">${c.name}</h3>
+                        <div class="inline-block bg-black/40 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-300 border border-white/10 mb-6 uppercase tracking-wider">${c.team} • ${c.cat}</div>
+                        <div class="text-6xl font-black text-emerald-400 num-font mb-2 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">${tPts}</div>
+                        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-900/30 inline-block px-3 py-1 rounded-full border border-emerald-800/50">Total Points Earned</p>
+                    </div>
+                    
+                    <h4 class="text-white font-black text-lg mb-3 tracking-tight">Your Events & Certificates</h4>
+                    <div class="space-y-3">`;
+                    
+                    if(c.assignedPrograms && c.assignedPrograms.length > 0) {
+                        c.assignedPrograms.forEach(pid => {
+                            const p = state.programs.find(x => x.id === pid); if(!p) return;
+                            const r = state.results.find(x => x.progId === pid);
+                            
+                            let badge = '<span class="text-[10px] text-slate-400 font-bold bg-slate-900 px-2 py-1.5 rounded-md border border-slate-800 uppercase tracking-wider shrink-0">⏳ Pending</span>';
+                            let downloadBtn = '';
+                            let positionStr = '';
+
+                            if (r) {
+                                if ((Array.isArray(r.first)?r.first:[]).includes(c.id)) {
+                                    badge = `<span class="text-[10px] text-yellow-900 bg-yellow-400 px-2 py-1.5 rounded-md font-bold uppercase tracking-wider shrink-0 shadow-md">🥇 1st Place (+${r.pts1})</span>`;
+                                    positionStr = 'First Place';
+                                }
+                                else if ((Array.isArray(r.second)?r.second:[]).includes(c.id)) {
+                                    badge = `<span class="text-[10px] text-slate-900 bg-slate-300 px-2 py-1.5 rounded-md font-bold uppercase tracking-wider shrink-0 shadow-md">🥈 2nd Place (+${r.pts2})</span>`;
+                                    positionStr = 'Second Place';
+                                }
+                                else if ((Array.isArray(r.third)?r.third:[]).includes(c.id)) {
+                                    badge = `<span class="text-[10px] text-amber-900 bg-amber-500 px-2 py-1.5 rounded-md font-bold uppercase tracking-wider shrink-0 shadow-md">🥉 3rd Place (+${r.pts3})</span>`;
+                                    positionStr = 'Third Place';
+                                }
+                                else {
+                                    badge = '<span class="text-[10px] text-slate-400 font-bold bg-slate-800/80 px-2 py-1.5 rounded-md shrink-0 uppercase tracking-wider">✔️ Participated</span>';
+                                }
+
+                                // If they won a position, show download button
+                                if(positionStr !== '') {
+                                    const safeProgName = p.name.replace(/'/g, "\\'");
+                                    const safeCandName = c.name.replace(/'/g, "\\'");
+                                    const safeTeam = c.team.replace(/'/g, "\\'");
+                                    const safeCat = c.cat.replace(/'/g, "\\'");
+                                    
+                                    downloadBtn = `
+                                    <button onclick="window.downloadCertificate('${safeCandName}', '${safeTeam}', '${safeCat}', '${safeProgName}', '${positionStr}')" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2.5 rounded-xl border border-indigo-400/50 shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        Download Certificate
+                                    </button>`;
+                                }
+                            }
+                            
+                            html += `
+                            <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-700/80 shadow-md">
+                                <div class="flex justify-between items-start gap-3">
+                                    <div class="text-sm font-bold text-white leading-tight">${p.progNo ? `<span class="text-sky-400 font-mono text-xs block mb-0.5">#${p.progNo}</span>` : ''}${p.name}</div>
+                                    ${badge}
+                                </div>
+                                ${downloadBtn}
+                            </div>`;
+                        });
+                    } else { 
+                        html += `<div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">No events currently assigned. Contact admin if this is a mistake.</div>`; 
+                    }
+                    html += `</div>`;
+                } else if (state.searchQuery.length > 0) {
+                    html += `<div class="text-center p-8 bg-slate-900/50 rounded-[2rem] border border-slate-800 text-slate-400 text-sm shadow-inner mt-4">
+                        <div class="text-4xl mb-2">🕵️‍♂️</div>
+                        No candidate found with Chest No <br><strong class="text-white text-lg mt-1 inline-block">"${state.searchQuery}"</strong>
+                    </div>`;
+                } else {
+                    html += `<div class="text-center p-8 text-slate-500 text-xs mt-10">Type your Chest Number above to instantly see your enrolled programs, points, and unlock your printable certificates!</div>`
+                }
+                content.innerHTML = html;
+            }
+        };
+    </script>
+</body>
+</html>
