@@ -193,13 +193,14 @@
                 ctx.textAlign = 'center';
                 
                 ctx.fillStyle = '#1e3a8a';
-                ctx.font = '900 65px "Cinzel"';
-                ctx.fillText('AAWAAZE FUNOON SEASON 04', canvas.width / 2, 600);
+                ctx.font = '900 55px "Cinzel"';
+                // Add maximum width constraint so it never crosses the border
+                ctx.fillText('AAWAAZE FUNOON SEASON 04', canvas.width / 2, 600, canvas.width - 240);
 
                 ctx.fillStyle = '#d4af37'; // Gold
-                ctx.font = 'bold 35px "Cinzel"';
+                ctx.font = 'bold 30px "Cinzel"';
                 ctx.letterSpacing = "8px";
-                ctx.fillText('CERTIFICATE OF ACHIEVEMENT', canvas.width / 2, 680);
+                ctx.fillText('CERTIFICATE OF ACHIEVEMENT', canvas.width / 2, 680, canvas.width - 240);
                 ctx.letterSpacing = "0px"; // reset
 
                 // 5. Content Text
@@ -210,12 +211,15 @@
                 // Candidate Name (Calligraphy Font)
                 ctx.fillStyle = '#0f172a';
                 ctx.font = 'normal 110px "Great Vibes"';
-                ctx.fillText(candName, canvas.width / 2, 960);
+                const maxNameWidth = canvas.width - 260; // Keep safely inside borders
+                ctx.fillText(candName, canvas.width / 2, 960, maxNameWidth);
                 
-                // Name Underline
+                // Name Underline (Dynamic width based on name length)
+                let nameMetrics = ctx.measureText(candName);
+                let underlineWidth = Math.min(nameMetrics.width + 60, maxNameWidth);
                 ctx.beginPath();
-                ctx.moveTo(canvas.width / 2 - 350, 990);
-                ctx.lineTo(canvas.width / 2 + 350, 990);
+                ctx.moveTo(canvas.width / 2 - (underlineWidth / 2), 990);
+                ctx.lineTo(canvas.width / 2 + (underlineWidth / 2), 990);
                 ctx.lineWidth = 2;
                 ctx.strokeStyle = '#d4af37';
                 ctx.stroke();
@@ -223,13 +227,13 @@
                 // Details
                 ctx.fillStyle = '#475569';
                 ctx.font = '30px "Playfair Display"';
-                ctx.fillText(`representing team ${candTeam} (${candCat})`, canvas.width / 2, 1070);
+                ctx.fillText(`representing team ${candTeam} (${candCat})`, canvas.width / 2, 1070, canvas.width - 240);
                 ctx.fillText('for securing', canvas.width / 2, 1140);
 
                 // Position
                 ctx.fillStyle = '#1e3a8a'; 
                 ctx.font = 'bold 55px "Cinzel"';
-                ctx.fillText(positionStr.toUpperCase(), canvas.width / 2, 1230);
+                ctx.fillText(positionStr.toUpperCase(), canvas.width / 2, 1230, canvas.width - 240);
 
                 ctx.fillStyle = '#475569';
                 ctx.font = 'italic 30px "Playfair Display"';
@@ -238,7 +242,7 @@
                 // Program Name
                 ctx.fillStyle = '#0f172a';
                 ctx.font = 'bold 45px "Cinzel"';
-                ctx.fillText(progName, canvas.width / 2, 1390);
+                ctx.fillText(progName, canvas.width / 2, 1390, canvas.width - 240);
 
                 // 6. Signatures area
                 ctx.fillStyle = '#0f172a';
@@ -250,7 +254,7 @@
                 
                 // Right Sig
                 ctx.beginPath(); ctx.moveTo(canvas.width - 500, 1600); ctx.lineTo(canvas.width - 250, 1600); ctx.stroke();
-                ctx.fillText('PRINCIPAL', canvas.width - 375, 1640);
+                ctx.fillText('USTHAD', canvas.width - 375, 1640);
 
                 // Trigger Download
                 const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
@@ -485,7 +489,7 @@
                         </div>
 
                         <!-- Add your actual Telegram Channel Link here -->
-                        <a href="https://t.me/+T3OBC3EeZCBlNjk1" target="_blank" class="w-full bg-[#0088cc] hover:bg-[#0077b3] text-white font-bold py-4 rounded-2xl shadow-[0_10px_20px_rgba(0,136,204,0.3)] flex items-center justify-center gap-3 transition active:scale-95 border border-[#0099e6]">
+                        <a href="https://t.me/+T3OBC3EeZCBlNjk1" target="_blank" class="w-full bg-[#0088cc] hover:bg-[#0077b3] text-white font-     py-4 rounded-2xl shadow-[0_10px_20px_rgba(0,136,204,0.3)] flex items-center justify-center gap-3 transition active:scale-95 border border-[#0099e6]">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.18 3.44-.49.33-.93.5-1.33.49-.44-.01-1.28-.24-1.9-.44-.77-.24-1.38-.37-1.33-.78.03-.21.32-.43.88-.67 3.45-1.5 5.75-2.5 6.9-2.98 3.28-1.38 3.96-1.62 4.41-1.63.1 0 .32.02.44.11.1.08.13.19.14.28.01.07.01.14 0 .2z"/></svg>
                             Join Official Telegram Channel
                         </a>
