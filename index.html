@@ -35,9 +35,29 @@
             font-family: 'Anek Malayalam', sans-serif;
             background-color: #020617;
             color: #f8fafc;
+    <!-- Custom Viewport Meta for All Mobile Browsers -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Portal - Urava S4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Premium Fonts for UI and Certificates -->
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;600;700;800&family=Outfit:wght@400;700;900&family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Anek Malayalam', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-y;
+            overflow-x: hidden;
         }
         .num-font { font-family: 'Outfit', sans-serif; }
         .nav-active { color: #38bdf8; transform: translateY(-2px); }
@@ -51,30 +71,23 @@
             animation: antiGravityFloat 7s ease-in-out 1.5s infinite;
         }
         .ag-card {
-            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.96));
             border: 1px solid rgba(56, 189, 248, 0.18);
             box-shadow: 0 18px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(56, 189, 248, 0.08);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        @media (hover: hover) {
-            .ag-card:hover {
-                transform: translateY(-4px);
-                border-color: rgba(56, 189, 248, 0.35);
-                box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.85), 0 0 30px 0px rgba(56, 189, 248, 0.15);
-            }
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
         @keyframes antiGravityFloat {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+            50% { transform: translateY(-4px); }
         }
         
         /* Animations */
         .toast-slide { animation: slideDown 0.4s ease forwards; }
-        .fade-in { animation: fadeIn 0.3s ease forwards; }
+        .fade-in { animation: fadeIn 0.25s ease forwards; }
         @keyframes slideDown { from { transform: translateY(-150%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Fit-to-screen responsive table cells for any device */
+        /* Fit-to-screen responsive table cells for any device without nested scroll traps */
         .fit-table {
             width: 100%;
             table-layout: fixed;
@@ -83,19 +96,6 @@
         .fit-table th, .fit-table td {
             word-wrap: break-word;
             overflow-wrap: break-word;
-        }
-
-        /* Clean scrollbars across mobile & desktop */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        
-        /* Internal scrollable table body when there are many programs */
-        .table-scroll-box {
-            max-height: 65vh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-y;
         }
     </style>
 </head>
@@ -148,11 +148,22 @@
             </nav>
 
             <div class="flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-500/20 rounded-full shrink-0">
-                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
-                <span class="text-[9px] sm:text-[10px] text-red-400 font-bold uppercase tracking-widest">Live</span>
+                <span id="liveDot" class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
+                <span id="liveStatusText" class="text-[9px] sm:text-[10px] text-red-400 font-bold uppercase tracking-widest">Live</span>
             </div>
         </div>
     </header>
+
+    <!-- Database / Network Warning Banner for Other Phones -->
+    <div id="dbErrorBanner" class="hidden max-w-7xl mx-auto mt-3 px-3 sm:px-6 lg:px-8 relative z-30">
+        <div class="bg-amber-950/90 border border-amber-500/50 rounded-2xl p-3.5 text-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-lg">
+            <div>
+                <strong class="text-amber-400 block sm:inline">⚠️ Connection Notice:</strong>
+                <span id="dbErrorMsg">Connecting to fallback database...</span>
+            </div>
+            <button onclick="window.location.reload()" class="bg-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-[10px] uppercase tracking-wider shrink-0 self-start sm:self-auto">Retry</button>
+        </div>
+    </div>
 
     <!-- Custom Toast Notification System -->
     <div id="liveToast" class="fixed top-16 sm:top-20 left-3 right-3 sm:left-auto sm:right-6 sm:w-96 bg-gradient-to-r from-sky-600 to-indigo-600 text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl z-[100] hidden border border-sky-400/50 flex-col gap-1 cursor-pointer transition-all" onclick="this.style.display='none'">
@@ -194,7 +205,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // UPDATED TO NEW PRIMARY DATABASE (fest-66fe3)
+        // PRIMARY DATABASE (fest-66fe3)
         const firebaseConfig = {
             apiKey: "AIzaSyDy4XPx_UwsoLzh3PTCgfsccZxz5Oc80n8",
             authDomain: "fest-66fe3.firebaseapp.com",
@@ -204,16 +215,31 @@
             appId: "1:1044450457376:web:94c5aa76b0bf7a2fc20945",
             measurementId: "G-47FEMSFRCH"
         };
+
+        // FALLBACK LEGACY DATABASE (pullani-6a39b) - Used automatically if new DB blocks other phones
+        const legacyFirebaseConfig = {
+            apiKey: "AIzaSyCIbvk4teIJ6AlfaXbFgDMgCWpnekNwmx8",
+            authDomain: "pullani-6a39b.firebaseapp.com",
+            projectId: "pullani-6a39b",
+            storageBucket: "pullani-6a39b.firebasestorage.app",
+            messagingSenderId: "617480764841",
+            appId: "1:617480764841:web:c22959689a7003a31498b8"
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        const legacyApp = initializeApp(legacyFirebaseConfig, "legacyPortalApp");
+        const legacyAuth = getAuth(legacyApp);
+        const legacyDb = getFirestore(legacyApp);
+
         const festId = 'urava-s4-fest';
 
         // Read QR Code URL parameter (?c=J101 or ?chest=J101)
         const urlParams = new URLSearchParams(window.location.search);
         const qrCandParam = urlParams.get('c') || urlParams.get('chest') || '';
 
-        // Automatic Device Detection Engine
         const detectDeviceType = () => {
             const w = window.innerWidth;
             if (w < 640) return 'mobile';
@@ -228,9 +254,12 @@
             tab: qrCandParam ? 'search' : 'home', 
             searchQuery: qrCandParam,
             pointTableFilter: 'All',
-            device: detectDeviceType()
+            device: detectDeviceType(),
+            usingFallbackDb: false
         };
         let initialLoad = true;
+        let listenersAttached = false;
+        let fallbackAttached = false;
 
         const updateDeviceBadge = () => {
             const newDevice = detectDeviceType();
@@ -260,7 +289,7 @@
             document.getElementById('toastMsg').innerText = msg;
             toast.style.display = 'flex'; 
             toast.classList.remove('toast-slide');
-            void toast.offsetWidth; // trigger reflow
+            void toast.offsetWidth;
             toast.classList.add('toast-slide');
             setTimeout(()=> { toast.style.display = 'none'; }, 5000);
         };
@@ -274,20 +303,72 @@
             if(s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } 
         };
 
+        // Automatic Fallback to Legacy DB if Primary DB has strict rules or is empty on other phones
+        const attachFallbackListeners = (reason) => {
+            if (fallbackAttached) return;
+            fallbackAttached = true;
+            state.usingFallbackDb = true;
+            console.warn("Switching to fallback database:", reason);
+
+            signInAnonymously(legacyAuth).catch(() => {});
+
+            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
+                if (state.programs.length === 0) {
+                    snap.docs.forEach(d => { if(d.id === 'config') state.programs = d.data().programs || []; });
+                    renderApp();
+                }
+            }, () => {});
+
+            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
+                if (state.candidates.length === 0) {
+                    state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderApp();
+                }
+            }, () => {});
+
+            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
+                if (state.results.length === 0) {
+                    state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp);
+                    renderApp();
+                }
+            }, () => {});
+        };
+
         const attachPortalListeners = () => {
+            if (listenersAttached) return;
+            listenersAttached = true;
+
             onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
-                snap.docs.forEach(d => { if(d.id === 'config') state.programs = d.data().programs || []; }); 
-                renderApp();
-            }, (err) => console.warn("Settings sync notice:", err));
+                let foundProgs = [];
+                snap.docs.forEach(d => { if(d.id === 'config') foundProgs = d.data().programs || []; });
+                if (foundProgs.length > 0) {
+                    state.programs = foundProgs;
+                    renderApp();
+                } else {
+                    attachFallbackListeners("Primary DB has 0 programs");
+                }
+            }, (err) => {
+                console.warn("Primary Settings sync error:", err);
+                attachFallbackListeners(err.message);
+            });
 
             onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
-                state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
-                renderApp();
-            }, (err) => console.warn("Candidates sync notice:", err));
+                if (snap.docs.length > 0) {
+                    state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
+                    renderApp();
+                } else {
+                    attachFallbackListeners("Primary DB has 0 candidates");
+                }
+            }, (err) => {
+                console.warn("Primary Candidates sync error:", err);
+                attachFallbackListeners(err.message);
+            });
 
             onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
-                state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); 
-                renderApp();
+                if (snap.docs.length > 0) {
+                    state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); 
+                    renderApp();
+                }
                 
                 if(!initialLoad) {
                     snap.docChanges().forEach((change) => {
@@ -298,10 +379,22 @@
                     });
                 }
                 setTimeout(() => { initialLoad = false; }, 2000);
-            }, (err) => console.warn("Results sync notice:", err));
+            }, (err) => {
+                console.warn("Primary Results sync error:", err);
+                attachFallbackListeners(err.message);
+            });
         };
 
-        signInAnonymously(auth).catch(() => {
+        // 1. Render UI immediately so other phones NEVER get stuck on "Syncing Live Data..."
+        setTimeout(() => {
+            if (window.renderApp) window.renderApp();
+        }, 50);
+
+        // 2. Attach listeners right away AND on auth state change so disabled Anonymous Auth never blocks loading
+        attachPortalListeners();
+
+        signInAnonymously(auth).catch((err) => {
+            console.warn("Anonymous Auth not enabled on primary project:", err.message);
             attachPortalListeners();
         });
 
@@ -549,7 +642,7 @@
                                 </div>
                             </div>
 
-                            <div class="w-full rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950/90 table-scroll-box">
+                            <div class="w-full rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950/90 overflow-hidden">
                                 <table class="fit-table text-left">
                                     <colgroup>
                                         <col style="width: 40%;">
@@ -560,7 +653,7 @@
                                         <col style="width: 10%;">
                                         <col style="width: 10%;">
                                     </colgroup>
-                                    <thead class="sticky top-0 z-20 shadow-md">
+                                    <thead>
                                         <!-- Top Row: Program Name on Left + Two Team Names -->
                                         <tr class="bg-slate-900 border-b border-slate-800 text-[9px] sm:text-xs font-black uppercase tracking-wider">
                                             <th rowspan="2" class="py-2 sm:py-3 px-1.5 sm:px-3 text-slate-300 border-r border-slate-800 align-middle leading-tight bg-slate-900">${title}<br><span class="text-[8px] sm:text-[10px] text-slate-500 font-bold">Programs</span></th>
@@ -580,7 +673,7 @@
                                     <tbody class="divide-y divide-slate-800/60">
                                         ${rowsHtml}
                                     </tbody>
-                                    <tfoot class="sticky bottom-0 z-20 shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
+                                    <tfoot>
                                         <tr class="bg-slate-900 border-t border-slate-700 font-black text-[9px] sm:text-xs num-font">
                                             <td class="py-2 px-1.5 sm:px-3 text-slate-300 uppercase text-[8px] sm:text-[10px] tracking-wider border-r border-slate-800 leading-tight">Place Totals</td>
                                             <td class="py-2 px-0.5 text-center text-yellow-400 border-r border-slate-800/60">${secTotals.m1}</td>
