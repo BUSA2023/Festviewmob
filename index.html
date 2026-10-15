@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+.<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Main Content -->
-    <main class="p-4 relative z-10" id="appContent">
+    <main class="p-4 relative z-10 max-w-lg mx-auto" id="appContent">
         <div class="flex justify-center items-center h-40 text-slate-500 text-sm">
             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             Syncing Live Data...
@@ -92,21 +92,32 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Connects directly to the user's specific Firebase project
+        // UPDATED TO NEW PRIMARY DATABASE (fest-66fe3)
         const firebaseConfig = {
-            apiKey: "AIzaSyCIbvk4teIJ6AlfaXbFgDMgCWpnekNwmx8",
-            authDomain: "pullani-6a39b.firebaseapp.com",
-            projectId: "pullani-6a39b",
-            storageBucket: "pullani-6a39b.firebasestorage.app",
-            messagingSenderId: "617480764841",
-            appId: "1:617480764841:web:c22959689a7003a31498b8"
+            apiKey: "AIzaSyDy4XPx_UwsoLzh3PTCgfsccZxz5Oc80n8",
+            authDomain: "fest-66fe3.firebaseapp.com",
+            projectId: "fest-66fe3",
+            storageBucket: "fest-66fe3.firebasestorage.app",
+            messagingSenderId: "1044450457376",
+            appId: "1:1044450457376:web:94c5aa76b0bf7a2fc20945",
+            measurementId: "G-47FEMSFRCH"
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const festId = 'urava-s4-fest';
 
-        let state = { programs: [], candidates: [], results: [], tab: 'home', searchQuery: '' };
+        // Read QR Code URL parameter (?c=J101 or ?chest=J101)
+        const urlParams = new URLSearchParams(window.location.search);
+        const qrCandParam = urlParams.get('c') || urlParams.get('chest') || '';
+
+        let state = { 
+            programs: [], 
+            candidates: [], 
+            results: [], 
+            tab: qrCandParam ? 'search' : 'home', 
+            searchQuery: qrCandParam 
+        };
         let initialLoad = true;
 
         window.showAppToast = (header, msg, icon="✨") => {
@@ -129,29 +140,41 @@
             if(s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } 
         };
 
-        signInAnonymously(auth).catch(console.error);
+        const attachPortalListeners = () => {
+            onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
+                snap.docs.forEach(d => { if(d.id === 'config') state.programs = d.data().programs || []; }); 
+                renderApp();
+            }, (err) => console.warn("Settings sync notice:", err));
+
+            onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
+                state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
+                renderApp();
+            }, (err) => console.warn("Candidates sync notice:", err));
+
+            onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
+                state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); 
+                renderApp();
+                
+                if(!initialLoad) {
+                    snap.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const prog = state.programs.find(p => p.id === change.doc.data().progId);
+                            if(prog) window.showAppToast("New Result Published!", prog.name, "🏆");
+                        }
+                    });
+                }
+                setTimeout(() => { initialLoad = false; }, 2000);
+            }, (err) => console.warn("Results sync notice:", err));
+        };
+
+        signInAnonymously(auth).catch(() => {
+            // Fallback if anonymous auth isn't enabled in Firebase console yet
+            attachPortalListeners();
+        });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
-                    snap.docs.forEach(d => { if(d.id === 'config') state.programs = d.data().programs || []; }); renderApp();
-                });
-                onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
-                    state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderApp();
-                });
-                onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
-                    state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); renderApp();
-                    
-                    if(!initialLoad) {
-                        snap.docChanges().forEach((change) => {
-                            if (change.type === "added") {
-                                const prog = state.programs.find(p => p.id === change.doc.data().progId);
-                                if(prog) window.showAppToast("New Result Published!", prog.name, "🏆");
-                            }
-                        });
-                    }
-                    setTimeout(() => { initialLoad = false; }, 2000);
-                });
+                attachPortalListeners();
             }
         });
 
@@ -166,14 +189,13 @@
             canvas.width = 1240; 
             canvas.height = 1754;
 
-            // Load the new specific logo requested
             const logo = new Image();
             logo.crossOrigin = "Anonymous";
             logo.src = "https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261011_193849.png";
             
             logo.onload = () => {
                 // 1. Draw Background
-                ctx.fillStyle = '#f8fafc'; // Off-white luxury background
+                ctx.fillStyle = '#f8fafc';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 // 2. Draw Decorative Premium Borders
@@ -194,27 +216,26 @@
                 
                 ctx.fillStyle = '#1e3a8a';
                 ctx.font = '900 55px "Cinzel"';
-                // Add maximum width constraint so it never crosses the border
                 ctx.fillText('AAWAAZE FUNOON SEASON 04', canvas.width / 2, 600, canvas.width - 240);
 
                 ctx.fillStyle = '#d4af37'; // Gold
                 ctx.font = 'bold 30px "Cinzel"';
                 ctx.letterSpacing = "8px";
                 ctx.fillText('CERTIFICATE OF ACHIEVEMENT', canvas.width / 2, 680, canvas.width - 240);
-                ctx.letterSpacing = "0px"; // reset
+                ctx.letterSpacing = "0px";
 
                 // 5. Content Text
                 ctx.fillStyle = '#475569';
                 ctx.font = 'italic 35px "Playfair Display"';
                 ctx.fillText('This certificate is proudly presented to', canvas.width / 2, 820);
 
-                // Candidate Name (Modern Professional Font)
+                // Candidate Name
                 ctx.fillStyle = '#0f172a';
                 ctx.font = '900 90px "Outfit"';
-                const maxNameWidth = canvas.width - 260; // Keep safely inside borders
+                const maxNameWidth = canvas.width - 260;
                 ctx.fillText(candName, canvas.width / 2, 950, maxNameWidth);
                 
-                // Name Underline (Dynamic width based on name length)
+                // Name Underline
                 let nameMetrics = ctx.measureText(candName);
                 let underlineWidth = Math.min(nameMetrics.width + 60, maxNameWidth);
                 ctx.beginPath();
@@ -248,11 +269,9 @@
                 ctx.fillStyle = '#0f172a';
                 ctx.font = 'bold 22px "Cinzel"';
                 
-                // Left Sig
                 ctx.beginPath(); ctx.moveTo(250, 1600); ctx.lineTo(500, 1600); ctx.stroke();
                 ctx.fillText('FEST COORDINATOR', 375, 1640);
                 
-                // Right Sig
                 ctx.beginPath(); ctx.moveTo(canvas.width - 500, 1600); ctx.lineTo(canvas.width - 250, 1600); ctx.stroke();
                 ctx.fillText('PRINCIPAL', canvas.width - 375, 1640);
 
@@ -274,7 +293,6 @@
         };
 
         window.renderApp = () => {
-            // Update Nav Colors
             ['home', 'results', 'search', 'gallery'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
                 if(el) el.className = `flex flex-col items-center p-2 w-16 transition-colors ${state.tab === t ? 'nav-active' : 'nav-inactive'}`;
@@ -325,8 +343,8 @@
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-xl border border-indigo-500/50">🔍</div>
                             <div>
-                                <h4 class="text-white font-bold text-sm">Download Your Certificate</h4>
-                                <p class="text-xs text-slate-400">Head to the Search tab, enter your Chest No, and instantly download high-quality certificates for your winning events!</p>
+                                <h4 class="text-white font-bold text-sm">Scan ID QR or Search Chest No</h4>
+                                <p class="text-xs text-slate-400">Scan the QR code on your ID card or head to the Search tab to view your live results and download digital certificates!</p>
                             </div>
                         </div>
                     </div>
@@ -375,19 +393,18 @@
             }
 
             if (state.tab === 'search') {
-                // Notice the inputmode="numeric" and placeholder telling them to just type numbers!
                 let html = `
                     <div class="fade-in">
                         <h2 class="text-white font-black text-2xl mb-4 tracking-tight">Candidate Profile</h2>
                         <div class="relative mb-6">
-                            <input type="text" inputmode="numeric" pattern="[0-9]*" id="searchInp" autocomplete="off" placeholder="Type ONLY Numbers (e.g. 101)..." value="${state.searchQuery}" oninput="window.updateSearch(this.value)" class="w-full bg-slate-900 border-2 border-slate-700 rounded-2xl pl-5 pr-12 py-4 text-white outline-none focus:border-sky-500 num-font text-xl shadow-inner transition-colors uppercase">
+                            <input type="text" id="searchInp" autocomplete="off" placeholder="Enter Chest No (e.g. J101 or 101)..." value="${state.searchQuery}" oninput="window.updateSearch(this.value)" class="w-full bg-slate-900 border-2 border-slate-700 rounded-2xl pl-5 pr-12 py-4 text-white outline-none focus:border-sky-500 num-font text-xl shadow-inner transition-colors uppercase">
                             <div class="absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xl pointer-events-none">🔍</div>
                         </div>
                     </div>
                 `;
                 
                 const q = state.searchQuery.trim().toLowerCase();
-                // Smart Search: if they type "101", it matches "101", "j101", or "s101" automatically.
+                // Smart Search: matches exact Chest No (e.g. "j101") or numeric shorthand ("101")
                 const c = state.candidates.find(x => {
                     const reg = String(x.regNo).trim().toLowerCase();
                     return reg === q || reg === 'j' + q || reg === 's' + q;
@@ -468,7 +485,7 @@
                         No candidate found for <br><strong class="text-white text-lg mt-1 inline-block">"${state.searchQuery}"</strong>
                     </div>`;
                 } else {
-                    html += `<div class="fade-in text-center p-8 text-slate-500 text-xs mt-10">Type your Numbers above (e.g., 101) to instantly see your enrolled programs, points, and unlock your printable certificates!</div>`
+                    html += `<div class="fade-in text-center p-8 text-slate-500 text-xs mt-10">Type your Chest No above (e.g., J101 or 101) to instantly see your enrolled programs, points, and unlock your printable certificates!</div>`;
                 }
                 content.innerHTML = html;
             }
@@ -488,7 +505,6 @@
                             <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_191200.png" class="rounded-2xl w-full h-32 sm:h-40 object-cover border border-slate-700/50 shadow-md bg-black">
                         </div>
 
-                        <!-- Add your actual Telegram Channel Link here -->
                         <a href="https://t.me" target="_blank" class="w-full bg-[#0088cc] hover:bg-[#0077b3] text-white font-bold py-4 rounded-2xl shadow-[0_10px_20px_rgba(0,136,204,0.3)] flex items-center justify-center gap-3 transition active:scale-95 border border-[#0099e6]">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.18 3.44-.49.33-.93.5-1.33.49-.44-.01-1.28-.24-1.9-.44-.77-.24-1.38-.37-1.33-.78.03-.21.32-.43.88-.67 3.45-1.5 5.75-2.5 6.9-2.98 3.28-1.38 3.96-1.62 4.41-1.63.1 0 .32.02.44.11.1.08.13.19.14.28.01.07.01.14 0 .2z"/></svg>
                             Join Official Telegram Channel
