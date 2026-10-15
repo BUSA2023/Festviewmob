@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Candidate Portal - Urava S4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -10,24 +10,80 @@
     <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;600;700;800&family=Outfit:wght@400;700;900&family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Great+Vibes&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Anek Malayalam', sans-serif; background-color: #020617; color: #f8fafc; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        :root {
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            font-family: 'Anek Malayalam', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+            scroll-behavior: smooth;
+        }
         .num-font { font-family: 'Outfit', sans-serif; }
-        .nav-active { color: #38bdf8; }
+        .nav-active { color: #38bdf8; transform: translateY(-2px); }
         .nav-inactive { color: #64748b; }
+        
+        /* Anti-Gravity Floating UI Setup */
+        .ag-float {
+            animation: antiGravityFloat 6s ease-in-out infinite;
+            will-change: transform;
+        }
+        .ag-float-delayed {
+            animation: antiGravityFloat 7s ease-in-out 1.5s infinite;
+            will-change: transform;
+        }
+        .ag-card {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.85), rgba(2, 6, 23, 0.92));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(56, 189, 248, 0.16);
+            box-shadow: 0 18px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(56, 189, 248, 0.08);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        @media (hover: hover) {
+            .ag-card:hover {
+                transform: translateY(-4px);
+                border-color: rgba(56, 189, 248, 0.35);
+                box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.85), 0 0 30px 0px rgba(56, 189, 248, 0.15);
+            }
+        }
+        @keyframes antiGravityFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
         
         /* Animations */
         .toast-slide { animation: slideDown 0.4s ease forwards; }
         .fade-in { animation: fadeIn 0.3s ease forwards; }
         @keyframes slideDown { from { transform: translateY(-150%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Fit-to-screen responsive table cells for any device */
+        .fit-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+        .fit-table th, .fit-table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
         /* Clean scrollbars across mobile & desktop */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-950 pb-24 md:pb-12 relative min-h-screen flex flex-col">
+<body class="bg-slate-950 pb-28 md:pb-12 relative min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
 
     <!-- Preload fonts for Canvas so they don't pop-in late -->
     <div style="visibility: hidden; position: absolute; width: 0; height: 0; overflow: hidden;">
@@ -36,34 +92,41 @@
         <span style="font-family: 'Great Vibes';">preload</span>
     </div>
 
-    <!-- Background Watermark -->
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
-        <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%204-01.png" class="w-full max-w-4xl h-auto object-contain">
+    <!-- Ambient Anti-Gravity Background Orbs & Watermark -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/3 -right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="inset-0 opacity-[0.03] flex items-center justify-center w-full h-full">
+            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%204-01.png" class="w-4/5 max-w-3xl h-auto object-contain">
+        </div>
     </div>
 
-    <!-- Header (Adaptive for Phone, Tablet & PC) -->
-    <header class="bg-slate-900/85 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_191200.png" class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl shadow-md border border-slate-700/50 object-cover">
-                <div>
-                    <h1 class="text-base sm:text-xl font-black text-white tracking-tight leading-none mb-0.5" style="font-family: 'Cinzel', serif;">AAWAAZE FUNOON S04</h1>
-                    <p class="text-[9px] sm:text-[11px] text-sky-400 font-bold uppercase tracking-widest leading-none">Live Results & Candidate Portal</p>
+    <!-- Header (Auto-Adaptive for Phone, Tablet & PC) -->
+    <header class="bg-slate-900/85 backdrop-blur-2xl border-b border-slate-800/80 sticky top-0 z-40 shadow-xl w-full">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex justify-between items-center gap-2">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_191200.png" class="h-9 w-9 sm:h-11 sm:w-11 rounded-xl shadow-md border border-slate-700/50 object-cover shrink-0">
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-lg lg:text-xl font-black text-white tracking-tight leading-none mb-0.5 truncate" style="font-family: 'Cinzel', serif;">AAWAAZE FUNOON S04</h1>
+                    <div class="flex items-center gap-1.5">
+                        <p class="text-[8px] sm:text-[10px] text-sky-400 font-bold uppercase tracking-widest leading-none truncate">Live Results Portal</p>
+                        <span id="deviceBadge" class="text-[8px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-bold uppercase border border-slate-700 hidden sm:inline-block">Auto-Fit</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Desktop / Tablet Top Navigation -->
-            <nav class="hidden md:flex items-center gap-1 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800">
-                <button onclick="switchTab('home')" id="dnav-home" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+            <nav class="hidden md:flex items-center gap-1 bg-slate-950/90 p-1.5 rounded-2xl border border-slate-800/90 shadow-inner shrink-0">
+                <button onclick="switchTab('home')" id="dnav-home" class="px-3.5 lg:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
                     <span>📊</span><span>Dashboard</span>
                 </button>
-                <button onclick="switchTab('results')" id="dnav-results" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                <button onclick="switchTab('results')" id="dnav-results" class="px-3.5 lg:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
                     <span>🏆</span><span>Results</span>
                 </button>
-                <button onclick="switchTab('search')" id="dnav-search" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
-                    <span>🔍</span><span>Candidate Search</span>
+                <button onclick="switchTab('search')" id="dnav-search" class="px-3.5 lg:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span>🔍</span><span>Profile & Certs</span>
                 </button>
-                <button onclick="switchTab('gallery')" id="dnav-gallery" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                <button onclick="switchTab('gallery')" id="dnav-gallery" class="px-3.5 lg:px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
                     <span>🖼️</span><span>Gallery</span>
                 </button>
             </nav>
@@ -76,34 +139,36 @@
     </header>
 
     <!-- Custom Toast Notification System -->
-    <div id="liveToast" class="fixed top-20 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 bg-gradient-to-r from-sky-600 to-indigo-600 text-white p-4 rounded-2xl shadow-2xl z-[100] hidden border border-sky-400/50 flex-col gap-1 cursor-pointer transition-all" onclick="this.style.display='none'">
+    <div id="liveToast" class="fixed top-16 sm:top-20 left-3 right-3 sm:left-auto sm:right-6 sm:w-96 bg-gradient-to-r from-sky-600 to-indigo-600 text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl z-[100] hidden border border-sky-400/50 flex-col gap-1 cursor-pointer transition-all" onclick="this.style.display='none'">
         <span id="toastHeader" class="text-[10px] font-black uppercase tracking-widest text-sky-200 flex items-center gap-1"><span>✨</span> Notification</span>
-        <span id="toastMsg" class="font-bold text-sm leading-tight">Message goes here</span>
+        <span id="toastMsg" class="font-bold text-xs sm:text-sm leading-tight">Message goes here</span>
     </div>
 
-    <!-- Main Content (Fluid container for Phone, Tablet & PC) -->
-    <main class="p-4 sm:p-6 lg:p-8 relative z-10 max-w-7xl w-full mx-auto flex-1" id="appContent">
+    <!-- Main Content (100% Fluid Container for Phone, Tablet & PC) -->
+    <main class="p-2.5 sm:p-5 lg:p-8 relative z-10 max-w-7xl w-full mx-auto flex-1" id="appContent">
         <div class="flex justify-center items-center h-40 text-slate-500 text-sm">
             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             Syncing Live Data...
         </div>
     </main>
 
-    <!-- Mobile Bottom Navigation (Hidden on Tablet/PC) -->
-    <nav class="md:hidden fixed bottom-0 w-full bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 p-2 pb-safe flex justify-around items-center z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
-        <button onclick="switchTab('home')" class="flex flex-col items-center p-2 w-16 transition-transform active:scale-95" id="nav-home">
-            <span class="text-2xl mb-1 drop-shadow-md">📊</span><span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
-        </button>
-        <button onclick="switchTab('results')" class="flex flex-col items-center p-2 w-16 transition-transform active:scale-95" id="nav-results">
-            <span class="text-2xl mb-1 drop-shadow-md">🏆</span><span class="text-[10px] font-bold uppercase tracking-wider">Results</span>
-        </button>
-        <button onclick="switchTab('search')" class="flex flex-col items-center p-2 w-16 transition-transform active:scale-95" id="nav-search">
-            <span class="text-2xl mb-1 drop-shadow-md">🔍</span><span class="text-[10px] font-bold uppercase tracking-wider">Search</span>
-        </button>
-        <button onclick="switchTab('gallery')" class="flex flex-col items-center p-2 w-16 transition-transform active:scale-95" id="nav-gallery">
-            <span class="text-2xl mb-1 drop-shadow-md">🖼️</span><span class="text-[10px] font-bold uppercase tracking-wider">Gallery</span>
-        </button>
-    </nav>
+    <!-- Anti-Gravity Floating Bottom Navigation Dock for Mobile & Small Screens -->
+    <div class="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-none" style="padding-bottom: var(--safe-bottom);">
+        <nav class="pointer-events-auto bg-slate-900/90 backdrop-blur-2xl border border-slate-700/80 rounded-2xl p-1.5 flex justify-around items-center shadow-[0_15px_35px_rgba(0,0,0,0.85)]">
+            <button onclick="switchTab('home')" class="flex flex-col items-center py-1.5 px-2 rounded-xl flex-1 transition-all active:scale-95" id="nav-home">
+                <span class="text-xl leading-none mb-1 drop-shadow">📊</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Points</span>
+            </button>
+            <button onclick="switchTab('results')" class="flex flex-col items-center py-1.5 px-2 rounded-xl flex-1 transition-all active:scale-95" id="nav-results">
+                <span class="text-xl leading-none mb-1 drop-shadow">🏆</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Results</span>
+            </button>
+            <button onclick="switchTab('search')" class="flex flex-col items-center py-1.5 px-2 rounded-xl flex-1 transition-all active:scale-95" id="nav-search">
+                <span class="text-xl leading-none mb-1 drop-shadow">🔍</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Profile</span>
+            </button>
+            <button onclick="switchTab('gallery')" class="flex flex-col items-center py-1.5 px-2 rounded-xl flex-1 transition-all active:scale-95" id="nav-gallery">
+                <span class="text-xl leading-none mb-1 drop-shadow">🖼️</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Gallery</span>
+            </button>
+        </nav>
+    </div>
 
     <!-- Hidden Canvas for Certificate Generation -->
     <canvas id="certCanvas" style="display:none;"></canvas>
@@ -132,15 +197,41 @@
         const urlParams = new URLSearchParams(window.location.search);
         const qrCandParam = urlParams.get('c') || urlParams.get('chest') || '';
 
+        // Automatic Device Detection Engine
+        const detectDeviceType = () => {
+            const w = window.innerWidth;
+            if (w < 640) return 'mobile';
+            if (w < 1024) return 'tablet';
+            return 'desktop';
+        };
+
         let state = { 
             programs: [], 
             candidates: [], 
             results: [], 
             tab: qrCandParam ? 'search' : 'home', 
             searchQuery: qrCandParam,
-            pointTableFilter: 'All'
+            pointTableFilter: 'All',
+            device: detectDeviceType()
         };
         let initialLoad = true;
+
+        const updateDeviceBadge = () => {
+            const newDevice = detectDeviceType();
+            const badge = document.getElementById('deviceBadge');
+            if (badge) {
+                const labels = { mobile: '📱 Mobile View', tablet: '📲 Tablet View', desktop: '💻 Desktop View' };
+                badge.innerText = labels[newDevice] || 'Auto-Fit';
+            }
+            if (state.device !== newDevice) {
+                state.device = newDevice;
+                if (window.renderApp) window.renderApp();
+            }
+        };
+
+        window.addEventListener('resize', updateDeviceBadge);
+        window.addEventListener('orientationchange', () => setTimeout(updateDeviceBadge, 150));
+        updateDeviceBadge();
 
         window.setPointFilter = (f) => {
             state.pointTableFilter = f;
@@ -195,7 +286,6 @@
         };
 
         signInAnonymously(auth).catch(() => {
-            // Fallback if anonymous auth isn't enabled in Firebase console yet
             attachPortalListeners();
         });
 
@@ -212,7 +302,7 @@
             const canvas = document.getElementById('certCanvas');
             const ctx = canvas.getContext('2d');
             
-            // Set A4 Dimensions (150 DPI to prevent mobile memory crashes)
+            // Set A4 Dimensions (150 DPI)
             canvas.width = 1240; 
             canvas.height = 1754;
 
@@ -221,48 +311,38 @@
             logo.src = "https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261011_193849.png";
             
             logo.onload = () => {
-                // 1. Draw Background
                 ctx.fillStyle = '#f8fafc';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // 2. Draw Decorative Premium Borders
                 ctx.lineWidth = 20;
-                ctx.strokeStyle = '#1e3a8a'; // Deep Blue
+                ctx.strokeStyle = '#1e3a8a'; 
                 ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
                 
                 ctx.lineWidth = 6;
-                ctx.strokeStyle = '#d4af37'; // Gold
+                ctx.strokeStyle = '#d4af37'; 
                 ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
                 ctx.strokeRect(92, 92, canvas.width - 184, canvas.height - 184);
 
-                // 3. Draw Logo
                 ctx.drawImage(logo, canvas.width / 2 - 200, 150, 400, 400);
 
-                // 4. Header Texts
                 ctx.textAlign = 'center';
-                
                 ctx.fillStyle = '#1e3a8a';
                 ctx.font = '900 55px "Cinzel"';
                 ctx.fillText('AAWAAZE FUNOON SEASON 04', canvas.width / 2, 600, canvas.width - 240);
 
-                ctx.fillStyle = '#d4af37'; // Gold
+                ctx.fillStyle = '#d4af37'; 
                 ctx.font = 'bold 30px "Cinzel"';
-                ctx.letterSpacing = "8px";
                 ctx.fillText('CERTIFICATE OF ACHIEVEMENT', canvas.width / 2, 680, canvas.width - 240);
-                ctx.letterSpacing = "0px";
 
-                // 5. Content Text
                 ctx.fillStyle = '#475569';
                 ctx.font = 'italic 35px "Playfair Display"';
                 ctx.fillText('This certificate is proudly presented to', canvas.width / 2, 820);
 
-                // Candidate Name
                 ctx.fillStyle = '#0f172a';
                 ctx.font = '900 90px "Outfit"';
                 const maxNameWidth = canvas.width - 260;
                 ctx.fillText(candName, canvas.width / 2, 950, maxNameWidth);
                 
-                // Name Underline
                 let nameMetrics = ctx.measureText(candName);
                 let underlineWidth = Math.min(nameMetrics.width + 60, maxNameWidth);
                 ctx.beginPath();
@@ -272,13 +352,11 @@
                 ctx.strokeStyle = '#d4af37';
                 ctx.stroke();
 
-                // Details
                 ctx.fillStyle = '#475569';
                 ctx.font = '30px "Playfair Display"';
                 ctx.fillText(`representing team ${candTeam} (${candCat})`, canvas.width / 2, 1070, canvas.width - 240);
                 ctx.fillText('for securing', canvas.width / 2, 1140);
 
-                // Position
                 ctx.fillStyle = '#1e3a8a'; 
                 ctx.font = 'bold 55px "Cinzel"';
                 ctx.fillText(positionStr.toUpperCase(), canvas.width / 2, 1230, canvas.width - 240);
@@ -287,22 +365,17 @@
                 ctx.font = 'italic 30px "Playfair Display"';
                 ctx.fillText('in the event', canvas.width / 2, 1310);
 
-                // Program Name
                 ctx.fillStyle = '#0f172a';
                 ctx.font = 'bold 45px "Cinzel"';
                 ctx.fillText(progName, canvas.width / 2, 1390, canvas.width - 240);
 
-                // 6. Signatures area
                 ctx.fillStyle = '#0f172a';
                 ctx.font = 'bold 22px "Cinzel"';
-                
                 ctx.beginPath(); ctx.moveTo(250, 1600); ctx.lineTo(500, 1600); ctx.stroke();
                 ctx.fillText('FEST COORDINATOR', 375, 1640);
-                
                 ctx.beginPath(); ctx.moveTo(canvas.width - 500, 1600); ctx.lineTo(canvas.width - 250, 1600); ctx.stroke();
                 ctx.fillText('PRINCIPAL', canvas.width - 375, 1640);
 
-                // Trigger Download
                 const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
                 const a = document.createElement('a');
                 a.href = dataUrl;
@@ -315,16 +388,16 @@
             };
 
             logo.onerror = () => {
-                window.showAppToast('Error', 'Could not load certificate assets. Check internet.', '❌');
+                window.showAppToast('Error', 'Could not load certificate assets.', '❌');
             };
         };
 
         window.renderApp = () => {
             ['home', 'results', 'search', 'gallery'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
-                if(el) el.className = `flex flex-col items-center p-2 w-16 transition-colors ${state.tab === t ? 'nav-active' : 'nav-inactive'}`;
+                if(el) el.className = `flex flex-col items-center p-1.5 w-16 transition-colors ${state.tab === t ? 'nav-active' : 'nav-inactive'}`;
                 const del = document.getElementById('dnav-' + t);
-                if(del) del.className = `px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${state.tab === t ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30 shadow' : 'text-slate-400 hover:text-white hover:bg-slate-900'}`;
+                if(del) del.className = `px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${state.tab === t ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30 shadow' : 'text-slate-400 hover:text-white hover:bg-slate-900'}`;
             });
 
             const content = document.getElementById('appContent');
@@ -383,9 +456,11 @@
                 const srQazwini = detailedStats['Senior']['Total']['Al-Qazwini'];
                 const srDiff = Math.abs(srMasudi - srQazwini);
 
+                const isMobile = state.device === 'mobile';
+
                 // Helper to build each Program Table (Junior Stage, Junior Non-Stage, Senior Stage, Senior Non-Stage)
+                // Fits 100% inside mobile, tablet, and desktop screens without horizontal scrollbars
                 const buildProgramSectionTable = (cat, type, title, badgeColor) => {
-                    // Get published results for this category & type
                     const sectionProgs = state.programs.filter(p => p.cat === cat && p.type === type);
                     let rowsHtml = '';
                     let secTotals = {
@@ -422,21 +497,21 @@
                         secTotals.q1 += q1; secTotals.q2 += q2; secTotals.q3 += q3; secTotals.qSum += (q1 + q2 + q3);
 
                         rowsHtml += `
-                            <tr class="hover:bg-slate-900/60 transition-colors">
-                                <td class="py-2.5 px-3 font-bold text-slate-200 border-r border-slate-800/80">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span>${prog.progNo ? `<span class="text-sky-400 font-mono text-[10px] mr-1">#${prog.progNo}</span>` : ''}${prog.name}</span>
-                                        ${!res ? '<span class="text-[9px] font-semibold text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 shrink-0">Pending</span>' : ''}
+                            <tr class="hover:bg-slate-900/70 transition-colors">
+                                <td class="py-2 px-1.5 sm:py-2.5 sm:px-3 font-bold text-slate-200 border-r border-slate-800/80 leading-tight">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5 sm:gap-2">
+                                        <span class="text-[10px] sm:text-xs break-words">${prog.progNo ? `<span class="text-sky-400 font-mono text-[9px] sm:text-[10px] mr-1">#${prog.progNo}</span>` : ''}${prog.name}</span>
+                                        ${!res ? '<span class="text-[8px] sm:text-[9px] font-semibold text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800 w-fit shrink-0">Pending</span>' : ''}
                                     </div>
                                 </td>
                                 <!-- Al-Masūdi 1st, 2nd, 3rd -->
-                                <td class="py-2.5 px-1.5 text-center num-font font-bold ${m1 > 0 ? 'text-yellow-400 bg-sky-950/20' : 'text-slate-600'} border-r border-slate-800/40">${m1 || '-'}</td>
-                                <td class="py-2.5 px-1.5 text-center num-font font-bold ${m2 > 0 ? 'text-slate-200 bg-sky-950/20' : 'text-slate-600'} border-r border-slate-800/40">${m2 || '-'}</td>
-                                <td class="py-2.5 px-1.5 text-center num-font font-bold ${m3 > 0 ? 'text-amber-500 bg-sky-950/20' : 'text-slate-600'} border-r border-slate-700">${m3 || '-'}</td>
+                                <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${m1 > 0 ? 'text-yellow-400 bg-sky-950/30' : 'text-slate-600'} border-r border-slate-800/40">${m1 || '-'}</td>
+                                <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${m2 > 0 ? 'text-slate-200 bg-sky-950/30' : 'text-slate-600'} border-r border-slate-800/40">${m2 || '-'}</td>
+                                <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${m3 > 0 ? 'text-amber-500 bg-sky-950/30' : 'text-slate-600'} border-r border-slate-700">${m3 || '-'}</td>
                                 <!-- Al-Qazwini 1st, 2nd, 3rd -->
-                                <td class="py-2.5 px-1.5 text-center num-font font-bold ${q1 > 0 ? 'text-yellow-400 bg-emerald-950/20' : 'text-slate-600'} border-r border-slate-800/40">${q1 || '-'}</td>
-                                <td class="py-2.5 px-1.5 text-center num-font font-bold ${q2 > 0 ? 'text-slate-200 bg-emerald-950/20' : 'text-slate-600'} border-r border-slate-800/40">${q2 || '-'}</td>
-                                <td class="py-2.5 px-1.5 text-center num-font font-bold ${q3 > 0 ? 'text-amber-500 bg-emerald-950/20' : 'text-slate-600'}">${q3 || '-'}</td>
+                                <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${q1 > 0 ? 'text-yellow-400 bg-emerald-950/30' : 'text-slate-600'} border-r border-slate-800/40">${q1 || '-'}</td>
+                                <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${q2 > 0 ? 'text-slate-200 bg-emerald-950/30' : 'text-slate-600'} border-r border-slate-800/40">${q2 || '-'}</td>
+                                <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${q3 > 0 ? 'text-amber-500 bg-emerald-950/30' : 'text-slate-600'}">${q3 || '-'}</td>
                             </tr>
                         `;
                     });
@@ -446,54 +521,63 @@
                     }
 
                     return `
-                        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl backdrop-blur-md mb-5">
-                            <div class="flex justify-between items-center mb-3 px-1">
-                                <h4 class="text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full ${badgeColor}"></span>
+                        <div class="ag-card rounded-2xl sm:rounded-3xl p-2.5 sm:p-5 mb-4 sm:mb-5">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-2.5 px-1">
+                                <h4 class="text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full ${badgeColor} shrink-0"></span>
                                     <span>${title}</span>
                                 </h4>
-                                <div class="flex items-center gap-3 text-[10px] sm:text-xs font-extrabold num-font">
-                                    <span class="text-sky-400 bg-sky-950/50 border border-sky-500/30 px-2.5 py-0.5 rounded-full">Al-Masūdi: ${secTotals.mSum}</span>
-                                    <span class="text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">Al-Qazwini: ${secTotals.qSum}</span>
+                                <div class="flex items-center gap-1.5 sm:gap-2.5 text-[9px] sm:text-xs font-extrabold num-font">
+                                    <span class="text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-full">Al-Masūdi: ${secTotals.mSum}</span>
+                                    <span class="text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">Al-Qazwini: ${secTotals.qSum}</span>
                                 </div>
                             </div>
 
-                            <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/80">
-                                <table class="w-full text-left border-collapse min-w-[340px]">
+                            <div class="w-full rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950/90 overflow-hidden">
+                                <table class="fit-table text-left">
+                                    <colgroup>
+                                        <col style="width: 40%;">
+                                        <col style="width: 10%;">
+                                        <col style="width: 10%;">
+                                        <col style="width: 10%;">
+                                        <col style="width: 10%;">
+                                        <col style="width: 10%;">
+                                        <col style="width: 10%;">
+                                    </colgroup>
                                     <thead>
                                         <!-- Top Row: Program Name on Left + Two Team Names -->
-                                        <tr class="bg-slate-900 border-b border-slate-800 text-[10px] sm:text-xs font-black uppercase tracking-wider">
-                                            <th rowspan="2" class="py-3 px-3 text-slate-300 border-r border-slate-800 w-[44%] align-middle">${title} Programs</th>
-                                            <th colspan="3" class="py-2 px-2 text-center text-sky-400 border-r border-slate-700 bg-sky-950/30">Al-Masūdi</th>
-                                            <th colspan="3" class="py-2 px-2 text-center text-emerald-400 bg-emerald-950/30">Al-Qazwini</th>
+                                        <tr class="bg-slate-900 border-b border-slate-800 text-[9px] sm:text-xs font-black uppercase tracking-wider">
+                                            <th rowspan="2" class="py-2 sm:py-3 px-1.5 sm:px-3 text-slate-300 border-r border-slate-800 align-middle leading-tight">${title}<br><span class="text-[8px] sm:text-[10px] text-slate-500 font-bold">Programs</span></th>
+                                            <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-sky-400 border-r border-slate-700 bg-sky-950/30 truncate">Al-Masūdi</th>
+                                            <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-emerald-400 bg-emerald-950/30 truncate">Al-Qazwini</th>
                                         </tr>
                                         <!-- Second Row: 1st, 2nd, 3rd columns for each team -->
-                                        <tr class="bg-slate-900/90 border-b border-slate-800 text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-center">
-                                            <th class="py-1.5 px-1 text-yellow-400 border-r border-slate-800/60 w-[9%]">1st</th>
-                                            <th class="py-1.5 px-1 text-slate-300 border-r border-slate-800/60 w-[9%]">2nd</th>
-                                            <th class="py-1.5 px-1 text-amber-500 border-r border-slate-700 w-[9%]">3rd</th>
-                                            <th class="py-1.5 px-1 text-yellow-400 border-r border-slate-800/60 w-[9%]">1st</th>
-                                            <th class="py-1.5 px-1 text-slate-300 border-r border-slate-800/60 w-[9%]">2nd</th>
-                                            <th class="py-1.5 px-1 text-amber-500 w-[9%]">3rd</th>
+                                        <tr class="bg-slate-900/95 border-b border-slate-800 text-[8px] sm:text-[10px] font-extrabold uppercase tracking-tighter sm:tracking-wider text-center">
+                                            <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60">1st</th>
+                                            <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60">2nd</th>
+                                            <th class="py-1 px-0.5 text-amber-500 border-r border-slate-700">3rd</th>
+                                            <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60">1st</th>
+                                            <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60">2nd</th>
+                                            <th class="py-1 px-0.5 text-amber-500">3rd</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-800/60 text-xs">
+                                    <tbody class="divide-y divide-slate-800/60">
                                         ${rowsHtml}
                                     </tbody>
                                     <tfoot>
-                                        <tr class="bg-slate-900/90 border-t border-slate-700 font-black text-xs num-font">
-                                            <td class="py-2.5 px-3 text-slate-300 uppercase text-[10px] tracking-wider border-r border-slate-800">Place Breakdown Total</td>
-                                            <td class="py-2.5 px-1 text-center text-yellow-400 border-r border-slate-800/60">${secTotals.m1}</td>
-                                            <td class="py-2.5 px-1 text-center text-slate-300 border-r border-slate-800/60">${secTotals.m2}</td>
-                                            <td class="py-2.5 px-1 text-center text-amber-500 border-r border-slate-700">${secTotals.m3}</td>
-                                            <td class="py-2.5 px-1 text-center text-yellow-400 border-r border-slate-800/60">${secTotals.q1}</td>
-                                            <td class="py-2.5 px-1 text-center text-slate-300 border-r border-slate-800/60">${secTotals.q2}</td>
-                                            <td class="py-2.5 px-1 text-center text-amber-500">${secTotals.q3}</td>
+                                        <tr class="bg-slate-900/90 border-t border-slate-700 font-black text-[9px] sm:text-xs num-font">
+                                            <td class="py-2 px-1.5 sm:px-3 text-slate-300 uppercase text-[8px] sm:text-[10px] tracking-wider border-r border-slate-800 leading-tight">Place Totals</td>
+                                            <td class="py-2 px-0.5 text-center text-yellow-400 border-r border-slate-800/60">${secTotals.m1}</td>
+                                            <td class="py-2 px-0.5 text-center text-slate-300 border-r border-slate-800/60">${secTotals.m2}</td>
+                                            <td class="py-2 px-0.5 text-center text-amber-500 border-r border-slate-700">${secTotals.m3}</td>
+                                            <td class="py-2 px-0.5 text-center text-yellow-400 border-r border-slate-800/60">${secTotals.q1}</td>
+                                            <td class="py-2 px-0.5 text-center text-slate-300 border-r border-slate-800/60">${secTotals.q2}</td>
+                                            <td class="py-2 px-0.5 text-center text-amber-500">${secTotals.q3}</td>
                                         </tr>
                                         <tr class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 font-black text-xs sm:text-sm num-font">
-                                            <td class="py-2.5 px-3 text-white uppercase text-[10px] sm:text-xs tracking-wider border-r border-slate-800">${title} Total</td>
-                                            <td colspan="3" class="py-2.5 px-2 text-center text-sky-400 border-r border-slate-700 text-sm sm:text-base">${secTotals.mSum} PTS</td>
-                                            <td colspan="3" class="py-2.5 px-2 text-center text-emerald-400 text-sm sm:text-base">${secTotals.qSum} PTS</td>
+                                            <td class="py-2 sm:py-2.5 px-1.5 sm:px-3 text-white uppercase text-[9px] sm:text-xs tracking-wider border-r border-slate-800 leading-tight">${title} Total</td>
+                                            <td colspan="3" class="py-2 sm:py-2.5 px-1 text-center text-sky-400 border-r border-slate-700 text-xs sm:text-base">${secTotals.mSum} PTS</td>
+                                            <td colspan="3" class="py-2 sm:py-2.5 px-1 text-center text-emerald-400 text-xs sm:text-base">${secTotals.qSum} PTS</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -509,44 +593,44 @@
                 let bottomSummaryHtml = '';
                 if (state.pointTableFilter === 'Junior') {
                     bottomSummaryHtml = `
-                        <div class="bg-slate-900/90 border border-sky-500/30 rounded-3xl p-4 sm:p-6 shadow-xl">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-widest text-sky-400 mb-3 text-center">🏆 Junior Category Points Summary</h4>
-                            <div class="grid grid-cols-3 gap-2.5 sm:gap-4 text-center">
-                                <div class="bg-sky-950/40 border border-sky-500/30 rounded-2xl p-3">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-sky-400 tracking-wider">Al-Masūdi (Junior)</div>
-                                    <div class="text-xl sm:text-3xl font-black text-white num-font mt-1">${jrMasudi} <span class="text-[9px] sm:text-xs font-bold text-slate-400">PTS</span></div>
-                                    <div class="text-[9px] text-slate-400 mt-1">Stage: ${detailedStats['Junior']['Stage']['Al-Masūdi']} • Non-Stage: ${detailedStats['Junior']['Non-Stage']['Al-Masūdi']}</div>
+                        <div class="ag-card border-sky-500/30 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6">
+                            <h4 class="text-[11px] sm:text-sm font-black uppercase tracking-widest text-sky-400 mb-3 text-center">🏆 Junior Category Points Summary</h4>
+                            <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                                <div class="bg-sky-950/40 border border-sky-500/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-sky-400 tracking-wider truncate">Al-Masūdi</div>
+                                    <div class="text-lg sm:text-3xl font-black text-white num-font mt-0.5">${jrMasudi} <span class="text-[8px] sm:text-xs font-bold text-slate-400">PTS</span></div>
+                                    <div class="text-[8px] sm:text-[9px] text-slate-400 mt-0.5 leading-tight">S: ${detailedStats['Junior']['Stage']['Al-Masūdi']} • NS: ${detailedStats['Junior']['Non-Stage']['Al-Masūdi']}</div>
                                 </div>
-                                <div class="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-3">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-emerald-400 tracking-wider">Al-Qazwini (Junior)</div>
-                                    <div class="text-xl sm:text-3xl font-black text-white num-font mt-1">${jrQazwini} <span class="text-[9px] sm:text-xs font-bold text-slate-400">PTS</span></div>
-                                    <div class="text-[9px] text-slate-400 mt-1">Stage: ${detailedStats['Junior']['Stage']['Al-Qazwini']} • Non-Stage: ${detailedStats['Junior']['Non-Stage']['Al-Qazwini']}</div>
+                                <div class="bg-emerald-950/40 border border-emerald-500/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-emerald-400 tracking-wider truncate">Al-Qazwini</div>
+                                    <div class="text-lg sm:text-3xl font-black text-white num-font mt-0.5">${jrQazwini} <span class="text-[8px] sm:text-xs font-bold text-slate-400">PTS</span></div>
+                                    <div class="text-[8px] sm:text-[9px] text-slate-400 mt-0.5 leading-tight">S: ${detailedStats['Junior']['Stage']['Al-Qazwini']} • NS: ${detailedStats['Junior']['Non-Stage']['Al-Qazwini']}</div>
                                 </div>
-                                <div class="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-center">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-amber-400 tracking-wider">Junior Difference</div>
-                                    <div class="text-xl sm:text-3xl font-black text-amber-300 num-font mt-1">${jrDiff} <span class="text-[9px] sm:text-xs font-bold text-amber-400/80">PTS</span></div>
+                                <div class="bg-amber-950/40 border border-amber-500/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 flex flex-col justify-center">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-amber-400 tracking-wider">Jr Diff</div>
+                                    <div class="text-lg sm:text-3xl font-black text-amber-300 num-font mt-0.5">${jrDiff} <span class="text-[8px] sm:text-xs font-bold text-amber-400/80">PTS</span></div>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (state.pointTableFilter === 'Senior') {
                     bottomSummaryHtml = `
-                        <div class="bg-slate-900/90 border border-emerald-500/30 rounded-3xl p-4 sm:p-6 shadow-xl">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-widest text-emerald-400 mb-3 text-center">🏆 Senior Category Points Summary</h4>
-                            <div class="grid grid-cols-3 gap-2.5 sm:gap-4 text-center">
-                                <div class="bg-sky-950/40 border border-sky-500/30 rounded-2xl p-3">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-sky-400 tracking-wider">Al-Masūdi (Senior)</div>
-                                    <div class="text-xl sm:text-3xl font-black text-white num-font mt-1">${srMasudi} <span class="text-[9px] sm:text-xs font-bold text-slate-400">PTS</span></div>
-                                    <div class="text-[9px] text-slate-400 mt-1">Stage: ${detailedStats['Senior']['Stage']['Al-Masūdi']} • Non-Stage: ${detailedStats['Senior']['Non-Stage']['Al-Masūdi']}</div>
+                        <div class="ag-card border-emerald-500/30 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6">
+                            <h4 class="text-[11px] sm:text-sm font-black uppercase tracking-widest text-emerald-400 mb-3 text-center">🏆 Senior Category Points Summary</h4>
+                            <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                                <div class="bg-sky-950/40 border border-sky-500/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-sky-400 tracking-wider truncate">Al-Masūdi</div>
+                                    <div class="text-lg sm:text-3xl font-black text-white num-font mt-0.5">${srMasudi} <span class="text-[8px] sm:text-xs font-bold text-slate-400">PTS</span></div>
+                                    <div class="text-[8px] sm:text-[9px] text-slate-400 mt-0.5 leading-tight">S: ${detailedStats['Senior']['Stage']['Al-Masūdi']} • NS: ${detailedStats['Senior']['Non-Stage']['Al-Masūdi']}</div>
                                 </div>
-                                <div class="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-3">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-emerald-400 tracking-wider">Al-Qazwini (Senior)</div>
-                                    <div class="text-xl sm:text-3xl font-black text-white num-font mt-1">${srQazwini} <span class="text-[9px] sm:text-xs font-bold text-slate-400">PTS</span></div>
-                                    <div class="text-[9px] text-slate-400 mt-1">Stage: ${detailedStats['Senior']['Stage']['Al-Qazwini']} • Non-Stage: ${detailedStats['Senior']['Non-Stage']['Al-Qazwini']}</div>
+                                <div class="bg-emerald-950/40 border border-emerald-500/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-emerald-400 tracking-wider truncate">Al-Qazwini</div>
+                                    <div class="text-lg sm:text-3xl font-black text-white num-font mt-0.5">${srQazwini} <span class="text-[8px] sm:text-xs font-bold text-slate-400">PTS</span></div>
+                                    <div class="text-[8px] sm:text-[9px] text-slate-400 mt-0.5 leading-tight">S: ${detailedStats['Senior']['Stage']['Al-Qazwini']} • NS: ${detailedStats['Senior']['Non-Stage']['Al-Qazwini']}</div>
                                 </div>
-                                <div class="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-3 flex flex-col justify-center">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-amber-400 tracking-wider">Senior Difference</div>
-                                    <div class="text-xl sm:text-3xl font-black text-amber-300 num-font mt-1">${srDiff} <span class="text-[9px] sm:text-xs font-bold text-amber-400/80">PTS</span></div>
+                                <div class="bg-amber-950/40 border border-amber-500/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 flex flex-col justify-center">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-amber-400 tracking-wider">Sr Diff</div>
+                                    <div class="text-lg sm:text-3xl font-black text-amber-300 num-font mt-0.5">${srDiff} <span class="text-[8px] sm:text-xs font-bold text-amber-400/80">PTS</span></div>
                                 </div>
                             </div>
                         </div>
@@ -554,44 +638,44 @@
                 } else {
                     // 'All' Selected -> Show Junior & Senior Earned + Each Team Full Points & Difference
                     bottomSummaryHtml = `
-                        <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-widest text-white text-center">📊 Complete Fest Points & Category Summary</h4>
+                        <div class="ag-card rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 space-y-3.5 sm:space-y-4">
+                            <h4 class="text-[11px] sm:text-sm font-black uppercase tracking-widest text-white text-center">📊 Complete Fest Points & Category Summary</h4>
                             
                             <!-- Juniors & Seniors Earned Breakdown -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-center">
-                                <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3">
-                                    <div class="text-[10px] font-black uppercase tracking-wider text-sky-400 mb-2">Junior Category Earned</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-center">
+                                <div class="bg-slate-950/80 border border-slate-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
+                                    <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-sky-400 mb-1.5">Junior Category Earned</div>
                                     <div class="flex justify-around items-center text-xs sm:text-sm font-bold num-font">
-                                        <div><span class="text-slate-400 block text-[9px] uppercase">Al-Masūdi</span><span class="text-sky-300 text-lg font-black">${jrMasudi}</span></div>
-                                        <div class="text-slate-600">vs</div>
-                                        <div><span class="text-slate-400 block text-[9px] uppercase">Al-Qazwini</span><span class="text-emerald-300 text-lg font-black">${jrQazwini}</span></div>
-                                        <div class="border-l border-slate-800 pl-3"><span class="text-amber-400 block text-[9px] uppercase">Diff</span><span class="text-amber-300 text-lg font-black">${jrDiff}</span></div>
+                                        <div><span class="text-slate-400 block text-[8px] sm:text-[9px] uppercase">Al-Masūdi</span><span class="text-sky-300 text-base sm:text-lg font-black">${jrMasudi}</span></div>
+                                        <div class="text-slate-600 text-[10px]">vs</div>
+                                        <div><span class="text-slate-400 block text-[8px] sm:text-[9px] uppercase">Al-Qazwini</span><span class="text-emerald-300 text-base sm:text-lg font-black">${jrQazwini}</span></div>
+                                        <div class="border-l border-slate-800 pl-2 sm:pl-3"><span class="text-amber-400 block text-[8px] sm:text-[9px] uppercase">Diff</span><span class="text-amber-300 text-base sm:text-lg font-black">${jrDiff}</span></div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3">
-                                    <div class="text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-2">Senior Category Earned</div>
+                                <div class="bg-slate-950/80 border border-slate-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
+                                    <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-emerald-400 mb-1.5">Senior Category Earned</div>
                                     <div class="flex justify-around items-center text-xs sm:text-sm font-bold num-font">
-                                        <div><span class="text-slate-400 block text-[9px] uppercase">Al-Masūdi</span><span class="text-sky-300 text-lg font-black">${srMasudi}</span></div>
-                                        <div class="text-slate-600">vs</div>
-                                        <div><span class="text-slate-400 block text-[9px] uppercase">Al-Qazwini</span><span class="text-emerald-300 text-lg font-black">${srQazwini}</span></div>
-                                        <div class="border-l border-slate-800 pl-3"><span class="text-amber-400 block text-[9px] uppercase">Diff</span><span class="text-amber-300 text-lg font-black">${srDiff}</span></div>
+                                        <div><span class="text-slate-400 block text-[8px] sm:text-[9px] uppercase">Al-Masūdi</span><span class="text-sky-300 text-base sm:text-lg font-black">${srMasudi}</span></div>
+                                        <div class="text-slate-600 text-[10px]">vs</div>
+                                        <div><span class="text-slate-400 block text-[8px] sm:text-[9px] uppercase">Al-Qazwini</span><span class="text-emerald-300 text-base sm:text-lg font-black">${srQazwini}</span></div>
+                                        <div class="border-l border-slate-800 pl-2 sm:pl-3"><span class="text-amber-400 block text-[8px] sm:text-[9px] uppercase">Diff</span><span class="text-amber-300 text-base sm:text-lg font-black">${srDiff}</span></div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Full Points & Difference Between Teams -->
-                            <div class="grid grid-cols-3 gap-2.5 sm:gap-4 pt-2 border-t border-slate-800 text-center">
-                                <div class="bg-sky-950/40 border border-sky-500/40 rounded-2xl p-3.5 shadow-inner">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-sky-400 tracking-wider">Al-Masūdi Full Points</div>
-                                    <div class="text-2xl sm:text-4xl font-black text-white num-font mt-1">${masudiTotal} <span class="text-[9px] sm:text-xs font-bold text-slate-400">PTS</span></div>
+                            <div class="grid grid-cols-3 gap-2 sm:gap-4 pt-2 border-t border-slate-800 text-center">
+                                <div class="bg-sky-950/40 border border-sky-500/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 shadow-inner">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-sky-400 tracking-wider truncate">Al-Masūdi Total</div>
+                                    <div class="text-xl sm:text-4xl font-black text-white num-font mt-0.5">${masudiTotal} <span class="text-[8px] sm:text-xs font-bold text-slate-400">PTS</span></div>
                                 </div>
-                                <div class="bg-emerald-950/40 border border-emerald-500/40 rounded-2xl p-3.5 shadow-inner">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-emerald-400 tracking-wider">Al-Qazwini Full Points</div>
-                                    <div class="text-2xl sm:text-4xl font-black text-white num-font mt-1">${qazwiniTotal} <span class="text-[9px] sm:text-xs font-bold text-slate-400">PTS</span></div>
+                                <div class="bg-emerald-950/40 border border-emerald-500/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 shadow-inner">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-emerald-400 tracking-wider truncate">Al-Qazwini Total</div>
+                                    <div class="text-xl sm:text-4xl font-black text-white num-font mt-0.5">${qazwiniTotal} <span class="text-[8px] sm:text-xs font-bold text-slate-400">PTS</span></div>
                                 </div>
-                                <div class="bg-amber-950/40 border border-amber-500/40 rounded-2xl p-3.5 shadow-inner flex flex-col justify-center">
-                                    <div class="text-[9px] sm:text-xs font-black uppercase text-amber-400 tracking-wider">Point Difference</div>
-                                    <div class="text-2xl sm:text-4xl font-black text-amber-300 num-font mt-1">${pointDiff} <span class="text-[9px] sm:text-xs font-bold text-amber-400/80">PTS</span></div>
+                                <div class="bg-amber-950/40 border border-amber-500/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 shadow-inner flex flex-col justify-center">
+                                    <div class="text-[8px] sm:text-xs font-black uppercase text-amber-400 tracking-wider">Difference</div>
+                                    <div class="text-xl sm:text-4xl font-black text-amber-300 num-font mt-0.5">${pointDiff} <span class="text-[8px] sm:text-xs font-bold text-amber-400/80">PTS</span></div>
                                 </div>
                             </div>
                         </div>
@@ -599,57 +683,57 @@
                 }
 
                 content.innerHTML = `
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                        <!-- Left Column on Desktop: Live Leaderboard & Quick Search Card -->
-                        <div class="lg:col-span-4 space-y-6">
-                            <div class="fade-in bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-6 text-center shadow-xl relative overflow-hidden backdrop-blur-md">
-                                <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="absolute -right-10 -bottom-10 h-44 opacity-20 object-contain pointer-events-none">
-                                <h2 class="text-white font-black text-2xl sm:text-3xl mb-1 tracking-tight">Live Leaderboard</h2>
-                                <p class="text-[10px] sm:text-xs text-sky-400 font-bold uppercase tracking-widest mb-5">Aawaaze Funoon S4 • ${state.results.length} Results</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
+                        <!-- Left Column on Desktop: Anti-Gravity Live Leaderboard & Quick Search Card -->
+                        <div class="lg:col-span-4 space-y-4 sm:space-y-6 lg:sticky lg:top-24">
+                            <div class="fade-in ag-card ag-float rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center relative overflow-hidden">
+                                <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="absolute -right-10 -bottom-10 h-36 sm:h-44 opacity-20 object-contain pointer-events-none">
+                                <h2 class="text-white font-black text-xl sm:text-3xl mb-0.5 tracking-tight">Live Leaderboard</h2>
+                                <p class="text-[9px] sm:text-xs text-sky-400 font-bold uppercase tracking-widest mb-4">Aawaaze Funoon S4 • ${state.results.length} Results</p>
                                 
-                                <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-5">
-                                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-sky-400 p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
-                                        <h3 class="text-sky-400 font-black text-xs tracking-widest uppercase mb-1">Al-Masūdi</h3>
-                                        <div class="text-3xl sm:text-4xl font-black text-white num-font relative z-10">${masudiTotal}</div>
+                                <div class="grid grid-cols-2 gap-2.5 sm:gap-4 mb-4">
+                                    <div class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-t-2 border-sky-400 p-3 sm:p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
+                                        <h3 class="text-sky-400 font-black text-[10px] sm:text-xs tracking-widest uppercase mb-0.5">Al-Masūdi</h3>
+                                        <div class="text-2xl sm:text-4xl font-black text-white num-font relative z-10">${masudiTotal}</div>
                                     </div>
-                                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-emerald-400 p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
-                                        <h3 class="text-emerald-400 font-black text-xs tracking-widest uppercase mb-1">Al-Qazwini</h3>
-                                        <div class="text-3xl sm:text-4xl font-black text-white num-font relative z-10">${qazwiniTotal}</div>
+                                    <div class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-t-2 border-emerald-400 p-3 sm:p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
+                                        <h3 class="text-emerald-400 font-black text-[10px] sm:text-xs tracking-widest uppercase mb-0.5">Al-Qazwini</h3>
+                                        <div class="text-2xl sm:text-4xl font-black text-white num-font relative z-10">${qazwiniTotal}</div>
                                     </div>
                                 </div>
 
-                                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs sm:text-sm font-extrabold tracking-wide ${leaderBadgeClass}">
+                                <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-[11px] sm:text-sm font-extrabold tracking-wide ${leaderBadgeClass}">
                                     <span>⚡</span>
                                     <span>${leaderText}</span>
                                 </div>
                             </div>
 
-                            <div onclick="switchTab('search')" class="fade-in cursor-pointer hover:border-sky-500/50 transition-all bg-slate-900/50 border border-slate-800 rounded-3xl p-5 backdrop-blur-sm shadow-lg">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-2xl border border-indigo-500/50 shrink-0">🔍</div>
+                            <div onclick="switchTab('search')" class="fade-in ag-card ag-float-delayed cursor-pointer rounded-2xl sm:rounded-3xl p-4 sm:p-5">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-xl sm:text-2xl border border-indigo-500/50 shrink-0">🔍</div>
                                     <div>
-                                        <h4 class="text-white font-bold text-sm sm:text-base">Scan ID QR or Search Chest No</h4>
-                                        <p class="text-xs text-slate-400 mt-0.5">Tap here or scan the QR code on your ID card to view your live points and download digital certificates!</p>
+                                        <h4 class="text-white font-bold text-xs sm:text-base">Scan ID QR or Search Chest No</h4>
+                                        <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5 leading-snug">Tap here to check your personal points and download digital certificates!</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Right Column on Desktop: Filterable 1st/2nd/3rd Program Tables -->
-                        <div class="lg:col-span-8 fade-in">
+                        <div class="lg:col-span-8 fade-in min-w-0">
                             <!-- Upper Filter Bar (All, Junior, Senior) -->
-                            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 sm:p-4 mb-5 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-lg">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-lg">📋</span>
+                            <div class="ag-card rounded-2xl p-3 sm:p-4 mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-center gap-2.5">
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <span class="text-base sm:text-lg">📋</span>
                                     <div>
-                                        <h3 class="text-white font-black text-sm sm:text-base uppercase tracking-wider leading-none">Program-Wise Point Table</h3>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">1st, 2nd & 3rd Place Team Breakdown</p>
+                                        <h3 class="text-white font-black text-xs sm:text-base uppercase tracking-wider leading-none">Program-Wise Point Table</h3>
+                                        <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">1st, 2nd & 3rd Place Team Breakdown</p>
                                     </div>
                                 </div>
-                                <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
+                                <div class="grid grid-cols-3 bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto gap-1">
                                     ${['All', 'Junior', 'Senior'].map(f => `
-                                        <button onclick="window.setPointFilter('${f}')" class="flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-extrabold uppercase tracking-wider transition-all ${state.pointTableFilter === f ? 'bg-sky-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}">
-                                            ${f === 'All' ? 'All Categories' : f}
+                                        <button onclick="window.setPointFilter('${f}')" class="px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-extrabold uppercase tracking-wider transition-all text-center ${state.pointTableFilter === f ? 'bg-sky-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}">
+                                            ${f === 'All' ? 'All' : f}
                                         </button>
                                     `).join('')}
                                 </div>
@@ -669,43 +753,40 @@
             }
 
             if (state.tab === 'results') {
-                let html = `<div class="fade-in flex justify-between items-center mb-6"><h2 class="text-white font-black text-2xl sm:text-3xl tracking-tight">Latest Results</h2><span class="bg-sky-500/20 text-sky-400 text-[10px] sm:text-xs px-3.5 py-1.5 rounded-full font-bold border border-sky-500/30 uppercase tracking-widest">${state.results.length} Published</span></div>`;
+                let html = `<div class="fade-in flex justify-between items-center mb-4"><h2 class="text-white font-black text-xl sm:text-2xl tracking-tight">Latest Results</h2><span class="bg-sky-500/20 text-sky-400 text-[10px] px-3 py-1 rounded-full font-bold border border-sky-500/30 uppercase tracking-widest">${state.results.length} Published</span></div>`;
                 
                 if(state.results.length === 0) {
-                    html += `<div class="text-center bg-slate-900/50 p-12 rounded-3xl border border-slate-800 text-slate-500 text-sm mt-10 max-w-lg mx-auto">No results published yet. Check back soon!</div>`;
+                    html += `<div class="text-center bg-slate-900/50 p-10 rounded-3xl border border-slate-800 text-slate-500 text-sm mt-6">No results published yet. Check back soon!</div>`;
                 } else {
-                    html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 fade-in">`;
+                    html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in">`;
                 }
                 
                 const getNameHtml = (ids) => {
                     let arr = Array.isArray(ids) ? ids : [];
-                    if(arr.length === 0) return '<div class="text-white/50 italic text-sm">-</div>';
+                    if(arr.length === 0) return '<div class="text-white/50 italic text-xs">-</div>';
                     return arr.map(id => {
                         const c = state.candidates.find(x => x.id === id);
-                        return c ? `<div class="font-bold text-white text-sm leading-tight flex justify-between items-end">${c.name} <span class="text-[9px] font-bold text-black/60 bg-white/30 px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">#${c.regNo}</span></div>` : '';
+                        return c ? `<div class="font-bold text-white text-xs sm:text-sm leading-tight flex justify-between items-end">${c.name} <span class="text-[9px] font-bold text-black/60 bg-white/30 px-1 py-0.5 rounded uppercase tracking-wider">#${c.regNo}</span></div>` : '';
                     }).join('<div class="h-px w-full bg-white/10 my-2"></div>');
                 };
 
                 state.results.forEach(res => {
                     const prog = state.programs.find(p => p.id === res.progId); if(!prog) return;
                     html += `
-                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/80 p-5 rounded-3xl relative shadow-lg overflow-hidden">
-                        <div class="mb-4">
-                            <h4 class="font-black text-white text-lg leading-tight mb-1">${prog.progNo ? `<span class="text-sky-400 font-mono">#${prog.progNo}</span> ` : ''}${prog.name}</h4>
-                            <div class="inline-block bg-slate-950 px-2.5 py-1 rounded text-[9px] font-bold text-slate-400 uppercase tracking-widest border border-slate-800 shadow-inner">${prog.cat} • ${prog.type}</div>
+                    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/80 p-4 rounded-2xl relative shadow-lg overflow-hidden">
+                        <div class="mb-3">
+                            <h4 class="font-black text-white text-base leading-tight mb-1">${prog.progNo ? `<span class="text-sky-400 font-mono">#${prog.progNo}</span> ` : ''}${prog.name}</h4>
+                            <div class="inline-block bg-slate-950 px-2 py-0.5 rounded text-[9px] font-bold text-slate-400 uppercase tracking-widest border border-slate-800">${prog.cat} • ${prog.type}</div>
                         </div>
-                        <div class="space-y-3">
-                            <div class="bg-gradient-to-r from-yellow-600/90 to-yellow-500/80 border border-yellow-400/50 p-3 rounded-2xl flex gap-3 shadow-md relative overflow-hidden">
-                                <div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-yellow-300/20 to-transparent pointer-events-none"></div>
-                                <div class="text-2xl drop-shadow-md bg-white/20 h-10 w-10 rounded-xl flex items-center justify-center border border-white/30 shrink-0">🥇</div><div class="flex-1 self-center z-10">${getNameHtml(res.first)}</div>
+                        <div class="space-y-2.5">
+                            <div class="bg-gradient-to-r from-yellow-600/90 to-yellow-500/80 border border-yellow-400/50 p-2.5 rounded-xl flex gap-2.5 shadow">
+                                <div class="text-xl bg-white/20 h-8 w-8 rounded-lg flex items-center justify-center border border-white/30 shrink-0">🥇</div><div class="flex-1 self-center">${getNameHtml(res.first)}</div>
                             </div>
-                            <div class="bg-gradient-to-r from-slate-600/90 to-slate-500/80 border border-slate-400/50 p-3 rounded-2xl flex gap-3 shadow-md relative overflow-hidden">
-                                <div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white/10 to-transparent pointer-events-none"></div>
-                                <div class="text-2xl drop-shadow-md bg-white/20 h-10 w-10 rounded-xl flex items-center justify-center border border-white/30 shrink-0">🥈</div><div class="flex-1 self-center z-10">${getNameHtml(res.second)}</div>
+                            <div class="bg-gradient-to-r from-slate-600/90 to-slate-500/80 border border-slate-400/50 p-2.5 rounded-xl flex gap-2.5 shadow">
+                                <div class="text-xl bg-white/20 h-8 w-8 rounded-lg flex items-center justify-center border border-white/30 shrink-0">🥈</div><div class="flex-1 self-center">${getNameHtml(res.second)}</div>
                             </div>
-                            <div class="bg-gradient-to-r from-amber-700/90 to-amber-600/80 border border-amber-500/50 p-3 rounded-2xl flex gap-3 shadow-md relative overflow-hidden">
-                                <div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-amber-300/20 to-transparent pointer-events-none"></div>
-                                <div class="text-2xl drop-shadow-md bg-white/20 h-10 w-10 rounded-xl flex items-center justify-center border border-white/30 shrink-0">🥉</div><div class="flex-1 self-center z-10">${getNameHtml(res.third)}</div>
+                            <div class="bg-gradient-to-r from-amber-700/90 to-amber-600/80 border border-amber-500/50 p-2.5 rounded-xl flex gap-2.5 shadow">
+                                <div class="text-xl bg-white/20 h-8 w-8 rounded-lg flex items-center justify-center border border-white/30 shrink-0">🥉</div><div class="flex-1 self-center">${getNameHtml(res.third)}</div>
                             </div>
                         </div>
                     </div>`;
@@ -715,16 +796,15 @@
 
             if (state.tab === 'search') {
                 let html = `
-                    <div class="fade-in max-w-3xl mx-auto">
-                        <h2 class="text-white font-black text-2xl sm:text-3xl mb-4 tracking-tight">Candidate Profile & Certificates</h2>
-                        <div class="relative mb-6">
-                            <input type="text" id="searchInp" autocomplete="off" placeholder="Enter Chest No (e.g. J101 or 101)..." value="${state.searchQuery}" oninput="window.updateSearch(this.value)" class="w-full bg-slate-900 border-2 border-slate-700 rounded-2xl pl-5 pr-12 py-4 text-white outline-none focus:border-sky-500 num-font text-xl shadow-inner transition-colors uppercase">
-                            <div class="absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xl pointer-events-none">🔍</div>
+                    <div class="fade-in max-w-2xl mx-auto">
+                        <h2 class="text-white font-black text-xl sm:text-2xl mb-3 tracking-tight">Candidate Profile & Certificates</h2>
+                        <div class="relative mb-5">
+                            <input type="text" id="searchInp" autocomplete="off" placeholder="Enter Chest No (e.g. J101 or 101)..." value="${state.searchQuery}" oninput="window.updateSearch(this.value)" class="w-full bg-slate-900 border-2 border-slate-700 rounded-2xl pl-4 pr-12 py-3.5 text-white outline-none focus:border-sky-500 num-font text-lg shadow-inner uppercase">
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 text-lg pointer-events-none">🔍</div>
                         </div>
                 `;
                 
                 const q = state.searchQuery.trim().toLowerCase();
-                // Smart Search: matches exact Chest No (e.g. "j101") or numeric shorthand ("101")
                 const c = state.candidates.find(x => {
                     const reg = String(x.regNo).trim().toLowerCase();
                     return reg === q || reg === 'j' + q || reg === 's' + q;
@@ -733,43 +813,42 @@
                 if(c) {
                     const tPts = candTotalPts[c.id] || 0;
                     html += `
-                    <div class="fade-in bg-gradient-to-br from-indigo-900/80 to-slate-900/80 border border-sky-500/40 p-6 sm:p-8 rounded-[2rem] shadow-2xl mb-6 text-center relative overflow-hidden backdrop-blur-sm">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl"></div>
-                        <div class="text-xs sm:text-sm font-black text-sky-400 uppercase tracking-widest mb-1 font-mono">Chest No. ${c.regNo}</div>
-                        <h3 class="text-2xl sm:text-4xl font-black text-white mb-2 leading-tight">${c.name}</h3>
-                        <div class="inline-block bg-black/40 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold text-slate-300 border border-white/10 mb-6 uppercase tracking-wider">${c.team} • ${c.cat}</div>
-                        <div class="text-6xl sm:text-7xl font-black text-emerald-400 num-font mb-2 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">${tPts}</div>
-                        <p class="text-[10px] sm:text-xs font-bold text-emerald-500 uppercase tracking-widest bg-emerald-900/30 inline-block px-3.5 py-1 rounded-full border border-emerald-800/50">Total Points Earned</p>
+                    <div class="fade-in bg-gradient-to-br from-indigo-900/80 to-slate-900/80 border border-sky-500/40 p-5 sm:p-7 rounded-3xl shadow-2xl mb-5 text-center relative overflow-hidden backdrop-blur-sm">
+                        <div class="text-xs font-black text-sky-400 uppercase tracking-widest mb-1 font-mono">Chest No. ${c.regNo}</div>
+                        <h3 class="text-2xl sm:text-3xl font-black text-white mb-2 leading-tight">${c.name}</h3>
+                        <div class="inline-block bg-black/40 px-3 py-1 rounded-lg text-xs font-bold text-slate-300 border border-white/10 mb-4 uppercase tracking-wider">${c.team} • ${c.cat}</div>
+                        <div class="text-5xl sm:text-6xl font-black text-emerald-400 num-font mb-1">${tPts}</div>
+                        <p class="text-[9px] sm:text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-900/30 inline-block px-3 py-1 rounded-full border border-emerald-800/50">Total Points Earned</p>
                     </div>
                     
-                    <h4 class="fade-in text-white font-black text-lg sm:text-xl mb-4 tracking-tight">Your Events & Certificates</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in pb-4">`;
+                    <h4 class="fade-in text-white font-black text-base sm:text-lg mb-3 tracking-tight">Your Events & Certificates</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 fade-in pb-4">`;
                     
                     if(c.assignedPrograms && c.assignedPrograms.length > 0) {
                         c.assignedPrograms.forEach(pid => {
                             const p = state.programs.find(x => x.id === pid); if(!p) return;
                             const r = state.results.find(x => x.progId === pid);
                             
-                            let badge = '<span class="text-[10px] text-slate-400 font-bold bg-slate-900 px-2 py-1.5 rounded-md border border-slate-800 uppercase tracking-wider shrink-0 shadow-inner">⏳ Pending</span>';
+                            let badge = '<span class="text-[9px] text-slate-400 font-bold bg-slate-900 px-2 py-1 rounded border border-slate-800 uppercase shrink-0">⏳ Pending</span>';
                             let downloadBtn = '';
                             let positionStr = '';
                             let pArr = (p.pointScheme || (p.format === 'Group' ? "15,8,5" : "10,5,3")).split(',').map(Number);
 
                             if (r) {
                                 if ((Array.isArray(r.first)?r.first:[]).includes(c.id)) {
-                                    badge = `<span class="text-[10px] text-yellow-900 bg-yellow-400 px-2 py-1.5 rounded-md font-bold uppercase tracking-wider shrink-0 shadow-md">🥇 1st Place (+${pArr[0]})</span>`;
+                                    badge = `<span class="text-[9px] text-yellow-900 bg-yellow-400 px-2 py-1 rounded font-bold uppercase shrink-0 shadow">🥇 1st (+${pArr[0]})</span>`;
                                     positionStr = 'First Place';
                                 }
                                 else if ((Array.isArray(r.second)?r.second:[]).includes(c.id)) {
-                                    badge = `<span class="text-[10px] text-slate-900 bg-slate-300 px-2 py-1.5 rounded-md font-bold uppercase tracking-wider shrink-0 shadow-md">🥈 2nd Place (+${pArr[1]})</span>`;
+                                    badge = `<span class="text-[9px] text-slate-900 bg-slate-300 px-2 py-1 rounded font-bold uppercase shrink-0 shadow">🥈 2nd (+${pArr[1]})</span>`;
                                     positionStr = 'Second Place';
                                 }
                                 else if ((Array.isArray(r.third)?r.third:[]).includes(c.id)) {
-                                    badge = `<span class="text-[10px] text-amber-900 bg-amber-500 px-2 py-1.5 rounded-md font-bold uppercase tracking-wider shrink-0 shadow-md">🥉 3rd Place (+${pArr[2]})</span>`;
+                                    badge = `<span class="text-[9px] text-amber-900 bg-amber-500 px-2 py-1 rounded font-bold uppercase shrink-0 shadow">🥉 3rd (+${pArr[2]})</span>`;
                                     positionStr = 'Third Place';
                                 }
                                 else {
-                                    badge = '<span class="text-[10px] text-slate-400 font-bold bg-slate-800/80 px-2 py-1.5 rounded-md shrink-0 uppercase tracking-wider">✔️ Participated</span>';
+                                    badge = '<span class="text-[9px] text-slate-400 font-bold bg-slate-800 px-2 py-1 rounded shrink-0 uppercase">✔️ Participated</span>';
                                 }
 
                                 if(positionStr !== '') {
@@ -779,54 +858,54 @@
                                     const safeCat = c.cat.replace(/'/g, "\\'");
                                     
                                     downloadBtn = `
-                                    <button onclick="window.downloadCertificate('${safeCandName}', '${safeTeam}', '${safeCat}', '${safeProgName}', '${positionStr}')" class="mt-3 w-full bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white text-xs font-bold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform border border-sky-400/30">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                        Download Digital Certificate
+                                    <button onclick="window.downloadCertificate('${safeCandName}', '${safeTeam}', '${safeCat}', '${safeProgName}', '${positionStr}')" class="mt-2.5 w-full bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white text-xs font-bold py-2.5 rounded-xl shadow flex items-center justify-center gap-1.5 active:scale-95 transition-transform border border-sky-400/30">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        Download Certificate
                                     </button>`;
                                 }
                             }
                             
                             html += `
-                            <div class="bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-700/80 shadow-md flex flex-col justify-between">
-                                <div class="flex justify-between items-start gap-3">
-                                    <div class="text-sm sm:text-base font-bold text-white leading-tight">${p.progNo ? `<span class="text-sky-400 font-mono text-xs block mb-0.5">#${p.progNo}</span>` : ''}${p.name}</div>
+                            <div class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-700/80 shadow flex flex-col justify-between">
+                                <div class="flex justify-between items-start gap-2">
+                                    <div class="text-xs sm:text-sm font-bold text-white leading-snug">${p.progNo ? `<span class="text-sky-400 font-mono text-[10px] block">#${p.progNo}</span>` : ''}${p.name}</div>
                                     ${badge}
                                 </div>
                                 ${downloadBtn}
                             </div>`;
                         });
                     } else { 
-                        html += `<div class="col-span-full bg-slate-900/50 p-6 rounded-2xl border border-slate-800 text-center text-xs sm:text-sm text-slate-400">No events assigned yet.</div>`; 
+                        html += `<div class="col-span-full bg-slate-900/50 p-6 rounded-2xl border border-slate-800 text-center text-xs text-slate-400">No events assigned yet.</div>`; 
                     }
                     html += `</div>`;
                 } else if (state.searchQuery.length > 0) {
-                    html += `<div class="fade-in text-center p-8 bg-slate-900/50 rounded-[2rem] border border-slate-800 text-slate-400 text-sm shadow-inner mt-4">
-                        <div class="text-4xl mb-2">🕵️‍♂️</div>
-                        No candidate found for <br><strong class="text-white text-lg mt-1 inline-block">"${state.searchQuery}"</strong>
+                    html += `<div class="fade-in text-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800 text-slate-400 text-xs mt-3">
+                        <div class="text-3xl mb-1">🕵️‍♂️</div>
+                        No candidate found for <br><strong class="text-white text-base mt-1 inline-block">"${state.searchQuery}"</strong>
                     </div>`;
                 } else {
-                    html += `<div class="fade-in text-center p-8 text-slate-500 text-xs sm:text-sm mt-10">Type your Chest No above (e.g., J101 or 101) to instantly see your enrolled programs, points, and unlock your printable certificates!</div>`;
+                    html += `<div class="fade-in text-center p-6 text-slate-500 text-xs mt-6">Type your Chest No above (e.g., J101 or 101) to instantly see your enrolled programs, points, and unlock your printable certificates!</div>`;
                 }
                 content.innerHTML = html + `</div>`;
             }
 
             if (state.tab === 'gallery') {
                 content.innerHTML = `
-                    <div class="fade-in pb-6 max-w-5xl mx-auto">
-                        <div class="mb-6 text-center">
-                            <h2 class="text-white font-black text-2xl sm:text-3xl tracking-tight mb-2">Fest Gallery</h2>
-                            <p class="text-slate-400 text-xs sm:text-sm">Highlights & Art from Aawaaze Funoon S4</p>
+                    <div class="fade-in pb-6 max-w-4xl mx-auto">
+                        <div class="mb-5 text-center">
+                            <h2 class="text-white font-black text-xl sm:text-2xl tracking-tight mb-1">Fest Gallery</h2>
+                            <p class="text-slate-400 text-xs">Highlights & Art from Aawaaze Funoon S4</p>
                         </div>
                         
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261011_193849.png" class="rounded-2xl w-full h-36 sm:h-48 object-cover border border-slate-700/50 shadow-md bg-white">
-                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="rounded-2xl w-full h-36 sm:h-48 object-cover border border-slate-700/50 shadow-md bg-black">
-                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%204-01.png" class="rounded-2xl w-full h-36 sm:h-48 object-cover border border-slate-700/50 shadow-md bg-black">
-                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%2020261008_191200.png" onerror="this.src='https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_191200.png'" class="rounded-2xl w-full h-36 sm:h-48 object-cover border border-slate-700/50 shadow-md bg-black">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261011_193849.png" class="rounded-2xl w-full h-32 sm:h-44 object-cover border border-slate-700/50 shadow bg-white">
+                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="rounded-2xl w-full h-32 sm:h-44 object-cover border border-slate-700/50 shadow bg-black">
+                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%204-01.png" class="rounded-2xl w-full h-32 sm:h-44 object-cover border border-slate-700/50 shadow bg-black">
+                            <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%2020261008_191200.png" onerror="this.src='https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/20261008_191200.png'" class="rounded-2xl w-full h-32 sm:h-44 object-cover border border-slate-700/50 shadow bg-black">
                         </div>
 
-                        <a href="https://t.me" target="_blank" class="max-w-md mx-auto w-full bg-[#0088cc] hover:bg-[#0077b3] text-white font-bold py-4 px-6 rounded-2xl shadow-[0_10px_20px_rgba(0,136,204,0.3)] flex items-center justify-center gap-3 transition active:scale-95 border border-[#0099e6]">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.18 3.44-.49.33-.93.5-1.33.49-.44-.01-1.28-.24-1.9-.44-.77-.24-1.38-.37-1.33-.78.03-.21.32-.43.88-.67 3.45-1.5 5.75-2.5 6.9-2.98 3.28-1.38 3.96-1.62 4.41-1.63.1 0 .32.02.44.11.1.08.13.19.14.28.01.07.01.14 0 .2z"/></svg>
+                        <a href="https://t.me" target="_blank" class="max-w-md mx-auto w-full bg-[#0088cc] hover:bg-[#0077b3] text-white font-bold py-3.5 px-6 rounded-2xl shadow-[0_10px_20px_rgba(0,136,204,0.3)] flex items-center justify-center gap-3 transition active:scale-95 border border-[#0099e6] text-xs sm:text-sm">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.18 3.44-.49.33-.93.5-1.33.49-.44-.01-1.28-.24-1.9-.44-.77-.24-1.38-.37-1.33-.78.03-.21.32-.43.88-.67 3.45-1.5 5.75-2.5 6.9-2.98 3.28-1.38 3.96-1.62 4.41-1.63.1 0 .32.02.44.11.1.08.13.19.14.28.01.07.01.14 0 .2z"/></svg>
                             Join Official Telegram Channel
                         </a>
                     </div>
