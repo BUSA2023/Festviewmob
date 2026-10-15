@@ -14,18 +14,30 @@
             --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
         * { box-sizing: border-box; }
-        html, body {
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
-            max-width: 100vw;
+            height: auto;
+            min-height: 100%;
             overflow-x: hidden;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: visible;
             font-family: 'Anek Malayalam', sans-serif;
             background-color: #020617;
             color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: none;
-            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
         .num-font { font-family: 'Outfit', sans-serif; }
         .nav-active { color: #38bdf8; transform: translateY(-2px); }
@@ -34,17 +46,13 @@
         /* Anti-Gravity Floating UI Setup */
         .ag-float {
             animation: antiGravityFloat 6s ease-in-out infinite;
-            will-change: transform;
         }
         .ag-float-delayed {
             animation: antiGravityFloat 7s ease-in-out 1.5s infinite;
-            will-change: transform;
         }
         .ag-card {
-            background: linear-gradient(145deg, rgba(15, 23, 42, 0.85), rgba(2, 6, 23, 0.92));
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(56, 189, 248, 0.16);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.95));
+            border: 1px solid rgba(56, 189, 248, 0.18);
             box-shadow: 0 18px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(56, 189, 248, 0.08);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -78,12 +86,20 @@
         }
 
         /* Clean scrollbars across mobile & desktop */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        /* Internal scrollable table body when there are many programs */
+        .table-scroll-box {
+            max-height: 65vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+        }
     </style>
 </head>
-<body class="bg-slate-950 pb-28 md:pb-12 relative min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
+<body class="bg-slate-950 pb-36 md:pb-16 relative min-h-screen selection:bg-sky-500 selection:text-slate-950">
 
     <!-- Preload fonts for Canvas so they don't pop-in late -->
     <div style="visibility: hidden; position: absolute; width: 0; height: 0; overflow: hidden;">
@@ -144,8 +160,8 @@
         <span id="toastMsg" class="font-bold text-xs sm:text-sm leading-tight">Message goes here</span>
     </div>
 
-    <!-- Main Content (100% Fluid Container for Phone, Tablet & PC) -->
-    <main class="p-2.5 sm:p-5 lg:p-8 relative z-10 max-w-7xl w-full mx-auto flex-1" id="appContent">
+    <!-- Main Content (100% Fluid & Vertically Scrollable Container for Phone, Tablet & PC) -->
+    <main class="p-2.5 sm:p-5 lg:p-8 pb-24 relative z-10 max-w-7xl w-full mx-auto" id="appContent">
         <div class="flex justify-center items-center h-40 text-slate-500 text-sm">
             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             Syncing Live Data...
@@ -525,7 +541,7 @@
                             <div class="flex flex-wrap justify-between items-center gap-2 mb-2.5 px-1">
                                 <h4 class="text-white font-black text-xs sm:text-sm uppercase tracking-wider flex items-center gap-1.5">
                                     <span class="w-2.5 h-2.5 rounded-full ${badgeColor} shrink-0"></span>
-                                    <span>${title}</span>
+                                    <span>${title} (${sectionProgs.length})</span>
                                 </h4>
                                 <div class="flex items-center gap-1.5 sm:gap-2.5 text-[9px] sm:text-xs font-extrabold num-font">
                                     <span class="text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-full">Al-Masūdi: ${secTotals.mSum}</span>
@@ -533,7 +549,7 @@
                                 </div>
                             </div>
 
-                            <div class="w-full rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950/90 overflow-hidden">
+                            <div class="w-full rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950/90 table-scroll-box">
                                 <table class="fit-table text-left">
                                     <colgroup>
                                         <col style="width: 40%;">
@@ -544,28 +560,28 @@
                                         <col style="width: 10%;">
                                         <col style="width: 10%;">
                                     </colgroup>
-                                    <thead>
+                                    <thead class="sticky top-0 z-20 shadow-md">
                                         <!-- Top Row: Program Name on Left + Two Team Names -->
                                         <tr class="bg-slate-900 border-b border-slate-800 text-[9px] sm:text-xs font-black uppercase tracking-wider">
-                                            <th rowspan="2" class="py-2 sm:py-3 px-1.5 sm:px-3 text-slate-300 border-r border-slate-800 align-middle leading-tight">${title}<br><span class="text-[8px] sm:text-[10px] text-slate-500 font-bold">Programs</span></th>
-                                            <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-sky-400 border-r border-slate-700 bg-sky-950/30 truncate">Al-Masūdi</th>
-                                            <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-emerald-400 bg-emerald-950/30 truncate">Al-Qazwini</th>
+                                            <th rowspan="2" class="py-2 sm:py-3 px-1.5 sm:px-3 text-slate-300 border-r border-slate-800 align-middle leading-tight bg-slate-900">${title}<br><span class="text-[8px] sm:text-[10px] text-slate-500 font-bold">Programs</span></th>
+                                            <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-sky-400 border-r border-slate-700 bg-slate-900 truncate">Al-Masūdi</th>
+                                            <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-emerald-400 bg-slate-900 truncate">Al-Qazwini</th>
                                         </tr>
                                         <!-- Second Row: 1st, 2nd, 3rd columns for each team -->
-                                        <tr class="bg-slate-900/95 border-b border-slate-800 text-[8px] sm:text-[10px] font-extrabold uppercase tracking-tighter sm:tracking-wider text-center">
-                                            <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60">1st</th>
-                                            <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60">2nd</th>
-                                            <th class="py-1 px-0.5 text-amber-500 border-r border-slate-700">3rd</th>
-                                            <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60">1st</th>
-                                            <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60">2nd</th>
-                                            <th class="py-1 px-0.5 text-amber-500">3rd</th>
+                                        <tr class="bg-slate-900 border-b border-slate-800 text-[8px] sm:text-[10px] font-extrabold uppercase tracking-tighter sm:tracking-wider text-center">
+                                            <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60 bg-slate-900">1st</th>
+                                            <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60 bg-slate-900">2nd</th>
+                                            <th class="py-1 px-0.5 text-amber-500 border-r border-slate-700 bg-slate-900">3rd</th>
+                                            <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60 bg-slate-900">1st</th>
+                                            <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60 bg-slate-900">2nd</th>
+                                            <th class="py-1 px-0.5 text-amber-500 bg-slate-900">3rd</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-800/60">
                                         ${rowsHtml}
                                     </tbody>
-                                    <tfoot>
-                                        <tr class="bg-slate-900/90 border-t border-slate-700 font-black text-[9px] sm:text-xs num-font">
+                                    <tfoot class="sticky bottom-0 z-20 shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
+                                        <tr class="bg-slate-900 border-t border-slate-700 font-black text-[9px] sm:text-xs num-font">
                                             <td class="py-2 px-1.5 sm:px-3 text-slate-300 uppercase text-[8px] sm:text-[10px] tracking-wider border-r border-slate-800 leading-tight">Place Totals</td>
                                             <td class="py-2 px-0.5 text-center text-yellow-400 border-r border-slate-800/60">${secTotals.m1}</td>
                                             <td class="py-2 px-0.5 text-center text-slate-300 border-r border-slate-800/60">${secTotals.m2}</td>
@@ -574,7 +590,7 @@
                                             <td class="py-2 px-0.5 text-center text-slate-300 border-r border-slate-800/60">${secTotals.q2}</td>
                                             <td class="py-2 px-0.5 text-center text-amber-500">${secTotals.q3}</td>
                                         </tr>
-                                        <tr class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700 font-black text-xs sm:text-sm num-font">
+                                        <tr class="bg-slate-900 border-t border-slate-700 font-black text-xs sm:text-sm num-font">
                                             <td class="py-2 sm:py-2.5 px-1.5 sm:px-3 text-white uppercase text-[9px] sm:text-xs tracking-wider border-r border-slate-800 leading-tight">${title} Total</td>
                                             <td colspan="3" class="py-2 sm:py-2.5 px-1 text-center text-sky-400 border-r border-slate-700 text-xs sm:text-base">${secTotals.mSum} PTS</td>
                                             <td colspan="3" class="py-2 sm:py-2.5 px-1 text-center text-emerald-400 text-xs sm:text-base">${secTotals.qSum} PTS</td>
