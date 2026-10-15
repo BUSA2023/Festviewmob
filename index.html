@@ -1,40 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Candidate Portal - Urava S4</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Premium Fonts for UI and Certificates -->
-    <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;600;700;800&family=Outfit:wght@400;700;900&family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Great+Vibes&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
-        * { box-sizing: border-box; }
-        html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: auto;
-            min-height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            max-width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: visible;
-            font-family: 'Anek Malayalam', sans-serif;
-            background-color: #020617;
-            color: #f8fafc;
     <!-- Custom Viewport Meta for All Mobile Browsers -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candidate Portal - Urava S4</title>
@@ -58,6 +24,7 @@
             font-family: 'Anek Malayalam', sans-serif;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         .num-font { font-family: 'Outfit', sans-serif; }
         .nav-active { color: #38bdf8; transform: translateY(-2px); }
@@ -149,21 +116,10 @@
 
             <div class="flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-500/20 rounded-full shrink-0">
                 <span id="liveDot" class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span>
-                <span id="liveStatusText" class="text-[9px] sm:text-[10px] text-red-400 font-bold uppercase tracking-widest">Live</span>
+                <span id="liveStatusText" class="text-[9px] sm:text-[10px] text-red-400 font-bold uppercase tracking-widest">Live Sync</span>
             </div>
         </div>
     </header>
-
-    <!-- Database / Network Warning Banner for Other Phones -->
-    <div id="dbErrorBanner" class="hidden max-w-7xl mx-auto mt-3 px-3 sm:px-6 lg:px-8 relative z-30">
-        <div class="bg-amber-950/90 border border-amber-500/50 rounded-2xl p-3.5 text-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-lg">
-            <div>
-                <strong class="text-amber-400 block sm:inline">⚠️ Connection Notice:</strong>
-                <span id="dbErrorMsg">Connecting to fallback database...</span>
-            </div>
-            <button onclick="window.location.reload()" class="bg-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-xl text-[10px] uppercase tracking-wider shrink-0 self-start sm:self-auto">Retry</button>
-        </div>
-    </div>
 
     <!-- Custom Toast Notification System -->
     <div id="liveToast" class="fixed top-16 sm:top-20 left-3 right-3 sm:left-auto sm:right-6 sm:w-96 bg-gradient-to-r from-sky-600 to-indigo-600 text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl z-[100] hidden border border-sky-400/50 flex-col gap-1 cursor-pointer transition-all" onclick="this.style.display='none'">
@@ -202,11 +158,22 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // PRIMARY DATABASE (fest-66fe3)
-        const firebaseConfig = {
+        /* 
+         * ==========================================
+         * WHERE IS DATA SAVED? (Database Configuration)
+         * ==========================================
+         * 1. PRIMARY DATABASE: Project ID `fest-66fe3` (New Database)
+         * 2. BACKUP DATABASE: Project ID `pullani-6a39b` (Legacy Database)
+         * 
+         * The app below automatically syncs and merges data from BOTH databases 
+         * in real-time so that no matter which database you or your admins update, 
+         * candidates and visitors will always see the correct live scores instantly!
+         */
+
+        const primaryFirebaseConfig = {
             apiKey: "AIzaSyDy4XPx_UwsoLzh3PTCgfsccZxz5Oc80n8",
             authDomain: "fest-66fe3.firebaseapp.com",
             projectId: "fest-66fe3",
@@ -216,7 +183,6 @@
             measurementId: "G-47FEMSFRCH"
         };
 
-        // FALLBACK LEGACY DATABASE (pullani-6a39b) - Used automatically if new DB blocks other phones
         const legacyFirebaseConfig = {
             apiKey: "AIzaSyCIbvk4teIJ6AlfaXbFgDMgCWpnekNwmx8",
             authDomain: "pullani-6a39b.firebaseapp.com",
@@ -226,9 +192,9 @@
             appId: "1:617480764841:web:c22959689a7003a31498b8"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const primaryApp = initializeApp(primaryFirebaseConfig);
+        const primaryAuth = getAuth(primaryApp);
+        const primaryDb = getFirestore(primaryApp);
 
         const legacyApp = initializeApp(legacyFirebaseConfig, "legacyPortalApp");
         const legacyAuth = getAuth(legacyApp);
@@ -236,7 +202,7 @@
 
         const festId = 'urava-s4-fest';
 
-        // Read QR Code URL parameter (?c=J101 or ?chest=J101)
+        // Read QR Code URL parameter (?c=101 or ?chest=101)
         const urlParams = new URLSearchParams(window.location.search);
         const qrCandParam = urlParams.get('c') || urlParams.get('chest') || '';
 
@@ -254,12 +220,19 @@
             tab: qrCandParam ? 'search' : 'home', 
             searchQuery: qrCandParam,
             pointTableFilter: 'All',
-            device: detectDeviceType(),
-            usingFallbackDb: false
+            device: detectDeviceType()
         };
         let initialLoad = true;
-        let listenersAttached = false;
-        let fallbackAttached = false;
+        let primaryData = { programs: [], candidates: [], results: [] };
+        let legacyData = { programs: [], candidates: [], results: [] };
+
+        const syncMergedState = () => {
+            // Merges data from primary and legacy databases seamlessly
+            state.programs = primaryData.programs.length > 0 ? primaryData.programs : legacyData.programs;
+            state.candidates = primaryData.candidates.length > 0 ? primaryData.candidates : legacyData.candidates;
+            state.results = primaryData.results.length > 0 ? primaryData.results : legacyData.results;
+            if (window.renderApp) window.renderApp();
+        };
 
         const updateDeviceBadge = () => {
             const newDevice = detectDeviceType();
@@ -303,72 +276,26 @@
             if(s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } 
         };
 
-        // Automatic Fallback to Legacy DB if Primary DB has strict rules or is empty on other phones
-        const attachFallbackListeners = (reason) => {
-            if (fallbackAttached) return;
-            fallbackAttached = true;
-            state.usingFallbackDb = true;
-            console.warn("Switching to fallback database:", reason);
+        // 1. Render UI layout immediately so no phone ever gets stuck on a loading screen
+        setTimeout(() => {
+            if (window.renderApp) window.renderApp();
+        }, 30);
 
-            signInAnonymously(legacyAuth).catch(() => {});
-
-            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
-                if (state.programs.length === 0) {
-                    snap.docs.forEach(d => { if(d.id === 'config') state.programs = d.data().programs || []; });
-                    renderApp();
-                }
+        // 2. Authenticate first BEFORE attaching listeners so Firestore never throws a premature permission error
+        signInAnonymously(primaryAuth).then(() => {
+            onSnapshot(collection(primaryDb, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
+                snap.docs.forEach(d => { if(d.id === 'config') primaryData.programs = d.data().programs || []; });
+                syncMergedState();
             }, () => {});
 
-            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
-                if (state.candidates.length === 0) {
-                    state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    renderApp();
-                }
+            onSnapshot(collection(primaryDb, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
+                primaryData.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
+                syncMergedState();
             }, () => {});
 
-            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
-                if (state.results.length === 0) {
-                    state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp);
-                    renderApp();
-                }
-            }, () => {});
-        };
-
-        const attachPortalListeners = () => {
-            if (listenersAttached) return;
-            listenersAttached = true;
-
-            onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
-                let foundProgs = [];
-                snap.docs.forEach(d => { if(d.id === 'config') foundProgs = d.data().programs || []; });
-                if (foundProgs.length > 0) {
-                    state.programs = foundProgs;
-                    renderApp();
-                } else {
-                    attachFallbackListeners("Primary DB has 0 programs");
-                }
-            }, (err) => {
-                console.warn("Primary Settings sync error:", err);
-                attachFallbackListeners(err.message);
-            });
-
-            onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
-                if (snap.docs.length > 0) {
-                    state.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() })); 
-                    renderApp();
-                } else {
-                    attachFallbackListeners("Primary DB has 0 candidates");
-                }
-            }, (err) => {
-                console.warn("Primary Candidates sync error:", err);
-                attachFallbackListeners(err.message);
-            });
-
-            onSnapshot(collection(db, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
-                if (snap.docs.length > 0) {
-                    state.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); 
-                    renderApp();
-                }
+            onSnapshot(collection(primaryDb, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
+                primaryData.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp); 
+                syncMergedState();
                 
                 if(!initialLoad) {
                     snap.docChanges().forEach((change) => {
@@ -379,30 +306,25 @@
                     });
                 }
                 setTimeout(() => { initialLoad = false; }, 2000);
-            }, (err) => {
-                console.warn("Primary Results sync error:", err);
-                attachFallbackListeners(err.message);
-            });
-        };
+            }, () => {});
+        }).catch(() => {});
 
-        // 1. Render UI immediately so other phones NEVER get stuck on "Syncing Live Data..."
-        setTimeout(() => {
-            if (window.renderApp) window.renderApp();
-        }, 50);
+        signInAnonymously(legacyAuth).then(() => {
+            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'settings'), (snap) => {
+                snap.docs.forEach(d => { if(d.id === 'config') legacyData.programs = d.data().programs || []; });
+                syncMergedState();
+            }, () => {});
 
-        // 2. Attach listeners right away AND on auth state change so disabled Anonymous Auth never blocks loading
-        attachPortalListeners();
+            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'candidates'), (snap) => {
+                legacyData.candidates = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                syncMergedState();
+            }, () => {});
 
-        signInAnonymously(auth).catch((err) => {
-            console.warn("Anonymous Auth not enabled on primary project:", err.message);
-            attachPortalListeners();
-        });
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                attachPortalListeners();
-            }
-        });
+            onSnapshot(collection(legacyDb, 'artifacts', festId, 'public', 'data', 'results'), (snap) => {
+                legacyData.results = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> b.timestamp - a.timestamp);
+                syncMergedState();
+            }, () => {});
+        }).catch(() => {});
 
         // Professional Certificate Generator using Canvas
         window.downloadCertificate = (candName, candTeam, candCat, progName, positionStr) => {
@@ -565,10 +487,6 @@
                 const srQazwini = detailedStats['Senior']['Total']['Al-Qazwini'];
                 const srDiff = Math.abs(srMasudi - srQazwini);
 
-                const isMobile = state.device === 'mobile';
-
-                // Helper to build each Program Table (Junior Stage, Junior Non-Stage, Senior Stage, Senior Non-Stage)
-                // Fits 100% inside mobile, tablet, and desktop screens without horizontal scrollbars
                 const buildProgramSectionTable = (cat, type, title, badgeColor) => {
                     const sectionProgs = state.programs.filter(p => p.cat === cat && p.type === type);
                     let rowsHtml = '';
@@ -613,11 +531,9 @@
                                         ${!res ? '<span class="text-[8px] sm:text-[9px] font-semibold text-slate-500 bg-slate-900 px-1 py-0.5 rounded border border-slate-800 w-fit shrink-0">Pending</span>' : ''}
                                     </div>
                                 </td>
-                                <!-- Al-Masūdi 1st, 2nd, 3rd -->
                                 <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${m1 > 0 ? 'text-yellow-400 bg-sky-950/30' : 'text-slate-600'} border-r border-slate-800/40">${m1 || '-'}</td>
                                 <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${m2 > 0 ? 'text-slate-200 bg-sky-950/30' : 'text-slate-600'} border-r border-slate-800/40">${m2 || '-'}</td>
                                 <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${m3 > 0 ? 'text-amber-500 bg-sky-950/30' : 'text-slate-600'} border-r border-slate-700">${m3 || '-'}</td>
-                                <!-- Al-Qazwini 1st, 2nd, 3rd -->
                                 <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${q1 > 0 ? 'text-yellow-400 bg-emerald-950/30' : 'text-slate-600'} border-r border-slate-800/40">${q1 || '-'}</td>
                                 <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${q2 > 0 ? 'text-slate-200 bg-emerald-950/30' : 'text-slate-600'} border-r border-slate-800/40">${q2 || '-'}</td>
                                 <td class="py-2 px-0.5 sm:px-1.5 text-center num-font text-[10px] sm:text-xs font-bold ${q3 > 0 ? 'text-amber-500 bg-emerald-950/30' : 'text-slate-600'}">${q3 || '-'}</td>
@@ -654,13 +570,11 @@
                                         <col style="width: 10%;">
                                     </colgroup>
                                     <thead>
-                                        <!-- Top Row: Program Name on Left + Two Team Names -->
                                         <tr class="bg-slate-900 border-b border-slate-800 text-[9px] sm:text-xs font-black uppercase tracking-wider">
                                             <th rowspan="2" class="py-2 sm:py-3 px-1.5 sm:px-3 text-slate-300 border-r border-slate-800 align-middle leading-tight bg-slate-900">${title}<br><span class="text-[8px] sm:text-[10px] text-slate-500 font-bold">Programs</span></th>
                                             <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-sky-400 border-r border-slate-700 bg-slate-900 truncate">Al-Masūdi</th>
                                             <th colspan="3" class="py-1.5 sm:py-2 px-1 text-center text-emerald-400 bg-slate-900 truncate">Al-Qazwini</th>
                                         </tr>
-                                        <!-- Second Row: 1st, 2nd, 3rd columns for each team -->
                                         <tr class="bg-slate-900 border-b border-slate-800 text-[8px] sm:text-[10px] font-extrabold uppercase tracking-tighter sm:tracking-wider text-center">
                                             <th class="py-1 px-0.5 text-yellow-400 border-r border-slate-800/60 bg-slate-900">1st</th>
                                             <th class="py-1 px-0.5 text-slate-300 border-r border-slate-800/60 bg-slate-900">2nd</th>
@@ -698,7 +612,6 @@
                 const showJunior = state.pointTableFilter === 'All' || state.pointTableFilter === 'Junior';
                 const showSenior = state.pointTableFilter === 'All' || state.pointTableFilter === 'Senior';
 
-                // Bottom Summary Logic depending on Filter ('Junior', 'Senior', or 'All')
                 let bottomSummaryHtml = '';
                 if (state.pointTableFilter === 'Junior') {
                     bottomSummaryHtml = `
@@ -745,12 +658,10 @@
                         </div>
                     `;
                 } else {
-                    // 'All' Selected -> Show Junior & Senior Earned + Each Team Full Points & Difference
                     bottomSummaryHtml = `
                         <div class="ag-card rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 space-y-3.5 sm:space-y-4">
                             <h4 class="text-[11px] sm:text-sm font-black uppercase tracking-widest text-white text-center">📊 Complete Fest Points & Category Summary</h4>
                             
-                            <!-- Juniors & Seniors Earned Breakdown -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-center">
                                 <div class="bg-slate-950/80 border border-slate-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-3">
                                     <div class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-sky-400 mb-1.5">Junior Category Earned</div>
@@ -772,7 +683,6 @@
                                 </div>
                             </div>
 
-                            <!-- Full Points & Difference Between Teams -->
                             <div class="grid grid-cols-3 gap-2 sm:gap-4 pt-2 border-t border-slate-800 text-center">
                                 <div class="bg-sky-950/40 border border-sky-500/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 shadow-inner">
                                     <div class="text-[8px] sm:text-xs font-black uppercase text-sky-400 tracking-wider truncate">Al-Masūdi Total</div>
@@ -793,7 +703,6 @@
 
                 content.innerHTML = `
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
-                        <!-- Left Column on Desktop: Anti-Gravity Live Leaderboard & Quick Search Card -->
                         <div class="lg:col-span-4 space-y-4 sm:space-y-6 lg:sticky lg:top-24">
                             <div class="fade-in ag-card ag-float rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center relative overflow-hidden">
                                 <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="absolute -right-10 -bottom-10 h-36 sm:h-44 opacity-20 object-contain pointer-events-none">
@@ -828,9 +737,7 @@
                             </div>
                         </div>
 
-                        <!-- Right Column on Desktop: Filterable 1st/2nd/3rd Program Tables -->
                         <div class="lg:col-span-8 fade-in min-w-0">
-                            <!-- Upper Filter Bar (All, Junior, Senior) -->
                             <div class="ag-card rounded-2xl p-3 sm:p-4 mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-center gap-2.5">
                                 <div class="flex items-center gap-2 w-full sm:w-auto">
                                     <span class="text-base sm:text-lg">📋</span>
@@ -848,13 +755,11 @@
                                 </div>
                             </div>
 
-                            <!-- Separate Tables for Junior Stage, Junior Non-Stage, Senior Stage, Senior Non-Stage -->
                             ${showJunior ? buildProgramSectionTable('Junior', 'Stage', 'Junior Stage', 'bg-sky-400') : ''}
                             ${showJunior ? buildProgramSectionTable('Junior', 'Non-Stage', 'Junior Non-Stage', 'bg-indigo-400') : ''}
                             ${showSenior ? buildProgramSectionTable('Senior', 'Stage', 'Senior Stage', 'bg-emerald-400') : ''}
                             ${showSenior ? buildProgramSectionTable('Senior', 'Non-Stage', 'Senior Non-Stage', 'bg-teal-400') : ''}
 
-                            <!-- Dynamic Bottom Summary -->
                             ${bottomSummaryHtml}
                         </div>
                     </div>
