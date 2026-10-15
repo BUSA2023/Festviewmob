@@ -1,4 +1,4 @@
-.<!DOCTYPE html>
+Put your HTML text here<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -300,6 +300,10 @@
 
             const content = document.getElementById('appContent');
             let stats = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
+            let detailedStats = {
+                'Junior': { 'Stage': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 }, 'Non-Stage': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 }, 'Total': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 } },
+                'Senior': { 'Stage': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 }, 'Non-Stage': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 }, 'Total': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 } }
+            };
             let candTotalPts = {};
             
             state.results.forEach(res => {
@@ -307,12 +311,20 @@
                 if(!prog) return;
                 
                 let ptsArr = (prog.pointScheme || (prog.format === 'Group' ? "15,8,5" : "10,5,3")).split(',').map(Number);
+                const pCat = prog.cat === 'Senior' ? 'Senior' : 'Junior';
+                const pType = prog.type === 'Non-Stage' ? 'Non-Stage' : 'Stage';
 
                 const addPts = (ids, pts) => {
                     (Array.isArray(ids)?ids:[]).forEach(id => {
                         const c = state.candidates.find(x => x.id === id);
                         if(c) {
-                            if(stats[c.team] !== undefined) stats[c.team] += pts;
+                            if(stats[c.team] !== undefined) {
+                                stats[c.team] += pts;
+                                if(detailedStats[pCat] && detailedStats[pCat][pType][c.team] !== undefined) {
+                                    detailedStats[pCat][pType][c.team] += pts;
+                                    detailedStats[pCat]['Total'][c.team] += pts;
+                                }
+                            }
                             candTotalPts[c.id] = (candTotalPts[c.id] || 0) + pts;
                         }
                     });
@@ -321,20 +333,141 @@
             });
 
             if (state.tab === 'home') {
+                const masudiTotal = stats['Al-Masūdi'];
+                const qazwiniTotal = stats['Al-Qazwini'];
+                const pointDiff = Math.abs(masudiTotal - qazwiniTotal);
+                let leaderText = 'Tie - Both Teams Equal';
+                let leaderBadgeClass = 'bg-slate-800 text-slate-300 border-slate-700';
+                if (masudiTotal > qazwiniTotal) {
+                    leaderText = `Al-Masūdi leads by ${pointDiff} PTS`;
+                    leaderBadgeClass = 'bg-sky-500/15 text-sky-300 border-sky-500/40';
+                } else if (qazwiniTotal > masudiTotal) {
+                    leaderText = `Al-Qazwini leads by ${pointDiff} PTS`;
+                    leaderBadgeClass = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40';
+                }
+
+                const jrDiff = Math.abs(detailedStats['Junior']['Total']['Al-Masūdi'] - detailedStats['Junior']['Total']['Al-Qazwini']);
+                const srDiff = Math.abs(detailedStats['Senior']['Total']['Al-Masūdi'] - detailedStats['Senior']['Total']['Al-Qazwini']);
+
                 content.innerHTML = `
-                    <div class="fade-in bg-slate-900/60 border border-slate-800 rounded-3xl p-6 text-center mb-6 shadow-xl relative overflow-hidden backdrop-blur-md">
+                    <div class="fade-in bg-slate-900/60 border border-slate-800 rounded-3xl p-5 text-center mb-5 shadow-xl relative overflow-hidden backdrop-blur-md">
                         <img src="https://raw.githubusercontent.com/BUSA2023/Kottam-admin/main/LOGO%205-01.png" class="absolute -right-10 -bottom-10 h-40 opacity-20 object-contain pointer-events-none">
-                        <h2 class="text-white font-black text-2xl mb-1 tracking-tight">Live Leaderboard</h2>
-                        <p class="text-[10px] text-sky-400 font-bold uppercase tracking-widest mb-6">Aawaaze Funoon S4</p>
+                        <h2 class="text-white font-black text-2xl mb-0.5 tracking-tight">Live Leaderboard</h2>
+                        <p class="text-[10px] text-sky-400 font-bold uppercase tracking-widest mb-4">Aawaaze Funoon S4 • ${state.results.length} Results</p>
                         
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-3 mb-4">
                             <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-sky-400 p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
                                 <h3 class="text-sky-400 font-black text-xs tracking-widest uppercase mb-1">Al-Masūdi</h3>
-                                <div class="text-4xl font-black text-white num-font relative z-10">${stats['Al-Masūdi']}</div>
+                                <div class="text-4xl font-black text-white num-font relative z-10">${masudiTotal}</div>
                             </div>
                             <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-t-2 border-emerald-400 p-4 rounded-2xl text-center shadow-lg relative overflow-hidden">
                                 <h3 class="text-emerald-400 font-black text-xs tracking-widest uppercase mb-1">Al-Qazwini</h3>
-                                <div class="text-4xl font-black text-white num-font relative z-10">${stats['Al-Qazwini']}</div>
+                                <div class="text-4xl font-black text-white num-font relative z-10">${qazwiniTotal}</div>
+                            </div>
+                        </div>
+
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-extrabold tracking-wide ${leaderBadgeClass}">
+                            <span>⚡</span>
+                            <span>${leaderText}</span>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Category & Stage/Non-Stage Point Table -->
+                    <div class="fade-in bg-slate-900/80 border border-slate-800 rounded-3xl p-4 mb-5 shadow-xl backdrop-blur-md">
+                        <div class="flex justify-between items-center mb-3 px-1">
+                            <h3 class="text-white font-black text-sm uppercase tracking-wider flex items-center gap-1.5">
+                                <span>📋</span> Category Point Table
+                            </h3>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Stage & Non-Stage</span>
+                        </div>
+
+                        <div class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-900 border-b border-slate-800 text-[10px] font-black uppercase tracking-wider">
+                                        <th class="py-3 px-3 text-slate-400">Category</th>
+                                        <th class="py-3 px-2 text-center text-sky-400">Al-Masūdi</th>
+                                        <th class="py-3 px-2 text-center text-emerald-400">Al-Qazwini</th>
+                                        <th class="py-3 px-2 text-center text-amber-400">Diff</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/70 text-xs">
+                                    <!-- Junior Stage -->
+                                    <tr class="hover:bg-slate-900/40">
+                                        <td class="py-2.5 px-3 font-bold text-slate-200 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-sky-400"></span> Junior Stage
+                                        </td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-sky-300">${detailedStats['Junior']['Stage']['Al-Masūdi']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-emerald-300">${detailedStats['Junior']['Stage']['Al-Qazwini']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-xs text-slate-400">${Math.abs(detailedStats['Junior']['Stage']['Al-Masūdi'] - detailedStats['Junior']['Stage']['Al-Qazwini'])}</td>
+                                    </tr>
+                                    <!-- Junior Non-Stage -->
+                                    <tr class="hover:bg-slate-900/40">
+                                        <td class="py-2.5 px-3 font-bold text-slate-200 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Junior Non-Stage
+                                        </td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-sky-300">${detailedStats['Junior']['Non-Stage']['Al-Masūdi']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-emerald-300">${detailedStats['Junior']['Non-Stage']['Al-Qazwini']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-xs text-slate-400">${Math.abs(detailedStats['Junior']['Non-Stage']['Al-Masūdi'] - detailedStats['Junior']['Non-Stage']['Al-Qazwini'])}</td>
+                                    </tr>
+                                    <!-- Junior Sub-Total -->
+                                    <tr class="bg-slate-900/70 font-black">
+                                        <td class="py-2 px-3 text-[10px] uppercase tracking-wider text-sky-400">Junior Total</td>
+                                        <td class="py-2 px-2 text-center num-font text-sm text-white">${detailedStats['Junior']['Total']['Al-Masūdi']}</td>
+                                        <td class="py-2 px-2 text-center num-font text-sm text-white">${detailedStats['Junior']['Total']['Al-Qazwini']}</td>
+                                        <td class="py-2 px-2 text-center num-font text-xs text-amber-400">${jrDiff}</td>
+                                    </tr>
+
+                                    <!-- Senior Stage -->
+                                    <tr class="hover:bg-slate-900/40">
+                                        <td class="py-2.5 px-3 font-bold text-slate-200 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Senior Stage
+                                        </td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-sky-300">${detailedStats['Senior']['Stage']['Al-Masūdi']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-emerald-300">${detailedStats['Senior']['Stage']['Al-Qazwini']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-xs text-slate-400">${Math.abs(detailedStats['Senior']['Stage']['Al-Masūdi'] - detailedStats['Senior']['Stage']['Al-Qazwini'])}</td>
+                                    </tr>
+                                    <!-- Senior Non-Stage -->
+                                    <tr class="hover:bg-slate-900/40">
+                                        <td class="py-2.5 px-3 font-bold text-slate-200 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-teal-400"></span> Senior Non-Stage
+                                        </td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-sky-300">${detailedStats['Senior']['Non-Stage']['Al-Masūdi']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-sm text-emerald-300">${detailedStats['Senior']['Non-Stage']['Al-Qazwini']}</td>
+                                        <td class="py-2.5 px-2 text-center font-bold num-font text-xs text-slate-400">${Math.abs(detailedStats['Senior']['Non-Stage']['Al-Masūdi'] - detailedStats['Senior']['Non-Stage']['Al-Qazwini'])}</td>
+                                    </tr>
+                                    <!-- Senior Sub-Total -->
+                                    <tr class="bg-slate-900/70 font-black">
+                                        <td class="py-2 px-3 text-[10px] uppercase tracking-wider text-emerald-400">Senior Total</td>
+                                        <td class="py-2 px-2 text-center num-font text-sm text-white">${detailedStats['Senior']['Total']['Al-Masūdi']}</td>
+                                        <td class="py-2 px-2 text-center num-font text-sm text-white">${detailedStats['Senior']['Total']['Al-Qazwini']}</td>
+                                        <td class="py-2 px-2 text-center num-font text-xs text-amber-400">${srDiff}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t-2 border-slate-700 font-black">
+                                        <td class="py-3 px-3 text-xs uppercase tracking-wider text-white">Grand Total</td>
+                                        <td class="py-3 px-2 text-center num-font text-lg text-sky-400">${masudiTotal}</td>
+                                        <td class="py-3 px-2 text-center num-font text-lg text-emerald-400">${qazwiniTotal}</td>
+                                        <td class="py-3 px-2 text-center num-font text-base text-amber-400">${pointDiff}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Under-Table Summary: Each Team Points & Point Difference -->
+                        <div class="grid grid-cols-3 gap-2.5 mt-3 pt-3 border-t border-slate-800/80 text-center">
+                            <div class="bg-sky-950/30 border border-sky-500/30 rounded-xl p-2.5">
+                                <div class="text-[9px] font-black uppercase text-sky-400 tracking-wider">Al-Masūdi</div>
+                                <div class="text-xl font-black text-white num-font mt-0.5">${masudiTotal} <span class="text-[9px] font-bold text-slate-400">PTS</span></div>
+                            </div>
+                            <div class="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-2.5">
+                                <div class="text-[9px] font-black uppercase text-emerald-400 tracking-wider">Al-Qazwini</div>
+                                <div class="text-xl font-black text-white num-font mt-0.5">${qazwiniTotal} <span class="text-[9px] font-bold text-slate-400">PTS</span></div>
+                            </div>
+                            <div class="bg-amber-950/30 border border-amber-500/30 rounded-xl p-2.5">
+                                <div class="text-[9px] font-black uppercase text-amber-400 tracking-wider">Difference</div>
+                                <div class="text-xl font-black text-amber-300 num-font mt-0.5">${pointDiff} <span class="text-[9px] font-bold text-amber-400/80">PTS</span></div>
                             </div>
                         </div>
                     </div>
