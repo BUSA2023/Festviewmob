@@ -379,10 +379,12 @@
             championSubtitle: "Congratulations to the victorious team of Aawaaze Funoon Season 04!",
             cancelledNotice: "Official Notice: 1 Program was cancelled by the Fest Committee.",
             trolls: [
-                { id: 't1', target: 'Runner-Up Team', text: 'അടുത്ത സീസണിൽ നോക്കാം മക്കളേ... കപ്പ് ഞങ്ങൾക്കിരിക്കട്ടെ! 🏆😂', voiceText: 'Adutha seasonil nokkaam makkale, cup njangalkku irikkatte!', soundType: 'laugh', audioUrl: '' },
-                { id: 't2', target: 'Point Table Lookers', text: 'പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളിയോ? ഇതൊക്കെയെന്ത്! 🔥😎', voiceText: 'Point table nokki kannu thalliyo? Ithokke enthu!', soundType: 'horn', audioUrl: '' },
-                { id: 't3', target: 'Cancelled Program', text: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് കരുതണ്ട! 🤣🎤', voiceText: 'Oru program cancel aayathukondu rakshappettu ennu karuthanda!', soundType: 'sad', audioUrl: '' },
-                { id: 't4', target: 'Champions', text: 'കപ്പും തൂക്കി... ഗ്രൗണ്ടും തൂക്കി... ഇനി ട്രോളുകളുടെ പൂരം! 👑🎺', voiceText: 'Cuppum thookki, groundum thookki, ini trollukalude pooram!', soundType: 'thug', audioUrl: '' }
+                { id: 't1', target: 'Runner-Up Team', text: 'അടുത്ത സീസണിൽ നോക്കാം മക്കളേ... കപ്പ് ഞങ്ങൾക്കിരിക്കട്ടെ! 🏆😂', voiceText: 'അടുത്ത സീസണിൽ നോക്കാം മക്കളേ, കപ്പ് ഞങ്ങൾക്കിരിക്കട്ടെ!', soundType: 'laugh', audioUrl: '' },
+                { id: 't2', target: 'Point Table Lookers', text: 'പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളിയോ? ഇതൊക്കെയെന്ത്! 🔥😎', voiceText: 'പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളിയോ? ഇതൊക്കെയെന്ത്!', soundType: 'horn', audioUrl: '' },
+                { id: 't3', target: 'Cancelled Program', text: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് കരുതണ്ട! 🤣🎤', voiceText: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് കരുതണ്ട!', soundType: 'sad', audioUrl: '' },
+                { id: 't4', target: 'Champions', text: 'കപ്പും തൂക്കി... ഗ്രൗണ്ടും തൂക്കി... ഇനി ട്രോളുകളുടെ പൂരം! 👑🎺', voiceText: 'കപ്പും തൂക്കി, ഗ്രൗണ്ടും തൂക്കി, ഇനി ട്രോളുകളുടെ പൂരം!', soundType: 'thug', audioUrl: '' },
+                { id: 't5', target: 'Kalaprathiba Tie-Break', text: 'ഇൻഡിവിജ്വൽ പോയിന്റ് സമമായപ്പോൾ ഗ്രൂപ്പ് പ്രോഗ്രാം നോക്കി കലാപ്രതിഭ തൂക്കി! 🌟🔥', voiceText: 'ഇൻഡിവിജ്വൽ പോയിന്റ് സമമായപ്പോൾ ഗ്രൂപ്പ് പ്രോഗ്രാം നോക്കി കലാപ്രതിഭ തൂക്കി!', soundType: 'horn', audioUrl: '' },
+                { id: 't6', target: 'Opposition Team', text: 'എവിടെയോ എന്തോ തകരാറു പോലെ... പോയിന്റ് ഒന്നും കാണുന്നില്ലല്ലോ! 🕵️‍♂️🤣', voiceText: 'എവിടെയോ എന്തോ തകരാറു പോലെ, പോയിന്റ് ഒന്നും കാണുന്നില്ലല്ലോ!', soundType: 'laugh', audioUrl: '' }
             ]
         };
 
@@ -632,8 +634,55 @@
             } catch (e) {}
         };
 
+        // Authentic Malayalam Voice TTS Engine (Native ml-IN + Cloud Malayalam Audio Fallback)
         let activeTrollAudio = null;
-        window.speakTrollCard = (idx, pitch = 1.15, rate = 1.0) => {
+        window.speakMalayalamText = (malayalamText, pitch = 1.1, rate = 0.95) => {
+            if (!malayalamText) return;
+            try {
+                if (activeTrollAudio) {
+                    activeTrollAudio.pause();
+                    activeTrollAudio = null;
+                }
+            } catch (e) {}
+
+            const playCloudMalayalamFallback = () => {
+                try {
+                    const encoded = encodeURIComponent(malayalamText);
+                    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ml&client=tw-ob&q=${encoded}`;
+                    activeTrollAudio = new Audio(url);
+                    activeTrollAudio.playbackRate = Math.min(Math.max(rate, 0.75), 1.5);
+                    activeTrollAudio.play().catch(() => {
+                        if ('speechSynthesis' in window) {
+                            window.speechSynthesis.cancel();
+                            const u = new SpeechSynthesisUtterance(malayalamText);
+                            u.lang = 'ml-IN';
+                            u.pitch = pitch;
+                            u.rate = rate;
+                            window.speechSynthesis.speak(u);
+                        }
+                    });
+                } catch (e) {}
+            };
+
+            if ('speechSynthesis' in window) {
+                const voices = window.speechSynthesis.getVoices();
+                const mlVoice = voices.find(v => v.lang && (v.lang.toLowerCase().includes('ml') || v.name.toLowerCase().includes('malayalam')));
+                if (mlVoice) {
+                    window.speechSynthesis.cancel();
+                    const utter = new SpeechSynthesisUtterance(malayalamText);
+                    utter.voice = mlVoice;
+                    utter.lang = 'ml-IN';
+                    utter.pitch = pitch;
+                    utter.rate = rate;
+                    window.speechSynthesis.speak(utter);
+                    return;
+                }
+            }
+            // If device lacks built-in Malayalam voice pack, stream Malayalam TTS audio directly
+            playCloudMalayalamFallback();
+        };
+
+        window.speakTrollCard = (idx, pitch = 1.1, rate = 0.95) => {
             const trolls = state.finaleConfig?.trolls || [];
             const item = trolls[idx];
             if (!item) return;
@@ -649,36 +698,19 @@
                 } catch (e) {}
             }
 
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                setTimeout(() => {
-                    const utter = new SpeechSynthesisUtterance(item.voiceText || item.text);
-                    utter.pitch = pitch;
-                    utter.rate = rate;
-                    const voices = window.speechSynthesis.getVoices();
-                    const mlVoice = voices.find(v => v.lang.includes('ml') || v.lang.includes('en-IN'));
-                    if (mlVoice) utter.voice = mlVoice;
-                    window.speechSynthesis.speak(utter);
-                }, 400);
-            } else {
-                window.showAppToast("Troll Sound Played!", item.text, "😂");
-            }
+            setTimeout(() => {
+                window.speakMalayalamText(item.text || item.voiceText, pitch, rate);
+            }, 380);
         };
 
         window.speakCustomTrollInput = () => {
             const txt = document.getElementById('customTrollInput')?.value?.trim();
             const effect = document.getElementById('customTrollEffect')?.value || 'horn';
-            if (!txt) return window.showAppToast("Type Troll Text", "Enter any dialogue to speak out loud!", "🎤");
+            if (!txt) return window.showAppToast("മലയാളം ട്രോൾ ടൈപ്പ് ചെയ്യുക", "ശബ്ദത്തിൽ കേൾക്കാൻ എന്തെങ്കിലും ടൈപ്പ് ചെയ്യുക!", "🎤");
             window.playTrollEffect(effect);
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                setTimeout(() => {
-                    const utter = new SpeechSynthesisUtterance(txt);
-                    utter.pitch = 1.2;
-                    utter.rate = 0.95;
-                    window.speechSynthesis.speak(utter);
-                }, 400);
-            }
+            setTimeout(() => {
+                window.speakMalayalamText(txt, 1.15, 0.95);
+            }, 380);
         };
 
         window.firePortalConfetti = () => {
@@ -758,6 +790,9 @@
                 'Senior': { 'Al-Masūdi': 0, 'Al-Qazwini': 0, Stage: { 'Al-Masūdi': 0, 'Al-Qazwini': 0 }, 'Non-Stage': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 } }
             };
             let candTotalPts = {};
+            let candGroupPts = {};
+            let candGroupBreakdown = {};
+            let candIndivBreakdown = {};
             let progTeamBreakdown = {};
 
             state.results.forEach(res => {
@@ -775,11 +810,18 @@
                     const arr = Array.isArray(ids) ? ids : (ids ? [ids] : []);
                     if (isGroup) {
                         const winningTeams = new Set();
+                        const creditedCands = new Set();
                         arr.forEach(id => {
-                            if (String(id).startsWith('TEAM:')) winningTeams.add(String(id).replace('TEAM:', ''));
-                            else {
+                            if (String(id).startsWith('TEAM:')) {
+                                const tName = String(id).replace('TEAM:', '');
+                                winningTeams.add(tName);
+                                state.candidates.filter(x => x.cat === prog.cat && x.team === tName && (x.assignedPrograms || []).includes(prog.id)).forEach(m => creditedCands.add(m.id));
+                            } else {
                                 const c = state.candidates.find(x => x.id === id);
-                                if (c && c.team) winningTeams.add(c.team);
+                                if (c && c.team) {
+                                    winningTeams.add(c.team);
+                                    creditedCands.add(c.id);
+                                }
                             }
                         });
                         winningTeams.forEach(tName => {
@@ -792,6 +834,12 @@
                                 progTeamBreakdown[prog.id][tName][placeKey] += pts;
                             }
                         });
+                        // Track Group Program points for Kalaprathiba Tie-Breaker
+                        creditedCands.forEach(cid => {
+                            candGroupPts[cid] = (candGroupPts[cid] || 0) + pts;
+                            if (!candGroupBreakdown[cid]) candGroupBreakdown[cid] = [];
+                            candGroupBreakdown[cid].push({ name: prog.name, pts });
+                        });
                     } else {
                         arr.forEach(id => {
                             const c = state.candidates.find(x => x.id === id);
@@ -802,6 +850,8 @@
                                     if (catTotals[prog.cat][prog.type]) catTotals[prog.cat][prog.type][c.team] += pts;
                                 }
                                 candTotalPts[c.id] = (candTotalPts[c.id] || 0) + pts;
+                                if (!candIndivBreakdown[c.id]) candIndivBreakdown[c.id] = [];
+                                candIndivBreakdown[c.id].push({ name: prog.name, pts });
                                 progTeamBreakdown[prog.id][c.team][placeKey] += pts;
                             }
                         });
@@ -812,6 +862,29 @@
                 awardPlace(res.second, pArr[1], 'second');
                 awardPlace(res.third, pArr[2], 'third');
             });
+
+            // Kalaprathiba Calculation with Group Program Tie-Breaker
+            const getKalaprathibaWinner = (cat) => {
+                const cands = state.candidates.filter(c => c.cat === cat).map(c => ({
+                    ...c,
+                    indivPts: candTotalPts[c.id] || 0,
+                    grpPts: candGroupPts[c.id] || 0,
+                    grpProgs: candGroupBreakdown[c.id] || [],
+                    indivProgs: candIndivBreakdown[c.id] || []
+                })).filter(c => c.indivPts > 0);
+                if (cands.length === 0) return null;
+                cands.sort((a, b) => {
+                    if (b.indivPts !== a.indivPts) return b.indivPts - a.indivPts;
+                    return b.grpPts - a.grpPts; // Tie-breaker: compare Group Program points!
+                });
+                const maxIndiv = cands[0].indivPts;
+                const tiedOnIndiv = cands.filter(c => c.indivPts === maxIndiv);
+                return {
+                    winner: cands[0],
+                    tieBrokenByGroup: tiedOnIndiv.length > 1 && cands[0].grpPts > 0,
+                    tiedList: tiedOnIndiv
+                };
+            };
 
             window.latestTeamTotals = teamTotals;
             const cancelledProgramsList = state.programs.filter(p => p.cancelled);
@@ -958,6 +1031,40 @@
                                     </div>
                                 </div>
                                 <button onclick="window.openQrScanner()" class="bg-sky-600 hover:bg-sky-500 text-white font-black px-3.5 py-2.5 rounded-xl text-xs shrink-0 shadow-lg transition">Scan QR</button>
+                            </div>
+
+                            <!-- Kalaprathiba Standings Card (With Group Program Tie-Breaker) -->
+                            <div class="ag-card rounded-3xl p-4 sm:p-5 border border-yellow-500/40 space-y-3">
+                                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                                    <h3 class="text-xs sm:text-sm font-black text-yellow-400 uppercase tracking-wider">👑 Kalaprathiba Champions</h3>
+                                    <span class="text-[9px] bg-yellow-500/10 text-yellow-300 px-2 py-0.5 rounded border border-yellow-500/30 font-bold">Tie-Break: +Group Pts</span>
+                                </div>
+                                ${['Junior', 'Senior'].map(cat => {
+                                    const resKala = getKalaprathibaWinner(cat);
+                                    if (!resKala) return `<div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800 text-xs text-slate-500">${cat} Kalaprathiba: TBA</div>`;
+                                    const w = resKala.winner;
+                                    const grpNames = w.grpProgs.map(g => `${g.name} (+${g.pts})`).join(', ');
+                                    return `
+                                        <div class="bg-slate-950/90 p-3.5 rounded-2xl border ${resKala.tieBrokenByGroup ? 'border-pink-500/50' : 'border-slate-800'}">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <span class="text-[9px] font-black uppercase text-sky-400">${cat} Kalaprathiba</span>
+                                                    <div class="text-sm sm:text-base font-black text-white">${w.name} <span class="text-xs text-slate-400 font-mono">#${w.regNo}</span></div>
+                                                    <div class="text-[10px] text-slate-400 font-bold">${w.team}</div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="text-2xl font-black text-yellow-400 num-font">${w.indivPts} <span class="text-[9px] text-slate-400">INDIV PTS</span></div>
+                                                    ${w.grpPts > 0 ? `<div class="text-[10px] font-black text-pink-400 num-font">+${w.grpPts} Group Pts (${w.indivPts + w.grpPts} Total)</div>` : ''}
+                                                </div>
+                                            </div>
+                                            ${resKala.tieBrokenByGroup ? `
+                                                <div class="mt-2 pt-2 border-t border-slate-800/80 text-[10px] text-pink-300 font-bold">
+                                                    ⚖️ Tie-Breaker Applied (Same Indiv Pts): Won via Group Program — ${grpNames}
+                                                </div>
+                                            ` : (w.grpProgs.length > 0 ? `<div class="mt-1.5 text-[10px] text-slate-400">👥 Group Wins: <span class="text-pink-300 font-semibold">${grpNames}</span></div>` : '')}
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
 
@@ -1233,16 +1340,16 @@
 
                         <!-- Live Custom Troll Voice Synthesizer Box -->
                         <div class="ag-card rounded-3xl p-4 sm:p-5 border border-sky-500/30">
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-sky-400 mb-2">🎤 Live Troll Voice Generator (Type Any Dialogue & Speak)</label>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-sky-400 mb-2">🎤 Live Malayalam Troll Voice Generator (മലയാളം ട്രോൾ വോയ്‌സ്)</label>
                             <div class="flex flex-col sm:flex-row gap-2.5">
-                                <input type="text" id="customTrollInput" placeholder="Type any funny troll message (e.g. Cup njangalkku irikkatte makkale!)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-xs sm:text-sm font-bold outline-none focus:border-sky-400">
+                                <input type="text" id="customTrollInput" placeholder="മലയാളത്തിൽ ട്രോൾ ടൈപ്പ് ചെയ്യുക (ഉദാ: അടുത്ത സീസണിൽ നോക്കാം മക്കളേ!)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-xs sm:text-sm font-bold outline-none focus:border-sky-400">
                                 <select id="customTrollEffect" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-pink-300 font-bold text-xs outline-none">
                                     <option value="horn">📯 With Airhorn</option>
                                     <option value="laugh">😂 With Laugh</option>
                                     <option value="sad">🎻 With Sad Trombone</option>
                                     <option value="thug">🕶️ With Thug Beat</option>
                                 </select>
-                                <button onclick="window.speakCustomTrollInput()" class="bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shrink-0">🔊 Speak Troll</button>
+                                <button onclick="window.speakCustomTrollInput()" class="bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shrink-0">🔊 മലയാളത്തിൽ പറയുക</button>
                             </div>
                         </div>
 
@@ -1256,11 +1363,11 @@
                                             <span class="text-xl">${t.soundType === 'horn' ? '📯' : (t.soundType === 'sad' ? '🎻' : (t.soundType === 'thug' ? '🕶️' : '😂'))}</span>
                                         </div>
                                         <p class="text-white font-black text-base sm:text-lg leading-snug mb-2">${t.text}</p>
-                                        <p class="text-[11px] text-slate-400 italic mb-4">🗣️ "${t.voiceText || t.text}"</p>
+                                        <p class="text-[11px] text-pink-300/90 font-semibold mb-4">🗣️ മലയാളം വോയ്‌സ്: "${t.text}"</p>
                                     </div>
                                     <div class="flex gap-2 pt-3 border-t border-slate-800/80">
-                                        <button onclick="window.speakTrollCard(${idx}, 1.15, 1.0)" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-black py-2.5 px-3 rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">🔊 Play Troll Voice</button>
-                                        <button onclick="window.speakTrollCard(${idx}, 1.6, 1.15)" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2.5 px-3 rounded-xl text-xs border border-slate-700 transition" title="Chipmunk Funny Pitch">🐿️ Funny Pitch</button>
+                                        <button onclick="window.speakTrollCard(${idx}, 1.05, 0.95)" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-black py-2.5 px-3 rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">🔊 മലയാളം വോയ്‌സ്</button>
+                                        <button onclick="window.speakTrollCard(${idx}, 1.55, 1.15)" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2.5 px-3 rounded-xl text-xs border border-slate-700 transition" title="Chipmunk Funny Pitch">🐿️ Funny Voice</button>
                                     </div>
                                 </div>
                             `).join('')}
