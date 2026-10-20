@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         body {
@@ -79,12 +80,16 @@
                 <button onclick="window.switchTab('home')" id="dnav-home" class="px-4 py-2 rounded-xl text-xs font-bold transition">📊 Home & Points</button>
                 <button onclick="window.switchTab('results')" id="dnav-results" class="px-4 py-2 rounded-xl text-xs font-bold transition">🏆 Results & Posters</button>
                 <button onclick="window.switchTab('search')" id="dnav-search" class="px-4 py-2 rounded-xl text-xs font-bold transition">🔍 Candidate Profile</button>
+                <button onclick="window.switchTab('trolls')" id="dnav-trolls" class="px-4 py-2 rounded-xl text-xs font-bold transition">🎭 Troll & Voice Zone</button>
                 <button onclick="window.switchTab('gallery')" id="dnav-gallery" class="px-4 py-2 rounded-xl text-xs font-bold transition">🖼️ Gallery</button>
             </div>
 
-            <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/25 rounded-full">
-                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
-                <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Live</span>
+            <div class="flex items-center gap-1.5">
+                <button onclick="window.openChampionPopup(true)" class="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded-full text-[10px] font-black text-amber-300 uppercase tracking-wider shadow transition">👑 Champions</button>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/25 rounded-full">
+                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+                    <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Finale</span>
+                </div>
             </div>
         </div>
     </header>
@@ -100,19 +105,44 @@
 
     <!-- Floating Bottom Navigation for Mobile -->
     <nav class="md:hidden fixed bottom-3 left-3 right-3 bg-slate-900/95 backdrop-blur-2xl border border-slate-700/80 p-1.5 rounded-2xl flex justify-around items-center z-40 shadow-[0_10px_30px_rgba(0,0,0,0.75)]">
-        <button onclick="window.switchTab('home')" id="nav-home" class="flex flex-col items-center py-1.5 px-3 rounded-xl transition">
+        <button onclick="window.switchTab('home')" id="nav-home" class="flex flex-col items-center py-1.5 px-2.5 rounded-xl transition">
             <span class="text-lg leading-none mb-0.5">📊</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Home</span>
         </button>
-        <button onclick="window.switchTab('results')" id="nav-results" class="flex flex-col items-center py-1.5 px-3 rounded-xl transition">
+        <button onclick="window.switchTab('results')" id="nav-results" class="flex flex-col items-center py-1.5 px-2.5 rounded-xl transition">
             <span class="text-lg leading-none mb-0.5">🏆</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Results</span>
         </button>
-        <button onclick="window.switchTab('search')" id="nav-search" class="flex flex-col items-center py-1.5 px-3 rounded-xl transition">
+        <button onclick="window.switchTab('search')" id="nav-search" class="flex flex-col items-center py-1.5 px-2.5 rounded-xl transition">
             <span class="text-lg leading-none mb-0.5">🔍</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Profile</span>
         </button>
-        <button onclick="window.switchTab('gallery')" id="nav-gallery" class="flex flex-col items-center py-1.5 px-3 rounded-xl transition">
+        <button onclick="window.switchTab('trolls')" id="nav-trolls" class="flex flex-col items-center py-1.5 px-2.5 rounded-xl transition">
+            <span class="text-lg leading-none mb-0.5">🎭</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Trolls</span>
+        </button>
+        <button onclick="window.switchTab('gallery')" id="nav-gallery" class="flex flex-col items-center py-1.5 px-2.5 rounded-xl transition">
             <span class="text-lg leading-none mb-0.5">🖼️</span><span class="text-[9px] font-extrabold uppercase tracking-wider">Gallery</span>
         </button>
     </nav>
+
+    <!-- Grand Finale Overall Champions Celebration Popup Modal -->
+    <div id="championPopupModal" style="display:none;" class="fixed inset-0 bg-black/90 z-[480] items-center justify-center p-4 backdrop-blur-lg overflow-y-auto">
+        <div class="ag-card max-w-lg w-full rounded-[2rem] p-6 sm:p-8 border-2 border-amber-400/60 text-center relative overflow-hidden shadow-[0_0_60px_rgba(245,158,11,0.3)] my-auto">
+            <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+            <button onclick="window.closeChampionPopup()" class="absolute top-4 right-4 px-3 py-1 bg-slate-800/90 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700">✕</button>
+            
+            <div class="text-5xl sm:text-6xl mb-2 animate-bounce">🏆</div>
+            <span class="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">Grand Finale Official Result</span>
+            <h2 id="champPopupHeading" class="text-xl sm:text-2xl font-black text-white mt-3 tracking-tight" style="font-family:'Cinzel', serif;">OVERALL CHAMPIONS</h2>
+            <p id="champPopupSub" class="text-xs text-slate-300 mt-1 mb-5"></p>
+
+            <div id="champWinnerBox" class="bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-slate-950 border-2 border-amber-400 rounded-3xl p-5 mb-4 shadow-xl"></div>
+            <div id="champRunnerBox" class="bg-slate-900/90 border border-slate-700 rounded-2xl p-3.5 mb-4"></div>
+            <div id="champCancelledBox" class="hidden bg-red-950/40 border border-red-500/40 rounded-xl p-2.5 text-[11px] text-red-200 font-bold mb-4"></div>
+
+            <div class="flex flex-wrap gap-2.5 justify-center">
+                <button onclick="window.playFanfareSound(); window.firePortalConfetti();" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black py-3 px-4 rounded-xl text-xs uppercase tracking-wider shadow-lg transition">🎺 Play Champion Fanfare</button>
+                <button onclick="window.closeChampionPopup(); window.switchTab('trolls');" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-black py-3 px-4 rounded-xl text-xs uppercase tracking-wider shadow-lg transition">🎭 Open Troll & Voice Zone</button>
+            </div>
+        </div>
+    </div>
 
     <!-- QR Code Scanner Modal -->
     <div id="qrScannerModal" style="display:none;" class="fixed inset-0 bg-black/90 z-[350] items-center justify-center p-4 backdrop-blur-md">
@@ -343,6 +373,19 @@
         const festId = 'urava-s4-fest';
         const DEFAULT_POSTER_URL = "https://raw.githubusercontent.com/BUSA2023/Festviewmob/refs/heads/main/Untitled-1-Recovered-Recovered.png";
 
+        const DEFAULT_FINALE_CONFIG = {
+            festEnded: true,
+            championTitle: "OVERALL CHAMPIONS - URAVA S04",
+            championSubtitle: "Congratulations to the victorious team of Aawaaze Funoon Season 04!",
+            cancelledNotice: "Official Notice: 1 Program was cancelled by the Fest Committee.",
+            trolls: [
+                { id: 't1', target: 'Runner-Up Team', text: 'അടുത്ത സീസണിൽ നോക്കാം മക്കളേ... കപ്പ് ഞങ്ങൾക്കിരിക്കട്ടെ! 🏆😂', voiceText: 'Adutha seasonil nokkaam makkale, cup njangalkku irikkatte!', soundType: 'laugh', audioUrl: '' },
+                { id: 't2', target: 'Point Table Lookers', text: 'പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളിയോ? ഇതൊക്കെയെന്ത്! 🔥😎', voiceText: 'Point table nokki kannu thalliyo? Ithokke enthu!', soundType: 'horn', audioUrl: '' },
+                { id: 't3', target: 'Cancelled Program', text: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് കരുതണ്ട! 🤣🎤', voiceText: 'Oru program cancel aayathukondu rakshappettu ennu karuthanda!', soundType: 'sad', audioUrl: '' },
+                { id: 't4', target: 'Champions', text: 'കപ്പും തൂക്കി... ഗ്രൗണ്ടും തൂക്കി... ഇനി ട്രോളുകളുടെ പൂരം! 👑🎺', voiceText: 'Cuppum thookki, groundum thookki, ini trollukalude pooram!', soundType: 'thug', audioUrl: '' }
+            ]
+        };
+
         let state = {
             programs: [],
             candidates: [],
@@ -357,10 +400,12 @@
                 activeWinnerModel: 1,
                 activeResultModel: 1
             },
+            finaleConfig: { ...DEFAULT_FINALE_CONFIG },
             tab: 'home',
             tableCatFilter: 'All',
             resCatFilter: 'All',
-            searchQuery: ''
+            searchQuery: '',
+            hasShownChampionPopup: false
         };
         window.state = state;
 
@@ -409,8 +454,8 @@
         };
 
         // Merge data from primary & legacy DBs seamlessly
-        let primaryData = { programs: [], candidates: [], results: [], templates: null };
-        let legacyData = { programs: [], candidates: [], results: [], templates: null };
+        let primaryData = { programs: [], candidates: [], results: [], templates: null, finale: null };
+        let legacyData = { programs: [], candidates: [], results: [], templates: null, finale: null };
 
         const recomputeMergedState = () => {
             const progMap = new Map();
@@ -435,7 +480,22 @@
                     ...(primaryData.templates || {})
                 };
             }
+            if (primaryData.finale || legacyData.finale) {
+                const mergedFin = {
+                    ...DEFAULT_FINALE_CONFIG,
+                    ...(legacyData.finale || {}),
+                    ...(primaryData.finale || {})
+                };
+                if (!Array.isArray(mergedFin.trolls) || mergedFin.trolls.length === 0) {
+                    mergedFin.trolls = DEFAULT_FINALE_CONFIG.trolls;
+                }
+                state.finaleConfig = mergedFin;
+            }
             window.renderApp();
+            if (state.finaleConfig.festEnded !== false && !state.hasShownChampionPopup && (state.results.length > 0 || state.programs.length > 0)) {
+                state.hasShownChampionPopup = true;
+                setTimeout(() => window.openChampionPopup(false), 600);
+            }
         };
 
         const startListeners = async () => {
@@ -447,6 +507,7 @@
                     if (d.id === 'config') {
                         primaryData.programs = d.data().programs || [];
                         if (d.data().posterTemplates) primaryData.templates = d.data().posterTemplates;
+                        if (d.data().finaleConfig) primaryData.finale = d.data().finaleConfig;
                     }
                 });
                 recomputeMergedState();
@@ -468,6 +529,7 @@
                     if (d.id === 'config') {
                         legacyData.programs = d.data().programs || [];
                         if (d.data().posterTemplates) legacyData.templates = d.data().posterTemplates;
+                        if (d.data().finaleConfig) legacyData.finale = d.data().finaleConfig;
                     }
                 });
                 recomputeMergedState();
@@ -484,10 +546,204 @@
             }, () => {});
         };
 
+        // Web Audio Synthesizer + SpeechSynthesis for Troll Voices & Champion Fanfare
+        let audioCtx = null;
+        const getAudioCtx = () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        };
+
+        window.playFanfareSound = () => {
+            try {
+                const ctx = getAudioCtx();
+                const notes = [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50];
+                const times = [0, 0.14, 0.28, 0.42, 0.62, 0.78];
+                const durations = [0.12, 0.12, 0.12, 0.18, 0.12, 0.45];
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + times[i]);
+                    gain.gain.setValueAtTime(0.25, ctx.currentTime + times[i]);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + times[i] + durations[i]);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + times[i]);
+                    osc.stop(ctx.currentTime + times[i] + durations[i]);
+                });
+            } catch (e) {}
+        };
+
+        window.playTrollEffect = (type) => {
+            try {
+                const ctx = getAudioCtx();
+                const now = ctx.currentTime;
+                if (type === 'horn') {
+                    [0, 0.18, 0.36].forEach((offset, idx) => {
+                        const dur = idx === 2 ? 0.65 : 0.14;
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(466.16, now + offset);
+                        gain.gain.setValueAtTime(0.25, now + offset);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + offset + dur);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(now + offset); osc.stop(now + offset + dur);
+                    });
+                } else if (type === 'sad') {
+                    const freqs = [392, 370, 349.23, 329.63];
+                    freqs.forEach((f, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(f, now + idx * 0.35);
+                        if (idx === 3) osc.frequency.linearRampToValueAtTime(300, now + idx * 0.35 + 0.7);
+                        gain.gain.setValueAtTime(0.2, now + idx * 0.35);
+                        gain.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.35 + (idx === 3 ? 0.75 : 0.3));
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.35); osc.stop(now + idx * 0.35 + (idx === 3 ? 0.75 : 0.3));
+                    });
+                } else if (type === 'thug') {
+                    const notes = [440, 523.25, 659.25, 587.33, 523.25, 440];
+                    notes.forEach((f, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(f, now + idx * 0.15);
+                        gain.gain.setValueAtTime(0.18, now + idx * 0.15);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.15 + 0.13);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.15); osc.stop(now + idx * 0.15 + 0.13);
+                    });
+                } else {
+                    // Funny laugh bounce
+                    [620, 540, 480, 420, 360].forEach((f, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(f, now + idx * 0.12);
+                        gain.gain.setValueAtTime(0.25, now + idx * 0.12);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.1);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.12); osc.stop(now + idx * 0.12 + 0.1);
+                    });
+                }
+            } catch (e) {}
+        };
+
+        let activeTrollAudio = null;
+        window.speakTrollCard = (idx, pitch = 1.15, rate = 1.0) => {
+            const trolls = state.finaleConfig?.trolls || [];
+            const item = trolls[idx];
+            if (!item) return;
+
+            window.playTrollEffect(item.soundType || 'laugh');
+
+            if (item.audioUrl) {
+                try {
+                    if (activeTrollAudio) activeTrollAudio.pause();
+                    activeTrollAudio = new Audio(item.audioUrl);
+                    activeTrollAudio.play();
+                    return;
+                } catch (e) {}
+            }
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                setTimeout(() => {
+                    const utter = new SpeechSynthesisUtterance(item.voiceText || item.text);
+                    utter.pitch = pitch;
+                    utter.rate = rate;
+                    const voices = window.speechSynthesis.getVoices();
+                    const mlVoice = voices.find(v => v.lang.includes('ml') || v.lang.includes('en-IN'));
+                    if (mlVoice) utter.voice = mlVoice;
+                    window.speechSynthesis.speak(utter);
+                }, 400);
+            } else {
+                window.showAppToast("Troll Sound Played!", item.text, "😂");
+            }
+        };
+
+        window.speakCustomTrollInput = () => {
+            const txt = document.getElementById('customTrollInput')?.value?.trim();
+            const effect = document.getElementById('customTrollEffect')?.value || 'horn';
+            if (!txt) return window.showAppToast("Type Troll Text", "Enter any dialogue to speak out loud!", "🎤");
+            window.playTrollEffect(effect);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                setTimeout(() => {
+                    const utter = new SpeechSynthesisUtterance(txt);
+                    utter.pitch = 1.2;
+                    utter.rate = 0.95;
+                    window.speechSynthesis.speak(utter);
+                }, 400);
+            }
+        };
+
+        window.firePortalConfetti = () => {
+            if (typeof confetti !== 'function') return;
+            confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 }, colors: ['#fbbf24', '#38bdf8', '#34d399', '#f43f5e'] });
+        };
+
+        window.openChampionPopup = (playAudio = false) => {
+            const modal = document.getElementById('championPopupModal');
+            if (!modal) return;
+            const totals = window.latestTeamTotals || { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
+            const mPts = totals['Al-Masūdi'] || 0;
+            const qPts = totals['Al-Qazwini'] || 0;
+            const isMasudiWinner = mPts >= qPts;
+            const winnerName = isMasudiWinner ? 'Al-Masūdi' : 'Al-Qazwini';
+            const winnerPts = isMasudiWinner ? mPts : qPts;
+            const runnerName = isMasudiWinner ? 'Al-Qazwini' : 'Al-Masūdi';
+            const runnerPts = isMasudiWinner ? qPts : mPts;
+            const diff = Math.abs(mPts - qPts);
+
+            const fin = state.finaleConfig || DEFAULT_FINALE_CONFIG;
+            document.getElementById('champPopupHeading').innerText = fin.championTitle || 'OVERALL CHAMPIONS - URAVA S04';
+            document.getElementById('champPopupSub').innerText = fin.championSubtitle || 'Aawaaze Funoon Season 04 Grand Finale Standings';
+
+            document.getElementById('champWinnerBox').innerHTML = `
+                <div class="text-[11px] font-black uppercase tracking-widest text-amber-300 mb-1">👑 Champion Team</div>
+                <div class="text-3xl sm:text-4xl font-black text-white tracking-tight">${winnerName}</div>
+                <div class="text-5xl sm:text-6xl font-black text-amber-400 num-font my-2 drop-shadow-[0_0_20px_rgba(245,158,11,0.4)]">${winnerPts} <span class="text-base font-bold text-amber-200">PTS</span></div>
+                <div class="inline-block bg-amber-500/20 border border-amber-400/40 text-amber-200 text-[11px] font-black px-3 py-1 rounded-full">Won by +${diff} Points Lead!</div>
+            `;
+
+            document.getElementById('champRunnerBox').innerHTML = `
+                <div class="flex justify-between items-center px-2">
+                    <div class="text-left">
+                        <span class="text-[10px] font-bold uppercase text-slate-400 block">🥈 Runner-Up Team</span>
+                        <span class="text-base font-black text-white">${runnerName}</span>
+                    </div>
+                    <div class="text-2xl font-black text-sky-400 num-font">${runnerPts} <span class="text-xs text-slate-400">PTS</span></div>
+                </div>
+            `;
+
+            const cancelledProgs = state.programs.filter(p => p.cancelled);
+            const cancelBox = document.getElementById('champCancelledBox');
+            if (fin.cancelledNotice || cancelledProgs.length > 0) {
+                cancelBox.classList.remove('hidden');
+                const names = cancelledProgs.map(p => `${p.progNo ? '#' + p.progNo + ' ' : ''}${p.name}`).join(', ');
+                cancelBox.innerHTML = `🚫 ${fin.cancelledNotice || `Official Notice: Program (${names}) was cancelled.`}`;
+            } else {
+                cancelBox.classList.add('hidden');
+            }
+
+            modal.style.display = 'flex';
+            window.firePortalConfetti();
+            if (playAudio) window.playFanfareSound();
+        };
+
+        window.closeChampionPopup = () => {
+            const modal = document.getElementById('championPopupModal');
+            if (modal) modal.style.display = 'none';
+        };
+
         window.renderApp = () => {
-            ['home', 'results', 'search', 'gallery'].forEach(t => {
+            ['home', 'results', 'search', 'trolls', 'gallery'].forEach(t => {
                 const mob = document.getElementById('nav-' + t);
-                if (mob) mob.className = `flex flex-col items-center py-1.5 px-3 rounded-xl transition ${state.tab === t ? 'text-sky-400 bg-sky-500/10' : 'text-slate-400'}`;
+                if (mob) mob.className = `flex flex-col items-center py-1.5 px-2.5 rounded-xl transition ${state.tab === t ? 'text-sky-400 bg-sky-500/10' : 'text-slate-400'}`;
                 const dsk = document.getElementById('dnav-' + t);
                 if (dsk) dsk.className = `px-4 py-2 rounded-xl text-xs font-bold transition ${state.tab === t ? 'bg-sky-600 text-white shadow' : 'text-slate-400 hover:text-white'}`;
             });
@@ -557,12 +813,26 @@
                 awardPlace(res.third, pArr[2], 'third');
             });
 
+            window.latestTeamTotals = teamTotals;
+            const cancelledProgramsList = state.programs.filter(p => p.cancelled);
+            const isMasudiLead = teamTotals['Al-Masūdi'] >= teamTotals['Al-Qazwini'];
+            const overallChampName = isMasudiLead ? 'Al-Masūdi' : 'Al-Qazwini';
+            const overallChampPts = Math.max(teamTotals['Al-Masūdi'], teamTotals['Al-Qazwini']);
+
             if (state.tab === 'home') {
                 const buildProgPointTable = (catName, typeName, borderAccent, badgeAccent) => {
-                    const matchingProgs = state.programs.filter(p => p.cat === catName && p.type === typeName && progTeamBreakdown[p.id]);
+                    const matchingProgs = state.programs.filter(p => p.cat === catName && p.type === typeName && (progTeamBreakdown[p.id] || p.cancelled));
                     let m1 = 0, m2 = 0, m3 = 0, q1 = 0, q2 = 0, q3 = 0;
 
                     const rowsHtml = matchingProgs.map(p => {
+                        if (p.cancelled) {
+                            return `
+                                <tr class="border-b border-red-900/40 bg-red-950/20 text-[11px]">
+                                    <td class="py-2 px-2 font-bold text-red-300 leading-tight"><span class="text-[9px] text-red-400 font-mono block">#${p.progNo || ''}</span><span class="line-through">${p.name}</span></td>
+                                    <td colspan="6" class="py-2 px-2 text-center font-black uppercase tracking-widest text-[10px] text-red-400">🚫 PROGRAM CANCELLED</td>
+                                </tr>
+                            `;
+                        }
                         const bd = progTeamBreakdown[p.id];
                         m1 += bd['Al-Masūdi'].first; m2 += bd['Al-Masūdi'].second; m3 += bd['Al-Masūdi'].third;
                         q1 += bd['Al-Qazwini'].first; q2 += bd['Al-Qazwini'].second; q3 += bd['Al-Qazwini'].third;
@@ -628,7 +898,38 @@
                 const showSen = state.tableCatFilter === 'All' || state.tableCatFilter === 'Senior';
                 const overallDiff = Math.abs(teamTotals['Al-Masūdi'] - teamTotals['Al-Qazwini']);
 
+                const cancelledAlertBanner = (cancelledProgramsList.length > 0 || state.finaleConfig?.cancelledNotice) ? `
+                    <div class="ag-card rounded-2xl p-3.5 border border-red-500/40 bg-red-950/25 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xl">🚫</span>
+                            <div>
+                                <div class="text-[10px] font-black uppercase tracking-wider text-red-400">Official Committee Notice • Cancelled Program</div>
+                                <div class="text-xs font-bold text-slate-200">${state.finaleConfig?.cancelledNotice || cancelledProgramsList.map(p => `${p.progNo ? '#' + p.progNo + ' ' : ''}${p.name} (${p.cat})`).join(' • ')}</div>
+                            </div>
+                        </div>
+                        <span class="text-[9px] font-black uppercase bg-red-500/20 text-red-300 px-2.5 py-1 rounded-lg border border-red-500/30 shrink-0">Cancelled</span>
+                    </div>
+                ` : '';
+
                 content.innerHTML = `
+                    <!-- Grand Finale Overall Champions Banner -->
+                    <div class="ag-card rounded-3xl p-4 sm:p-5 mb-5 border-2 border-amber-400/50 bg-gradient-to-r from-amber-500/15 via-slate-900 to-pink-500/15 flex flex-col sm:flex-row items-center justify-between gap-4 fade-in">
+                        <div class="flex items-center gap-3.5 text-center sm:text-left">
+                            <div class="text-4xl sm:text-5xl">🏆</div>
+                            <div>
+                                <span class="text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/30">Fest Ended • Grand Finale</span>
+                                <h2 class="text-lg sm:text-xl font-black text-white mt-0.5">👑 Overall Champions: <span class="text-amber-400">${overallChampName}</span> (${overallChampPts} Pts)</h2>
+                                <p class="text-xs text-slate-300">Celebrate the champions or visit the Troll & Voice Zone for funny audio reactions!</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0 w-full sm:w-auto">
+                            <button onclick="window.openChampionPopup(true)" class="flex-1 sm:flex-initial bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs shadow-lg transition">🏆 Champion Popup</button>
+                            <button onclick="window.switchTab('trolls')" class="flex-1 sm:flex-initial bg-pink-600 hover:bg-pink-500 text-white font-black px-4 py-2.5 rounded-xl text-xs shadow-lg transition">🎭 Troll & Voice</button>
+                        </div>
+                    </div>
+
+                    ${cancelledAlertBanner ? `<div class="mb-5 fade-in">${cancelledAlertBanner}</div>` : ''}
+
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 fade-in">
                         <!-- Left Column: Leaderboard & QR Scanner -->
                         <div class="lg:col-span-5 space-y-4">
@@ -834,10 +1135,12 @@
                                 const p = state.programs.find(x => x.id === pid);
                                 if (!p) return '';
                                 const r = state.results.find(x => x.progId === pid);
-                                let statusBadge = `<span class="text-[10px] text-slate-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 font-bold uppercase">⏳ Pending</span>`;
+                                let statusBadge = p.cancelled
+                                    ? `<span class="text-[10px] text-red-300 bg-red-950/80 px-2.5 py-1 rounded-lg border border-red-500/40 font-black uppercase">🚫 Cancelled</span>`
+                                    : `<span class="text-[10px] text-slate-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 font-bold uppercase">⏳ Pending</span>`;
                                 let positionStr = '';
 
-                                if (r) {
+                                if (r && !p.cancelled) {
                                     const f = Array.isArray(r.first) ? r.first : [];
                                     const s = Array.isArray(r.second) ? r.second : [];
                                     const th = Array.isArray(r.third) ? r.third : [];
@@ -896,6 +1199,72 @@
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">🔍</div>
                         </div>
                         ${profileHtml}
+                    </div>
+                `;
+            }
+
+            if (state.tab === 'trolls') {
+                const trolls = state.finaleConfig?.trolls || DEFAULT_FINALE_CONFIG.trolls;
+                const mPts = teamTotals['Al-Masūdi'];
+                const qPts = teamTotals['Al-Qazwini'];
+                const diff = Math.abs(mPts - qPts);
+
+                content.innerHTML = `
+                    <div class="fade-in max-w-4xl mx-auto space-y-5">
+                        <!-- Top Troll Header & Soundboard Bar -->
+                        <div class="ag-card rounded-3xl p-5 sm:p-6 border border-pink-500/40 bg-gradient-to-br from-slate-900 via-pink-950/20 to-slate-900">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-pink-400 bg-pink-500/10 px-3 py-1 rounded-full border border-pink-500/30">😂 Post-Fest Fun & Banter</span>
+                                    <h2 class="text-white font-black text-2xl sm:text-3xl mt-1">🎭 Fest Troll & Voice Zone</h2>
+                                    <p class="text-xs text-slate-300">Tap any card to play the Troll Voice & Sound Effects! (${overallChampName} leads by ${diff} pts)</p>
+                                </div>
+                                <button onclick="window.openChampionPopup(true)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs uppercase shadow-lg shrink-0">👑 View Champion Popup</button>
+                            </div>
+
+                            <!-- Instant Sound Effect Buttons -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-slate-800">
+                                <button onclick="window.playTrollEffect('horn')" class="bg-slate-950/90 hover:bg-pink-600/30 border border-pink-500/40 text-pink-300 font-black py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">📯 Airhorn Blast</button>
+                                <button onclick="window.playTrollEffect('laugh')" class="bg-slate-950/90 hover:bg-amber-600/30 border border-amber-500/40 text-amber-300 font-black py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">😂 Troll Laugh</button>
+                                <button onclick="window.playTrollEffect('sad')" class="bg-slate-950/90 hover:bg-sky-600/30 border border-sky-500/40 text-sky-300 font-black py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">🎻 Sad Fail</button>
+                                <button onclick="window.playTrollEffect('thug')" class="bg-slate-950/90 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-black py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow">🕶️ Thug Drop</button>
+                            </div>
+                        </div>
+
+                        <!-- Live Custom Troll Voice Synthesizer Box -->
+                        <div class="ag-card rounded-3xl p-4 sm:p-5 border border-sky-500/30">
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-sky-400 mb-2">🎤 Live Troll Voice Generator (Type Any Dialogue & Speak)</label>
+                            <div class="flex flex-col sm:flex-row gap-2.5">
+                                <input type="text" id="customTrollInput" placeholder="Type any funny troll message (e.g. Cup njangalkku irikkatte makkale!)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-xs sm:text-sm font-bold outline-none focus:border-sky-400">
+                                <select id="customTrollEffect" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-pink-300 font-bold text-xs outline-none">
+                                    <option value="horn">📯 With Airhorn</option>
+                                    <option value="laugh">😂 With Laugh</option>
+                                    <option value="sad">🎻 With Sad Trombone</option>
+                                    <option value="thug">🕶️ With Thug Beat</option>
+                                </select>
+                                <button onclick="window.speakCustomTrollInput()" class="bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shrink-0">🔊 Speak Troll</button>
+                            </div>
+                        </div>
+
+                        <!-- Troll Cards Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${trolls.map((t, idx) => `
+                                <div class="ag-card rounded-3xl p-5 border border-slate-800 hover:border-pink-500/50 transition flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-3">
+                                            <span class="text-[10px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 px-3 py-1 rounded-full border border-pink-500/30">🎯 ${t.target}</span>
+                                            <span class="text-xl">${t.soundType === 'horn' ? '📯' : (t.soundType === 'sad' ? '🎻' : (t.soundType === 'thug' ? '🕶️' : '😂'))}</span>
+                                        </div>
+                                        <p class="text-white font-black text-base sm:text-lg leading-snug mb-2">${t.text}</p>
+                                        <p class="text-[11px] text-slate-400 italic mb-4">🗣️ "${t.voiceText || t.text}"</p>
+                                    </div>
+                                    <div class="flex gap-2 pt-3 border-t border-slate-800/80">
+                                        <button onclick="window.speakTrollCard(${idx}, 1.15, 1.0)" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-black py-2.5 px-3 rounded-xl text-xs shadow transition flex items-center justify-center gap-1.5">🔊 Play Troll Voice</button>
+                                        <button onclick="window.speakTrollCard(${idx}, 1.6, 1.15)" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold py-2.5 px-3 rounded-xl text-xs border border-slate-700 transition" title="Chipmunk Funny Pitch">🐿️ Funny Pitch</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
             }
