@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         body {
@@ -59,6 +58,17 @@
         <div class="absolute -top-24 -left-24 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl"></div>
         <div class="absolute top-1/3 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-24 left-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Non-Stop Al-Masūdi Mega Troll Marquee Ticker -->
+    <div class="bg-gradient-to-r from-red-950 via-pink-900 to-amber-950 border-b border-pink-500/40 py-1.5 px-3 overflow-hidden relative z-50 shadow-lg">
+        <div class="flex items-center justify-between gap-3 max-w-7xl mx-auto">
+            <span class="shrink-0 bg-pink-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full animate-pulse">🔥 AL-MASŪDI MEGA ROAST LIVE</span>
+            <marquee id="topRoastMarquee" behavior="scroll" direction="left" scrollamount="6" class="text-xs font-extrabold text-amber-200 tracking-wide">
+                😂 അൽ മസൂദി ടീമിന്റെ ശ്രദ്ധയ്ക്ക്: പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളരുത്! • 🏆 കപ്പും തൂക്കി ഗ്രൗണ്ടും തൂക്കി അൽ ഖസ്‌വിനി രാജാക്കന്മാർ! • 🕵️‍♂️ ദാസാ... അൽ മസൂദിയുടെ പോയിന്റ് എവിടെപ്പോയി? എവിടെയോ എന്തോ തകരാറു പോലെ! • 🚑 അൽ മസൂദി ബെഞ്ചിലേക്ക് അടിയന്തരമായി രമണന്റെ സർബത്ത് എത്തേണ്ടതാണ്! • 🎬 തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദിയുടെ സീൻ കോൺട്രയാണ് മക്കളേ!
+            </marquee>
+            <button onclick="window.speakLiveScoreRoast('bellary')" class="shrink-0 bg-amber-400 hover:bg-amber-300 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-lg shadow">🔊 Play Score Roast</button>
+        </div>
     </div>
 
     <!-- Top Header & Desktop Navigation -->
@@ -132,20 +142,30 @@
             <p class="text-xs text-slate-300 mt-1 mb-4" id="champPopupSub">Congratulations to the winners of Aawaaze Funoon Season 04!</p>
 
             <div class="bg-slate-950/90 border border-amber-400/40 rounded-2xl p-4 mb-4">
-                <div class="text-xs font-black uppercase tracking-widest text-amber-400">🏆 Champion Team</div>
-                <div class="text-3xl sm:text-4xl font-black text-white mt-1" id="champWinnerName">Al-Masūdi</div>
+                <div class="text-xs font-black uppercase tracking-widest text-amber-400">🏆 Official Champion Team</div>
+                <div class="text-3xl sm:text-4xl font-black text-white mt-1" id="champWinnerName">Al-Qazwini</div>
                 <div class="text-xl font-black text-emerald-400 num-font mt-0.5" id="champWinnerPts">0 PTS</div>
-                <div class="text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-800 flex justify-between items-center">
-                    <span id="champRunnerInfo">Runner-Up: Al-Qazwini</span>
-                    <span class="text-amber-300 font-bold" id="champLeadMargin">Lead: 0 PTS</span>
+                <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800 text-center">
+                    <div class="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-2">
+                        <div class="text-[9px] font-black uppercase text-emerald-400">👑 Al-Qazwini</div>
+                        <div class="text-base font-black text-white num-font" id="champBoxQazPts">0 PTS</div>
+                    </div>
+                    <div class="bg-amber-950/40 border border-amber-500/40 rounded-xl p-2">
+                        <div class="text-[9px] font-black uppercase text-amber-300">⚡ Winning Margin</div>
+                        <div class="text-base font-black text-amber-400 num-font" id="champLeadMargin">0 PTS</div>
+                    </div>
+                    <div class="bg-pink-950/40 border border-pink-500/30 rounded-xl p-2">
+                        <div class="text-[9px] font-black uppercase text-pink-400">😭 Al-Masūdi</div>
+                        <div class="text-base font-black text-slate-300 num-font" id="champRunnerInfo">0 PTS</div>
+                    </div>
                 </div>
             </div>
 
             <div id="champCancelNoticeBox" class="hidden bg-red-950/40 border border-red-500/40 rounded-xl p-2.5 text-[11px] text-red-200 font-bold mb-4"></div>
 
             <div class="flex flex-wrap gap-2 justify-center">
-                <button onclick="window.playTrollEffect('horn'); window.firePortalConfetti();" class="flex-1 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs uppercase shadow-lg">🎺 Play Fanfare</button>
-                <button onclick="window.closeChampionPopup(); window.switchTab('trolls');" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-black py-2.5 px-4 rounded-xl text-xs uppercase shadow-lg">🎭 Open Troll Zone</button>
+                <button onclick="window.speakLiveScoreRoast('bellary'); window.firePortalConfetti();" class="flex-1 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black py-2.5 px-3 rounded-xl text-xs uppercase shadow-lg">🔊 Speak Exact Score Roast</button>
+                <button onclick="window.closeChampionPopup(); window.switchTab('trolls');" class="flex-1 bg-pink-600 hover:bg-pink-500 text-white font-black py-2.5 px-3 rounded-xl text-xs uppercase shadow-lg">🎭 Open Mega Troll Zone</button>
             </div>
         </div>
     </div>
@@ -382,14 +402,19 @@
         const DEFAULT_FINALE_CONFIG = {
             festEnded: true,
             championTitle: "OVERALL CHAMPIONS - URAVA S04",
-            championSubtitle: "Congratulations to the victorious team of Aawaaze Funoon Season 04!",
+            championSubtitle: "കപ്പും തൂക്കി അൽ ഖസ്‌വിനി! അൽ മസൂദിക്ക് ഇനി അടുത്ത സീസണിൽ നോക്കാം മക്കളേ! 🏆😂",
             cancelledNotice: "Official Notice: 1 Program was cancelled by the Fest Committee.",
             trolls: [
-                { id: 't1', target: 'Runner-Up Team', style: 'Rajamanikyam (Bellary Raja)', text: 'അടുത്ത സീസണിൽ നോക്കാം മക്കളേ... കപ്പ് ഞങ്ങൾക്കിരിക്കട്ടെ! തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ സീൻ കോൺട്രയാണ്! 🏆😂', voiceText: 'അടുത്ത സീസണിൽ നോക്കാം മക്കളേ, കപ്പ് ഞങ്ങൾക്കിരിക്കട്ടെ! സീൻ കോൺട്രയാണ്!', soundType: 'laugh', audioUrl: '' },
-                { id: 't2', target: 'Point Table Lookers', style: 'Spadikam (Aadu Thoma)', text: 'പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളിയോ? ഇതൊക്കെയെന്ത്! 🔥😎', voiceText: 'പോയിന്റ് ടേബിൾ നോക്കി കണ്ണ് തള്ളിയോ? ഇതൊക്കെയെന്ത്!', soundType: 'horn', audioUrl: '' },
-                { id: 't3', target: 'Cancelled Program', style: 'CID Moosa (Sahadevan)', text: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് കരുതണ്ട! 🤣🎤', voiceText: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് കരുതണ്ട!', soundType: 'sad', audioUrl: '' },
-                { id: 't4', target: 'Champions', style: 'Lucifer (Stephen)', text: 'കപ്പും തൂക്കി... ഗ്രൗണ്ടും തൂക്കി... ഇനി ട്രോളുകളുടെ പൂരം! 👑🎺', voiceText: 'കപ്പും തൂക്കി, ഗ്രൗണ്ടും തൂക്കി, ഇനി ട്രോളുകളുടെ പൂരം!', soundType: 'thug', audioUrl: '' },
-                { id: 't5', target: 'Kalaprathiba Tie-Break', style: 'Pulival Kalyanam (Manavalan)', text: 'ഇൻഡിവിജ്വൽ പോയിന്റ് സമമായപ്പോൾ ഗ്രൂപ്പ് പ്രോഗ്രാം നോക്കി കലാപ്രതിഭ തൂക്കി! 🌟🔥', voiceText: 'ഇൻഡിവിജ്വൽ പോയിന്റ് സമമായപ്പോൾ ഗ്രൂപ്പ് പ്രോഗ്രാം നോക്കി കലാപ്രതിഭ തൂക്കി!', soundType: 'horn', audioUrl: '' }
+                { id: 't1', target: 'അൽ മസൂദി (Al-Masūdi)', style: 'Rajamanikyam (Bellary Raja)', text: 'തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദി ടീമിന്റെ സീൻ കോൺട്രയാണ് മക്കളേ! കപ്പ് ഞങ്ങടെ അൽ ഖസ്‌വിനി അങ്ങ് എടുത്തു! 🏆😂', voiceText: 'തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദി ടീമിന്റെ സീൻ കോൺട്രയാണ് മക്കളേ! കപ്പ് ഞങ്ങടെ അൽ ഖസ്‌വിനി അങ്ങ് എടുത്തു!', soundType: 'horn', audioUrl: '' },
+                { id: 't2', target: 'അൽ മസൂദി ബെഞ്ച്', style: 'Punjabi House (Ramanan)', text: 'മുതലാളീ ജയിച്ചേ! പോയിന്റ് ടേബിൾ നോക്കി അൽ മസൂദി ടീമിന്റെ കണ്ണ് തള്ളിപ്പോയേ! രമണാ വെള്ളം കൊടുക്കൂ! 😂🎉', voiceText: 'മുതലാളീ ജയിച്ചേ! പോയിന്റ് ടേബിൾ നോക്കി അൽ മസൂദി ടീമിന്റെ കണ്ണ് തള്ളിപ്പോയേ! രമണാ വെള്ളം കൊടുക്കൂ!', soundType: 'laugh', audioUrl: '' },
+                { id: 't3', target: 'അൽ മസൂദി ക്യാമ്പ്', style: 'Chattambinadu (Dashamoolam Damu)', text: 'ദശമൂലം ദാമുവിനോടോ ബാലാ നിന്റെ കളി! അൽ ഖസ്‌വിനിയോട് മുട്ടാൻ വന്ന അൽ മസൂദി മൂലയ്ക്ക് ഇരുന്നോ മക്കളേ! 🔥😎', voiceText: 'ദശമൂലം ദാമുവിനോടോ ബാലാ നിന്റെ കളി! അൽ ഖസ്‌വിനിയോട് മുട്ടാൻ വന്ന അൽ മസൂദി മൂലയ്ക്ക് ഇരുന്നോ മക്കളേ!', soundType: 'thug', audioUrl: '' },
+                { id: 't4', target: 'അൽ മസൂദി പോയിന്റ് ടേബിൾ', style: 'Nadodikkattu (Dasan & Vijayan)', text: 'വിജയാ, അൽ മസൂദിയുടെ പോയിന്റ് ടേബിളിലേക്ക് ഒന്ന് നോക്കിയേ... എവിടെയോ എന്തോ തകരാറു പോലെ! പോയിന്റ് ഒന്നും കാണുന്നില്ലല്ലോ! 🕵️‍♂️🤣', voiceText: 'വിജയാ, അൽ മസൂദിയുടെ പോയിന്റ് ടേബിളിലേക്ക് ഒന്ന് നോക്കിയേ, എവിടെയോ എന്തോ തകരാറു പോലെ! പോയിന്റ് ഒന്നും കാണുന്നില്ലല്ലോ!', soundType: 'laugh', audioUrl: '' },
+                { id: 't5', target: 'അൽ മസൂദി ലീഡേഴ്സ്', style: 'Kilukkam (Kittunni)', text: 'എനിക്ക് വിശന്നിട്ട് കണ്ണ് കാണാൻ വയ്യേ... കപ്പും പോയി പോയിന്റും പോയി അൽ മസൂദി ടീമിന്റെ അവസ്ഥ പരമ കഷ്ടം! 😭🎻', voiceText: 'എനിക്ക് വിശന്നിട്ട് കണ്ണ് കാണാൻ വയ്യേ, കപ്പും പോയി പോയിന്റും പോയി അൽ മസൂദി ടീമിന്റെ അവസ്ഥ പരമ കഷ്ടം!', soundType: 'sad', audioUrl: '' },
+                { id: 't6', target: 'അൽ മസൂദി ഫാൻസ്', style: 'CID Moosa (Sahadevan)', text: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് അൽ മസൂദി കരുതണ്ട! കപ്പ് അൽ ഖസ്‌വിനിക്ക് തന്നെയാണ്! 🤣🎤', voiceText: 'ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് അൽ മസൂദി കരുതണ്ട! കപ്പ് അൽ ഖസ്‌വിനിക്ക് തന്നെയാണ്!', soundType: 'sad', audioUrl: '' },
+                { id: 't7', target: 'അൽ മസൂദി vs അൽ ഖസ്‌വിനി', style: 'Spadikam (Aadu Thoma)', text: 'ഇതൊക്കെയെന്ത്! അൽ ഖസ്‌വിനി ടീമിന്റെ കയ്യിൽ നിന്നും കപ്പ് തട്ടിയെടുക്കാൻ അൽ മസൂദി ഇനി അടുത്ത ജന്മത്തിൽ ജനിക്കണം! 🕶️🔥', voiceText: 'ഇതൊക്കെയെന്ത്! അൽ ഖസ്‌വിനി ടീമിന്റെ കയ്യിൽ നിന്നും കപ്പ് തട്ടിയെടുക്കാൻ അൽ മസൂദി ഇനി അടുത്ത ജന്മത്തിൽ ജനിക്കണം!', soundType: 'thug', audioUrl: '' },
+                { id: 't8', target: 'അൽ മസൂദി സപ്പോർട്ടേഴ്സ്', style: 'Pulival Kalyanam (Manavalan)', text: 'ഫോർട്ട് കൊച്ചിയിലെ മണവാളൻ പറയുകയാണ്: അൽ മസൂദി ടീമിന് ഇനി ടാറ്റാ ബൈ ബൈ! കപ്പ് അൽ ഖസ്‌വിനി തൂക്കി! 👑🎺', voiceText: 'ഫോർട്ട് കൊച്ചിയിലെ മണവാളൻ പറയുകയാണ്, അൽ മസൂദി ടീമിന് ഇനി ടാറ്റാ ബൈ ബൈ! കപ്പ് അൽ ഖസ്‌വിനി തൂക്കി!', soundType: 'horn', audioUrl: '' },
+                { id: 't9', target: 'അൽ മസൂദി ടെന്റ്', style: 'Vellimoonga (Mamachan)', text: 'അൽ മസൂദി ടീം കപ്പ് അടിക്കും എന്ന് കരുതിയവർക്ക് തെറ്റി മക്കളേ! കളി അൽ ഖസ്‌വിനി തൂക്കി! 😂🏆', voiceText: 'അൽ മസൂദി ടീം കപ്പ് അടിക്കും എന്ന് കരുതിയവർക്ക് തെറ്റി മക്കളേ! കളി അൽ ഖസ്‌വിനി തൂക്കി!', soundType: 'laugh', audioUrl: '' },
+                { id: 't10', target: 'അൽ മസൂദി സ്റ്റേജ്', style: 'Kalyana Raman (Mr. Ponjikara)', text: 'കമലഹാസൻ വരെ തോറ്റു പോയ സീനാണ് അൽ മസൂദിയുടെ പോയിന്റ് ടേബിൾ! മേളവും കൊട്ടി അൽ ഖസ്‌വിനി കപ്പ് കൊണ്ടുപോയി! 🥁🤣', voiceText: 'കമലഹാസൻ വരെ തോറ്റു പോയ സീനാണ് അൽ മസൂദിയുടെ പോയിന്റ് ടേബിൾ! മേളവും കൊട്ടി അൽ ഖസ്‌വിനി കപ്പ് കൊണ്ടുപോയി!', soundType: 'horn', audioUrl: '' }
             ]
         };
 
@@ -438,7 +463,28 @@
 
         window.firePortalConfetti = () => {
             try {
-                confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+                const colors = ['#38bdf8', '#34d399', '#fbbf24', '#f472b6', '#818cf8', '#f8fafc'];
+                const container = document.createElement('div');
+                container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;';
+                document.body.appendChild(container);
+
+                for (let i = 0; i < 55; i++) {
+                    const p = document.createElement('div');
+                    const size = Math.random() * 8 + 6;
+                    const startX = Math.random() * 100;
+                    const drift = (Math.random() - 0.5) * 220;
+                    const dur = Math.random() * 1600 + 1400;
+                    const delay = Math.random() * 300;
+                    p.style.cssText = `position:absolute;top:-20px;left:${startX}%;width:${size}px;height:${size * 0.65}px;background:${colors[i % colors.length]};border-radius:2px;opacity:0.95;`;
+                    container.appendChild(p);
+                    if (typeof p.animate === 'function') {
+                        p.animate([
+                            { transform: 'translate3d(0, 0, 0) rotate(0deg)', opacity: 1 },
+                            { transform: `translate3d(${drift}px, ${window.innerHeight + 60}px, 0) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                        ], { duration: dur, delay, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' });
+                    }
+                }
+                setTimeout(() => { if (container.parentNode) container.parentNode.removeChild(container); }, 3400);
             } catch(e) {}
         };
 
@@ -479,10 +525,35 @@
             }
         };
 
+        let sharedAudioCtx = null;
+        const getSharedAudioCtx = () => {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            if (!sharedAudioCtx) sharedAudioCtx = new AudioCtx();
+            if (sharedAudioCtx.state === 'suspended') {
+                sharedAudioCtx.resume().catch(() => {});
+            }
+            return sharedAudioCtx;
+        };
+
+        const drawRoundedRectPath = (ctx, x, y, w, h, r) => {
+            const radius = Math.min(r, w / 2, h / 2);
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(x, y, w, h, radius);
+            } else {
+                ctx.moveTo(x + radius, y);
+                ctx.arcTo(x + w, y, x + w, y + h, radius);
+                ctx.arcTo(x + w, y + h, x, y + h, radius);
+                ctx.arcTo(x, y + h, x, y, radius);
+                ctx.arcTo(x, y, x + w, y, radius);
+                ctx.closePath();
+            }
+        };
+
         window.playTrollEffect = (type = 'horn') => {
             try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioCtx();
+                const ctx = getSharedAudioCtx();
+                if (!ctx) return;
                 const now = ctx.currentTime;
                 if (type === 'horn') {
                     [440, 554.37, 659.25].forEach(freq => {
@@ -545,29 +616,231 @@
             window.stopTrollSongBeat();
         };
 
+        const base64ToArrayBuffer = (base64) => {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+            return bytes.buffer;
+        };
+
+        const pcmToWav = (pcm16, sampleRate = 24000) => {
+            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
+            const view = new DataView(buffer);
+            const writeString = (offset, str) => {
+                for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+            };
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + pcm16.length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, pcm16.length * 2, true);
+            let offset = 44;
+            for (let i = 0; i < pcm16.length; i++, offset += 2) {
+                view.setInt16(offset, pcm16[i], true);
+            }
+            return new Blob([buffer], { type: 'audio/wav' });
+        };
+
+        const CELEBRITY_VOICE_PROFILES = {
+            bellary: {
+                label: 'ബെല്ലാരി രാജ (മമ്മൂട്ടി സ്റ്റൈൽ)',
+                voiceName: 'Fenrir',
+                pitch: 0.88,
+                rate: 1.06,
+                prompt: 'തിരുവനന്തപുരം രാജമാണിക്യം ബെല്ലാരി രാജയുടെ തനി തിരുവനന്തപുരം ശൈലിയിലും ആവേശത്തിലും മാസ്സ് ശബ്ദത്തിൽ പറയുക:'
+            },
+            aaduthoma: {
+                label: 'ആടുതോമ / സ്റ്റീഫൻ (മോഹൻലാൽ സ്റ്റൈൽ)',
+                voiceName: 'Orus',
+                pitch: 0.78,
+                rate: 0.92,
+                prompt: 'സ്ഫടികത്തിലെ ആടുതോമയുടെയും ലൂസിഫറിലെ സ്റ്റീഫൻ നെടുമ്പള്ളിയുടെയും ഗാംഭീര്യമുള്ള മാസ്സ് ശബ്ദത്തിൽ പറയുക:'
+            },
+            damu: {
+                label: 'ദശമൂലം ദാമു (സുരാജ് സ്റ്റൈൽ)',
+                voiceName: 'Puck',
+                pitch: 1.28,
+                rate: 1.12,
+                prompt: 'ചട്ടമ്പിനാടിലെ ദശമൂലം ദാമുവിന്റെ തമാശയും ആവേശവും നിറഞ്ഞ കോമഡി ശൈലിയിൽ പറയുക:'
+            },
+            ramanan: {
+                label: 'രമണൻ (ഹരിശ്രീ അശോകൻ സ്റ്റൈൽ)',
+                voiceName: 'Puck',
+                pitch: 1.36,
+                rate: 1.15,
+                prompt: 'പഞ്ചാബി ഹൗസിലെ രമണന്റെ നിഷ്കളങ്കവും അതിശയവും നിറഞ്ഞ കോമഡി ശബ്ദത്തിൽ പറയുക:'
+            },
+            manavalan: {
+                label: 'മണവാളൻ (സലിം കുമാർ സ്റ്റൈൽ)',
+                voiceName: 'Zephyr',
+                pitch: 1.42,
+                rate: 1.14,
+                prompt: 'പുലിവാൽ കല്യാണത്തിലെ ഫോർട്ട് കൊച്ചി മണവാളന്റെ ചിരിപ്പിക്കുന്ന തഗ് കോമഡി ശബ്ദത്തിൽ പറയുക:'
+            },
+            innocent: {
+                label: 'മന്നാർ മത്തായി (ഇന്നസെന്റ് സ്റ്റൈൽ)',
+                voiceName: 'Charon',
+                pitch: 1.12,
+                rate: 0.94,
+                prompt: 'ഇന്നസെന്റിന്റെ തൃശ്ശൂർ ശൈലിയിലുള്ള രസകരമായ കോമഡി ഭാവത്തിൽ പറയുക:'
+            },
+            kittunni: {
+                label: 'കിട്ടുണ്ണി (ജഗതി ശ്രീകുമാർ സ്റ്റൈൽ)',
+                voiceName: 'Puck',
+                pitch: 1.24,
+                rate: 1.08,
+                prompt: 'കിലുക്കത്തിലെ കിട്ടുണ്ണിയുടെ തമാശയും കരച്ചിലും കലർന്ന ജഗതി ശ്രീകുമാർ ശൈലിയിൽ പറയുക:'
+            },
+            vijayan: {
+                label: 'വിജയൻ (ശ്രീനിവാസൻ സ്റ്റൈൽ)',
+                voiceName: 'Charon',
+                pitch: 0.95,
+                rate: 1.02,
+                prompt: 'നാടോടിക്കാറ്റിലെ വിജയന്റെ പരിഹാസവും തമാശയും നിറഞ്ഞ ശ്രീനിവാസൻ ശൈലിയിൽ പറയുക:'
+            },
+            mass: {
+                label: 'മാസ്സ് ഹീറോ ശബ്ദം',
+                voiceName: 'Fenrir',
+                pitch: 0.88,
+                rate: 1.0,
+                prompt: 'ആവേശത്തിലും തനി നാടൻ മലയാളം സിനിമാ മാസ്സ് ശൈലിയിൽ പറയുക:'
+            },
+            comedy: {
+                label: 'കോമഡി ട്രോൾ ശബ്ദം',
+                voiceName: 'Puck',
+                pitch: 1.25,
+                rate: 1.08,
+                prompt: 'വളരെ തമാശ നിറഞ്ഞ മലയാളം കോമഡി സിനിമാ ശൈലിയിൽ ചിരിച്ചുകൊണ്ട് പറയുക:'
+            },
+            villain: {
+                label: 'വില്ലൻ ബേസ് ശബ്ദം',
+                voiceName: 'Orus',
+                pitch: 0.68,
+                rate: 0.90,
+                prompt: 'ഗാംഭീര്യമുള്ള വില്ലൻ ശബ്ദത്തിൽ തനി മലയാളത്തിൽ പറയുക:'
+            },
+            chipmunk: {
+                label: 'ചിപ്മങ്ക് ഫണ്ണി ശബ്ദം',
+                voiceName: 'Zephyr',
+                pitch: 1.65,
+                rate: 1.18,
+                prompt: 'വളരെ രസകരമായ ആവേശത്തോടെ തനി മലയാളത്തിൽ വേഗത്തിൽ പറയുക:'
+            },
+            song: {
+                label: 'ട്രോൾ ഗാനമേള ശബ്ദം',
+                voiceName: 'Puck',
+                pitch: 1.12,
+                rate: 1.04,
+                prompt: 'താളത്തിലും ഈണത്തിലും നാടൻ മലയാളം ട്രോൾ പാട്ടായി പാടുക:'
+            }
+        };
+
+        window.getAccurateScoreMetrics = () => {
+            let teamTotals = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
+            let catTotals = {
+                'Junior': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 },
+                'Senior': { 'Al-Masūdi': 0, 'Al-Qazwini': 0 }
+            };
+            let firstPlaces = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
+
+            state.results.forEach(res => {
+                const prog = state.programs.find(p => p.id === res.progId);
+                if (!prog || prog.cancelled) return;
+                const isGroup = prog.format === 'Group';
+                const pArr = (prog.pointScheme || (isGroup ? "15,8,5" : "10,5,3")).split(',').map(Number);
+
+                const award = (ids, pts, isFirst = false) => {
+                    const arr = Array.isArray(ids) ? ids : (ids ? [ids] : []);
+                    if (isGroup) {
+                        const teams = new Set();
+                        arr.forEach(id => {
+                            if (String(id).startsWith('TEAM:')) teams.add(String(id).replace('TEAM:', ''));
+                            else {
+                                const c = state.candidates.find(x => x.id === id);
+                                if (c && c.team) teams.add(c.team);
+                            }
+                        });
+                        teams.forEach(t => {
+                            if (teamTotals[t] !== undefined) {
+                                teamTotals[t] += pts;
+                                if (catTotals[prog.cat]) catTotals[prog.cat][t] += pts;
+                                if (isFirst) firstPlaces[t]++;
+                            }
+                        });
+                    } else {
+                        arr.forEach(id => {
+                            const c = state.candidates.find(x => x.id === id);
+                            if (c && teamTotals[c.team] !== undefined) {
+                                teamTotals[c.team] += pts;
+                                if (catTotals[prog.cat]) catTotals[prog.cat][c.team] += pts;
+                                if (isFirst) firstPlaces[c.team]++;
+                            }
+                        });
+                    }
+                };
+                award(res.first, pArr[0], true);
+                award(res.second, pArr[1], false);
+                award(res.third, pArr[2], false);
+            });
+
+            const mPts = teamTotals['Al-Masūdi'] || 0;
+            const qPts = teamTotals['Al-Qazwini'] || 0;
+            const diff = Math.abs(qPts - mPts);
+            const champ = qPts >= mPts ? 'Al-Qazwini' : 'Al-Masūdi';
+            const runner = qPts >= mPts ? 'Al-Masūdi' : 'Al-Qazwini';
+            const champPts = Math.max(qPts, mPts);
+            const runnerPts = Math.min(qPts, mPts);
+
+            return {
+                mPts, qPts, diff, champ, runner, champPts, runnerPts,
+                junM: catTotals['Junior']['Al-Masūdi'],
+                junQ: catTotals['Junior']['Al-Qazwini'],
+                senM: catTotals['Senior']['Al-Masūdi'],
+                senQ: catTotals['Senior']['Al-Qazwini'],
+                firstM: firstPlaces['Al-Masūdi'],
+                firstQ: firstPlaces['Al-Qazwini']
+            };
+        };
+
+        window.speakLiveScoreRoast = (celebKey = 'bellary') => {
+            const sc = window.getAccurateScoreMetrics();
+            const prof = CELEBRITY_VOICE_PROFILES[celebKey] || CELEBRITY_VOICE_PROFILES.bellary;
+            const templates = {
+                bellary: `തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദി ടീമിന്റെ സീൻ കോൺട്രയാണ് മക്കളേ! ${sc.qPts} പോയിന്റും നേടി ${sc.diff} പോയിന്റ് ലീഡിൽ നമ്മുടെ അൽ ഖസ്‌വിനി കപ്പ് അങ്ങ് തൂക്കി! വെറും ${sc.mPts} പോയിന്റിൽ അൽ മസൂദി ഒതുങ്ങിപ്പോയി!`,
+                aaduthoma: `ഇതൊക്കെയെന്ത്! ${sc.qPts} പോയിന്റ് അടിച്ചുകയറ്റി അൽ ഖസ്‌വിനി കപ്പും ഗ്രൗണ്ടും തൂക്കി! ${sc.mPts} പോയിന്റ് മാത്രമുള്ള അൽ മസൂദി ടീമിന് ${sc.diff} പോയിന്റ് വ്യത്യാസത്തിൽ വൻ പരാജയം!`,
+                damu: `ദശമൂലം ദാമുവിനോടോ ബാലാ നിന്റെ കളി! അൽ ഖസ്‌വിനിക്ക് ${sc.qPts} പോയിന്റ്! അൽ മസൂദിക്ക് വെറും ${sc.mPts} പോയിന്റ്! ${sc.diff} പോയിന്റ് പുറകിലായ അൽ മസൂദി ഇനി മൂലയ്ക്ക് ഇരുന്നോ മക്കളേ!`,
+                ramanan: `മുതലാളീ ജയിച്ചേ! ${sc.qPts} പോയിന്റിൽ അൽ ഖസ്‌വിനി കപ്പടിച്ചേ! വെറും ${sc.mPts} പോയിന്റ് കണ്ടിട്ട് അൽ മസൂദി ടീമിന്റെ കണ്ണ് തള്ളിപ്പോയേ! രമണാ അൽ മസൂദിക്ക് സർബത്ത് കൊടുക്കൂ!`,
+                manavalan: `ഫോർട്ട് കൊച്ചിയിലെ മണവാളൻ പറയുകയാണ്: ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ഭൂരിപക്ഷവുമായി അൽ ഖസ്‌വിനി കപ്പ് തൂക്കി! ${sc.mPts} പോയിന്റുള്ള അൽ മസൂദിക്ക് ഇനി ടാറ്റാ ബൈ ബൈ!`,
+                innocent: `അല്ല മക്കളേ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റ് എടുത്തപ്പോൾ അൽ മസൂദിക്ക് ആകെ കിട്ടിയത് ${sc.mPts} പോയിന്റ്! ${sc.diff} പോയിന്റ് വ്യത്യാസം കണ്ടിട്ട് അൽ മസൂദി ബെഞ്ചിൽ ആകെ കൂട്ടക്കരച്ചിലാണ്!`,
+                kittunni: `എനിക്ക് വിശന്നിട്ട് കണ്ണ് കാണാൻ വയ്യേ! അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റ് എടുത്തു, അൽ മസൂദി ${sc.mPts} പോയിന്റിൽ വീണുപോയി! ${sc.diff} പോയിന്റ് പോയ അൽ മസൂദിയുടെ അവസ്ഥ പരമ കഷ്ടം!`,
+                vijayan: `ദാസാ, അൽ മസൂദിയുടെ പോയിന്റ് ടേബിൾ നോക്കിയേ, വെറും ${sc.mPts} പോയിന്റ്! അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡുമായി കപ്പും കൊണ്ട് പറന്നുപോയി!`
+            };
+            const text = templates[celebKey] || templates.bellary;
+            window.playTrollEffect(celebKey === 'ramanan' || celebKey === 'damu' ? 'laugh' : 'horn');
+            window.showAppToast(`🎤 ${prof.label}`, text, "🔊");
+            setTimeout(() => window.speakMalayalamText(text, celebKey), 220);
+        };
+
         const fetchGeminiMalayalamVoiceUrl = async (malayalamText, style = 'mass', isMultiSpeaker = false) => {
+            const apiKey = "";
+            if (!apiKey) return null;
+
             const cacheKey = `${style}_${isMultiSpeaker}_${malayalamText}`;
             if (malayalamAudioCache.has(cacheKey)) return malayalamAudioCache.get(cacheKey);
 
-            const apiKey = "";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-
-            let voiceName = 'Fenrir';
-            let stylePrompt = 'ജോഷിയിലും ആവേശത്തിലും തനി നാടൻ മലയാളം സിനിമാ മാസ്സ് ശൈലിയിൽ പറയുക:';
-
-            if (style === 'comedy') {
-                voiceName = 'Puck';
-                stylePrompt = 'വളരെ തമാശ നിറഞ്ഞ മലയാളം കോമഡി സിനിമാ ശൈലിയിൽ ചിരിച്ചുകൊണ്ട് പറയുക:';
-            } else if (style === 'villain') {
-                voiceName = 'Orus';
-                stylePrompt = 'ഗാംഭീര്യമുള്ള വില്ലൻ ശബ്ദത്തിൽ തനി മലയാളത്തിൽ പറയുക:';
-            } else if (style === 'chipmunk') {
-                voiceName = 'Zephyr';
-                stylePrompt = 'വളരെ രസകരമായ ആവേശത്തോടെ തനി മലയാളത്തിൽ വേഗത്തിൽ പറയുക:';
-            } else if (style === 'song') {
-                voiceName = 'Puck';
-                stylePrompt = 'താളത്തിലും ഈണത്തിലും നാടൻ മലയാളം ട്രോൾ പാട്ടായി പാടുക:';
-            }
+            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.mass;
+            const voiceName = prof.voiceName || 'Fenrir';
+            const stylePrompt = prof.prompt || CELEBRITY_VOICE_PROFILES.mass.prompt;
 
             let payload;
             if (isMultiSpeaker) {
@@ -610,12 +883,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            if (!resp.ok) throw new Error('TTS API fallback');
+            if (!resp.ok) return null;
             const result = await resp.json();
             const part = result?.candidates?.[0]?.content?.parts?.[0];
             const audioData = part?.inlineData?.data;
             const mimeType = part?.inlineData?.mimeType || 'audio/L16;rate=24000';
-            if (!audioData) throw new Error('No audio payload');
+            if (!audioData) return null;
 
             const rateMatch = mimeType.match(/rate=(\d+)/);
             const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
@@ -626,44 +899,10 @@
             malayalamAudioCache.set(cacheKey, wavUrl);
             return wavUrl;
         };
-
-        const base64ToArrayBuffer = (base64) => {
-            const binaryString = window.atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
-            return bytes.buffer;
-        };
-
-        const pcmToWav = (pcm16, sampleRate = 24000) => {
-            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
-            const view = new DataView(buffer);
-            const writeString = (offset, str) => {
-                for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-            };
-            writeString(0, 'RIFF');
-            view.setUint32(4, 36 + pcm16.length * 2, true);
-            writeString(8, 'WAVE');
-            writeString(12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(36, 'data');
-            view.setUint32(40, pcm16.length * 2, true);
-            let offset = 44;
-            for (let i = 0; i < pcm16.length; i++, offset += 2) {
-                view.setInt16(offset, pcm16[i], true);
-            }
-            return new Blob([buffer], { type: 'audio/wav' });
-        };
-
         window.speakMalayalamText = async (rawText, style = 'mass', customAudioUrl = '', isMultiSpeaker = false) => {
             window.stopAllTrollVoices();
             const pureMlText = window.toPureMalayalamScript(rawText);
+            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.mass;
 
             if (customAudioUrl) {
                 try {
@@ -684,53 +923,31 @@
             } catch(e) {}
 
             if ('speechSynthesis' in window) {
-                const voices = window.speechSynthesis.getVoices();
-                const mlVoice = voices.find(v => v.lang && (v.lang.toLowerCase().includes('ml') || v.name.toLowerCase().includes('malayalam')));
-                if (mlVoice) {
+                try {
+                    window.speechSynthesis.cancel();
+                    const voices = window.speechSynthesis.getVoices() || [];
+                    const mlVoice = voices.find(v => v.lang && (v.lang.toLowerCase().includes('ml') || v.name.toLowerCase().includes('malayalam')));
                     const utter = new SpeechSynthesisUtterance(pureMlText.replace(/ദാസൻ:|വിജയൻ:/g, ''));
                     utter.lang = 'ml-IN';
-                    utter.voice = mlVoice;
-                    if (style === 'chipmunk') { utter.pitch = 1.6; utter.rate = 1.15; }
-                    else if (style === 'comedy') { utter.pitch = 1.22; utter.rate = 1.05; }
-                    else if (style === 'villain') { utter.pitch = 0.65; utter.rate = 0.92; }
-                    else { utter.pitch = 0.92; utter.rate = 0.98; }
+                    if (mlVoice) utter.voice = mlVoice;
+                    utter.pitch = prof.pitch || 1.0;
+                    utter.rate = prof.rate || 1.0;
                     window.speechSynthesis.speak(utter);
                     return;
-                }
-            }
-
-            try {
-                const cleanText = pureMlText.replace(/ദാസൻ:|വിജയൻ:/g, '').replace(/[^\p{L}\p{N}\p{M}\s.,!?-]/gu, ' ').trim();
-                const chunks = cleanText.match(/.{1,165}(\s|$)/g) || [cleanText.slice(0, 165)];
-                for (const chunk of chunks) {
-                    const trimmed = chunk.trim();
-                    if (!trimmed) continue;
-                    const ttsUrl = `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(trimmed)}&tl=ml&client=tw-ob`;
-                    await new Promise((resolve, reject) => {
-                        activeTrollAudio = new Audio(ttsUrl);
-                        activeTrollAudio.playbackRate = style === 'chipmunk' ? 1.28 : (style === 'comedy' ? 1.12 : (style === 'villain' ? 0.88 : 1.0));
-                        activeTrollAudio.onended = resolve;
-                        activeTrollAudio.onerror = reject;
-                        activeTrollAudio.play().catch(reject);
-                    });
-                }
-            } catch(e) {
-                if ('speechSynthesis' in window) {
-                    const utter = new SpeechSynthesisUtterance(pureMlText);
-                    utter.lang = 'ml-IN';
-                    window.speechSynthesis.speak(utter);
-                }
+                } catch (e) {}
             }
         };
 
-        window.speakTrollCard = (idx, style = 'mass') => {
+        window.speakTrollCard = (idx, style = 'bellary') => {
             const trolls = state.finaleConfig?.trolls || DEFAULT_FINALE_CONFIG.trolls;
             const item = trolls[idx];
             if (!item) return;
+            const sc = window.getAccurateScoreMetrics();
             window.playTrollEffect(item.soundType || 'laugh');
-            const mlDialogue = window.toPureMalayalamScript(item.voiceText || item.text);
+            const rawText = (item.voiceText || item.text) + ` അൽ ഖസ്‌വിനിക്ക് ${sc.qPts} പോയിന്റ്, അൽ മസൂദിക്ക് വെറും ${sc.mPts} പോയിന്റ്!`;
+            const mlDialogue = window.toPureMalayalamScript(rawText);
             window.showAppToast(`🎭 ${item.target}`, mlDialogue, "🔊");
-            setTimeout(() => window.speakMalayalamText(mlDialogue, style, item.audioUrl), 250);
+            setTimeout(() => window.speakMalayalamText(mlDialogue, style, item.audioUrl), 220);
         };
 
         window.speakPresetFilmDialogue = (text, film, style, sound, isMulti = false) => {
@@ -763,8 +980,8 @@
         window.startTrollSongBeat = (tempoBpm = 114) => {
             window.stopTrollSongBeat();
             try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioCtx();
+                const ctx = getSharedAudioCtx();
+                if (!ctx) return;
                 let step = 0;
                 const stepMs = (60 / tempoBpm / 2) * 1000;
                 trollSongBeatInterval = setInterval(() => {
@@ -800,92 +1017,48 @@
         window.generateAiTrollSongForLoser = async (presetLyrics = null, presetTitle = null) => {
             const btn = document.getElementById('aiGenSongBtn');
             const lyricsBox = document.getElementById('trollSongLyricsDisplay');
-            const genre = presetTitle || document.getElementById('trollSongGenre')?.value || 'Naadan Parody Roast';
-
-            let teamTotals = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
-            state.results.forEach(res => {
-                const prog = state.programs.find(p => p.id === res.progId);
-                if (!prog) return;
-                const pArr = (prog.pointScheme || "10,5,3").split(',').map(Number);
-                const award = (ids, pts) => {
-                    (Array.isArray(ids) ? ids : (ids ? [ids] : [])).forEach(id => {
-                        const c = state.candidates.find(x => x.id === id);
-                        if (c && teamTotals[c.team] !== undefined) teamTotals[c.team] += pts;
-                        else if (String(id).startsWith('TEAM:')) {
-                            const tName = String(id).replace('TEAM:', '');
-                            if (teamTotals[tName] !== undefined) teamTotals[tName] += pts;
-                        }
-                    });
-                };
-                award(res.first, pArr[0]); award(res.second, pArr[1]); award(res.third, pArr[2]);
-            });
-
-            const mPts = teamTotals['Al-Masūdi'] || 0;
-            const qPts = teamTotals['Al-Qazwini'] || 0;
-            const champMl = mPts >= qPts ? 'അൽ മസൂദി' : 'അൽ ഖസ്‌വിനി';
-            const loserMl = mPts >= qPts ? 'അൽ ഖസ്‌വിനി' : 'അൽ മസൂദി';
-            const lead = Math.abs(mPts - qPts);
+            const sc = window.getAccurateScoreMetrics();
+            const genre = presetTitle || document.getElementById('trollSongGenre')?.value || 'അൽ മസൂദി മെഗാ ട്രോൾ ഗാനം';
 
             if (presetLyrics) {
                 const purePreset = window.toPureMalayalamScript(presetLyrics);
                 if (lyricsBox) lyricsBox.innerText = purePreset;
-                window.startTrollSongBeat(116);
+                window.startTrollSongBeat(118);
                 window.showAppToast(`🎶 ${genre}`, purePreset, "🎵");
                 await window.speakMalayalamText(purePreset.replace(/\n/g, ', '), 'song');
-                setTimeout(() => window.stopTrollSongBeat(), 9000);
+                setTimeout(() => window.stopTrollSongBeat(), 9500);
                 return;
             }
 
-            if (btn) { btn.disabled = true; btn.innerText = '🎵 പാട്ട് തയ്യാറാക്കുന്നു...'; }
-            const fallbackSongs = [
-                `തരികിട തരികിട താളത്തിൽ കപ്പും തൂക്കി ${champMl}!\nപോയിന്റ് ടേബിൾ നോക്കിയിരുന്ന് കണ്ണീരൊഴുക്കി ${loserMl}!\n${lead} പോയിന്റ് ലീഡിൽ ഞങ്ങൾ രാജാവായി മുന്നേറി!\nഅടുത്ത സീസൺ വരുമ്പോഴെങ്കിലും ജയിക്കാൻ നോക്കണേ മക്കളേ!`,
-                `കപ്പും പോയി ഗ്രൗണ്ടും പോയി ${loserMl} ടീമിന് പണി പാളി!\n${lead} പോയിന്റ് വ്യത്യാസത്തിൽ ${champMl} കപ്പും കൊണ്ട് പറന്നു പോയി!\nഇൻഡിവിജ്വൽ സമമായപ്പോൾ ഗ്രൂപ്പ് പോയിന്റിൽ കളി മാറി!\nഇനി അടുത്ത വർഷം കാണാം മക്കളേ ടാറ്റാ ബൈ ബൈ!`,
-                `അൽ മസൂദിയും അൽ ഖസ്‌വിനിയും നേർക്കുനേർ വന്നപ്പോൾ,\nകപ്പും തൂക്കി രാജാവായി ${champMl} മുന്നേറി!\nപോയിന്റ് പട്ടിക നോക്കിയിരുന്ന് ${loserMl} കണ്ണ് തള്ളിപ്പോയി!\nഇനി ട്രോളുകളുടെ പൂരമാണ് ഉറവ ഫെസ്റ്റ് മക്കളേ!`,
-                `ചെണ്ടയും മേളവും കൊട്ടിപ്പാടി ${champMl} കപ്പും തൂക്കി!\nമൂലയിലിരുന്ന് പോയിന്റ് എണ്ണി ${loserMl} തലയിൽ കൈ വെച്ചു!\nഇതൊക്കെയെന്ത് എന്ന് ചോദിച്ച് ഞങ്ങൾ ഗ്രൗണ്ട് ഭരിച്ചു മക്കളേ!`
+            if (btn) { btn.disabled = true; btn.innerText = '🎵 അൽ മസൂദി ട്രോൾ പാട്ട് തയ്യാറാക്കുന്നു...'; }
+            const masudiRoastSongs = [
+                `തരികിട തരികിട താളത്തിൽ ${sc.qPts} പോയിന്റിൽ അൽ ഖസ്‌വിനി!\nവെറും ${sc.mPts} പോയിന്റും നോക്കി കണ്ണീരൊഴുക്കി അൽ മസൂദി!\n${sc.diff} പോയിന്റ് ലീഡിൽ ഞങ്ങൾ രാജാവായി മുന്നേറി!\nഅടുത്ത സീസൺ വരുമ്പോഴെങ്കിലും ജയിക്കാൻ നോക്കണേ അൽ മസൂദി മക്കളേ!`,
+                `കപ്പും പോയി ഗ്രൗണ്ടും പോയി അൽ മസൂദി ടീമിന് പണി പാളി!\n${sc.qPts} പോയിന്റ് വന്നപ്പോൾ അൽ ഖസ്‌വിനി കപ്പും കൊണ്ട് പറന്നു പോയി!\nമൂലയിലിരുന്ന് ${sc.mPts} പോയിന്റ് എണ്ണി അൽ മസൂദി തലയിൽ കൈ വെച്ചു!\nഇനി അടുത്ത വർഷം കാണാം അൽ മസൂദി മക്കളേ ടാറ്റാ ബൈ ബൈ!`,
+                `ചെണ്ടയും മേളവും കൊട്ടിപ്പാടി ${sc.qPts} പോയിന്റിൽ അൽ ഖസ്‌വിനി കപ്പും തൂക്കി!\n${sc.diff} പോയിന്റ് വ്യത്യാസം കണ്ടു അൽ മസൂദി കണ്ണ് തള്ളിപ്പോയി!\nഇതൊക്കെയെന്ത് എന്ന് ചോദിച്ച് അൽ ഖസ്‌വിനി ഗ്രൗണ്ട് ഭരിച്ചു മക്കളേ!\nഅൽ മസൂദിക്ക് ഇനി രമണന്റെ സർബത്ത് കുടിച്ച് വിശ്രമിക്കാം!`,
+                `ഉറവ ഫെസ്റ്റിന്റെ മണ്ണിലിതാ അൽ ഖസ്‌വിനി തരംഗം ആഞ്ഞടിച്ചു!\nകപ്പ് അടിക്കാൻ വന്ന അൽ മസൂദി ${sc.mPts} പോയിന്റിൽ പകച്ചു പോയി!\nജൂനിയറും സീനിയറും തൂത്തുവാരി ${sc.qPts} പോയിന്റിൽ ചാമ്പ്യന്മാരായി!\nഅൽ മസൂദി മക്കളേ കരയല്ലേ, അടുത്ത സീസണിൽ നോക്കാം!`,
+                `മാനത്തെ വെള്ളിത്തേരിൽ ${sc.qPts} പോയിന്റും തൂക്കി അൽ ഖസ്‌വിനി വന്നു!\nതാഴെയിരുന്ന് ${sc.mPts} പോയിന്റ് തപ്പി അൽ മസൂദി വലഞ്ഞു പോയി!\n${sc.diff} പോയിന്റ് ലീഡിൽ സീൻ കോൺട്രയായപ്പോൾ അൽ മസൂദി ടെന്റും പൂട്ടി സ്ഥലം വിട്ടു!\nഇനി ട്രോളുകളുടെ പൂരമാണ് ഉറവ ഫെസ്റ്റ് മക്കളേ!`
             ];
-            let songLyrics = fallbackSongs[Math.floor(Math.random() * fallbackSongs.length)];
+            let songLyrics = masudiRoastSongs[Math.floor(Math.random() * masudiRoastSongs.length)];
 
             if (lyricsBox) lyricsBox.innerText = songLyrics;
-            if (btn) { btn.disabled = false; btn.innerText = '🎵 മലയാളം ട്രോൾ പാട്ട് പാടുക'; }
-            window.startTrollSongBeat(116);
-            window.showAppToast(`🎶 മലയാളം ട്രോൾ ഗാനം`, songLyrics, "🎤");
+            if (btn) { btn.disabled = false; btn.innerText = '🎵 അടുത്ത അൽ മസൂദി ട്രോൾ പാട്ട് പാടുക'; }
+            window.startTrollSongBeat(118);
+            window.showAppToast(`🎶 അൽ മസൂദി സ്പെഷ്യൽ ട്രോൾ ഗാനം`, songLyrics, "🎤");
             await window.speakMalayalamText(songLyrics.replace(/\n/g, ', '), 'song');
             setTimeout(() => window.stopTrollSongBeat(), 9500);
         };
 
         window.openChampionPopup = (manual = false) => {
-            let teamTotals = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
-            state.results.forEach(res => {
-                const prog = state.programs.find(p => p.id === res.progId);
-                if (!prog) return;
-                const pArr = (prog.pointScheme || "10,5,3").split(',').map(Number);
-                const award = (ids, pts) => {
-                    (Array.isArray(ids) ? ids : (ids ? [ids] : [])).forEach(id => {
-                        const c = state.candidates.find(x => x.id === id);
-                        if (c && teamTotals[c.team] !== undefined) teamTotals[c.team] += pts;
-                        else if (String(id).startsWith('TEAM:')) {
-                            const tName = String(id).replace('TEAM:', '');
-                            if (teamTotals[tName] !== undefined) teamTotals[tName] += pts;
-                        }
-                    });
-                };
-                award(res.first, pArr[0]); award(res.second, pArr[1]); award(res.third, pArr[2]);
-            });
-
-            const mPts = teamTotals['Al-Masūdi'] || 0;
-            const qPts = teamTotals['Al-Qazwini'] || 0;
-            const champ = mPts >= qPts ? 'Al-Masūdi' : 'Al-Qazwini';
-            const runner = mPts >= qPts ? 'Al-Qazwini' : 'Al-Masūdi';
-            const champPts = Math.max(mPts, qPts);
-            const runnerPts = Math.min(mPts, qPts);
-
+            const sc = window.getAccurateScoreMetrics();
             const fin = state.finaleConfig || DEFAULT_FINALE_CONFIG;
             document.getElementById('champPopupTitle').innerText = fin.championTitle || 'OVERALL CHAMPIONS - URAVA S04';
-            document.getElementById('champPopupSub').innerText = fin.championSubtitle || 'Congratulations to the victorious team of Aawaaze Funoon Season 04!';
-            document.getElementById('champWinnerName').innerText = champ;
-            document.getElementById('champWinnerPts').innerText = `${champPts} PTS`;
-            document.getElementById('champRunnerInfo').innerText = `Runner-Up: ${runner} (${runnerPts} PTS)`;
-            document.getElementById('champLeadMargin').innerText = `Lead: ${champPts - runnerPts} PTS`;
+            document.getElementById('champPopupSub').innerText = fin.championSubtitle || `കപ്പും തൂക്കി അൽ ഖസ്‌വിനി (${sc.qPts} PTS)! അൽ മസൂദിക്ക് (${sc.mPts} PTS) ഇനി അടുത്ത സീസണിൽ നോക്കാം മക്കളേ! 🏆😂`;
+            document.getElementById('champWinnerName').innerText = sc.champ;
+            document.getElementById('champWinnerPts').innerText = `${sc.champPts} PTS`;
+            const qBox = document.getElementById('champBoxQazPts');
+            if (qBox) qBox.innerText = `${sc.qPts} PTS`;
+            document.getElementById('champRunnerInfo').innerText = `${sc.mPts} PTS`;
+            document.getElementById('champLeadMargin').innerText = `+${sc.diff} PTS`;
 
             const cancelledProgs = state.programs.filter(p => p.cancelled);
             const cancelBox = document.getElementById('champCancelNoticeBox');
@@ -933,12 +1106,24 @@
                     ...(primaryData.templates || {})
                 };
             }
+
+            const primaryTrollList = primaryData.finale?.trolls || [];
+            const legacyTrollList = legacyData.finale?.trolls || [];
+            const customTrolls = primaryTrollList.length > 6 ? primaryTrollList : (legacyTrollList.length > 6 ? legacyTrollList : []);
+            const mergedTrolls = [...DEFAULT_FINALE_CONFIG.trolls];
+            customTrolls.forEach(ct => {
+                if (!mergedTrolls.some(mt => mt.text === ct.text)) mergedTrolls.unshift(ct);
+            });
+
             if (primaryData.finale || legacyData.finale) {
                 state.finaleConfig = {
                     ...DEFAULT_FINALE_CONFIG,
                     ...(legacyData.finale || {}),
-                    ...(primaryData.finale || {})
+                    ...(primaryData.finale || {}),
+                    trolls: mergedTrolls
                 };
+            } else {
+                state.finaleConfig = { ...DEFAULT_FINALE_CONFIG, trolls: mergedTrolls };
             }
             window.renderApp();
 
@@ -1183,8 +1368,38 @@
                 const showJun = state.tableCatFilter === 'All' || state.tableCatFilter === 'Junior';
                 const showSen = state.tableCatFilter === 'All' || state.tableCatFilter === 'Senior';
                 const overallDiff = Math.abs(teamTotals['Al-Masūdi'] - teamTotals['Al-Qazwini']);
+                const qTotal = teamTotals['Al-Qazwini'];
+                const mTotal = teamTotals['Al-Masūdi'];
+
+                const marqueeEl = document.getElementById('topRoastMarquee');
+                if (marqueeEl) {
+                    marqueeEl.innerHTML = `🏆 അൽ ഖസ്‌വിനി ഒഫീഷ്യൽ ചാമ്പ്യന്മാർ (${qTotal} പോയിന്റ്)! • 😂 അൽ മസൂദി വെറും ${mTotal} പോയിന്റിൽ പുറകിൽ (${overallDiff} പോയിന്റ് ലീഡ്)! • 🎬 ബെല്ലാരി രാജ: തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദിയുടെ സീൻ കോൺട്രയാണ് മക്കളേ! • 🚑 അൽ മസൂദി ബെഞ്ചിലേക്ക് അടിയന്തരമായി രമണന്റെ സർബത്ത് എത്തേണ്ടതാണ്! • 🔥 ദശമൂലം ദാമുവിനോടോ ബാലാ നിന്റെ കളി!`;
+                }
 
                 content.innerHTML = `
+                    <!-- Huge Al-Masūdi Mega Roast & Exact Victory Scoreboard Banner on Home Page -->
+                    <div class="ag-card rounded-3xl p-4 sm:p-6 border-2 border-pink-500/70 bg-gradient-to-br from-pink-950/60 via-slate-900 to-amber-950/50 mb-5 fade-in shadow-[0_0_50px_rgba(236,72,153,0.25)]">
+                        <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-3.5 text-center lg:text-left flex-col sm:flex-row">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/30 to-pink-600/30 border border-amber-400/60 flex items-center justify-center text-4xl shrink-0 animate-bounce shadow-lg">👑</div>
+                                <div>
+                                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+                                        <span class="text-[10px] font-black uppercase tracking-widest bg-emerald-500 text-slate-950 px-2.5 py-0.5 rounded-full">🏆 AL-QAZWINI VICTORY (${qTotal} PTS)</span>
+                                        <span class="text-[10px] font-black uppercase tracking-widest bg-pink-600 text-white px-2.5 py-0.5 rounded-full">😭 AL-MASŪDI ROAST (${mTotal} PTS)</span>
+                                        <span class="text-[10px] font-bold text-amber-300">⚡ +${overallDiff} PTS LEAD</span>
+                                    </div>
+                                    <h3 class="text-lg sm:text-2xl font-black text-white">${qTotal} പോയിന്റും തൂക്കി അൽ ഖസ്‌വിനി രാജാക്കന്മാർ! വെറും ${mTotal} പോയിന്റിൽ അൽ മസൂദിക്ക് കൂട്ടക്കരച്ചിൽ! 😂🏆</h3>
+                                    <p class="text-xs text-slate-300 mt-1">മമ്മൂട്ടി (ബെല്ലാരി രാജ), മോഹൻലാൽ (ആടുതോമ), ദശമൂലം ദാമു, രമണൻ, മണവാളൻ ശബ്ദങ്ങളിൽ കൃത്യമായ പോയിന്റോടെ അൽ മസൂദിക്ക് മെഗാ ട്രോൾ അഭിഷേകം!</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 shrink-0 justify-center">
+                                <button onclick="window.speakLiveScoreRoast('bellary')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs uppercase shadow-lg transition">🔊 ബെല്ലാരി രാജ സ്കോർ റോസ്റ്റ്</button>
+                                <button onclick="window.speakLiveScoreRoast('damu')" class="bg-pink-600 hover:bg-pink-500 text-white font-black px-4 py-2.5 rounded-xl text-xs uppercase shadow-lg transition">🔊 ദശമൂലം ദാമു റോസ്റ്റ്</button>
+                                <button onclick="window.switchTab('trolls')" class="bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs uppercase shadow-lg transition">🎭 സമ്പൂർണ്ണ ട്രോൾ സ്റ്റുഡിയോ ➔</button>
+                            </div>
+                        </div>
+                    </div>
+
                     ${(cancelledProgs.length > 0 || state.finaleConfig?.cancelledNotice) ? `
                         <div class="ag-card rounded-2xl p-3.5 border border-red-500/40 bg-red-950/20 flex items-center justify-between gap-3 mb-5 fade-in">
                             <div class="flex items-center gap-3">
@@ -1516,60 +1731,137 @@
 
             if (state.tab === 'trolls') {
                 const trolls = state.finaleConfig?.trolls || DEFAULT_FINALE_CONFIG.trolls;
-                const isMasudiLead = teamTotals['Al-Masūdi'] >= teamTotals['Al-Qazwini'];
-                const champTeamMl = isMasudiLead ? 'അൽ മസൂദി' : 'അൽ ഖസ്‌വിനി';
-                const loserTeamMl = isMasudiLead ? 'അൽ ഖസ്‌വിനി' : 'അൽ മസൂദി';
-                const marginPts = Math.abs(teamTotals['Al-Masūdi'] - teamTotals['Al-Qazwini']);
+                const sc = window.getAccurateScoreMetrics();
+
+                const celebRoastButtons = [
+                    { key: 'bellary', actor: 'മമ്മൂട്ടി സ്റ്റൈൽ', role: 'ബെല്ലാരി രാജ (രാജമാണിക്യം)', emoji: '🕶️', color: 'border-amber-500/50 bg-amber-950/30 text-amber-300' },
+                    { key: 'aaduthoma', actor: 'മോഹൻലാൽ സ്റ്റൈൽ', role: 'ആടുതോമ / സ്റ്റീഫൻ (സ്ഫടികം)', emoji: '🔥', color: 'border-emerald-500/50 bg-emerald-950/30 text-emerald-300' },
+                    { key: 'damu', actor: 'സുരാജ് സ്റ്റൈൽ', role: 'ദശമൂലം ദാമു (ചട്ടമ്പിനാട്)', emoji: '💪', color: 'border-pink-500/50 bg-pink-950/30 text-pink-300' },
+                    { key: 'ramanan', actor: 'ഹരിശ്രീ അശോകൻ സ്റ്റൈൽ', role: 'രമണൻ (പഞ്ചാബി ഹൗസ്)', emoji: '😂', color: 'border-sky-500/50 bg-sky-950/30 text-sky-300' },
+                    { key: 'manavalan', actor: 'സലിം കുമാർ സ്റ്റൈൽ', role: 'മണവാളൻ (പുലിവാൽ കല്യാണം)', emoji: '👑', color: 'border-purple-500/50 bg-purple-950/30 text-purple-300' },
+                    { key: 'innocent', actor: 'ഇന്നസെന്റ് സ്റ്റൈൽ', role: 'മന്നാർ മത്തായി സ്പീക്കിംഗ്', emoji: '🎭', color: 'border-teal-500/50 bg-teal-950/30 text-teal-300' },
+                    { key: 'kittunni', actor: 'ജഗതി സ്റ്റൈൽ', role: 'കിട്ടുണ്ണി (കിലുക്കം)', emoji: '🎻', color: 'border-rose-500/50 bg-rose-950/30 text-rose-300' },
+                    { key: 'vijayan', actor: 'ശ്രീനിവാസൻ സ്റ്റൈൽ', role: 'വിജയൻ (നാടോടിക്കാറ്റ്)', emoji: '🕵️‍♂️', color: 'border-indigo-500/50 bg-indigo-950/30 text-indigo-300' }
+                ];
 
                 const famousDialogues = [
-                    { film: 'രാജമാണിക്യം (ബെല്ലാരി രാജ)', style: 'mass', sound: 'thug', text: `തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ ${loserTeamMl} ടീമിന്റെ സീൻ കോൺട്രയാണ് മക്കളേ! കപ്പ് ഞങ്ങടെ ${champTeamMl} അങ്ങ് എടുത്തു!` },
-                    { film: 'സ്ഫടികം (ആടുതോമ)', style: 'mass', sound: 'horn', text: `ഇതൊക്കെയെന്ത്! ${champTeamMl} ടീമിന്റെ കയ്യിൽ നിന്നും കപ്പ് തട്ടിയെടുക്കാൻ നോക്കുന്നോ മക്കളേ!` },
-                    { film: 'പഞ്ചാബി ഹൗസ് (രമണൻ)', style: 'comedy', sound: 'laugh', text: `മുതലാളീ ജയിച്ചേ! ${marginPts} പോയിന്റ് വ്യത്യാസത്തിൽ പോയിന്റ് ടേബിൾ നോക്കി ${loserTeamMl} കണ്ണ് തള്ളിപ്പോയേ!` },
-                    { film: 'ചട്ടമ്പിനാട് (ദശമൂലം ദാമു)', style: 'comedy', sound: 'laugh', text: `ദശമൂലം ദാമുവിനോടോ ബാലാ നിന്റെ കളി! പോയിന്റ് ടേബിൾ കണ്ട് പേടിക്കണ്ട ${loserTeamMl} മക്കളേ!` },
-                    { film: 'കിലുക്കം (കിട്ടുണ്ണി)', style: 'comedy', sound: 'sad', text: `എനിക്ക് വിശന്നിട്ട് കണ്ണ് കാണാൻ വയ്യേ... കപ്പും പോയി പോയിന്റും പോയി ${loserTeamMl} ടീമിന്റെ അവസ്ഥ പരമ കഷ്ടം!` },
-                    { film: 'പുലിവാൽ കല്യാണം (മണവാളൻ)', style: 'chipmunk', sound: 'horn', text: `ഇൻഡിവിജ്വൽ പോയിന്റ് സമം ആയപ്പോൾ ഗ്രൂപ്പ് പോയിന്റ് വെച്ച് ഞങ്ങൾ കലാപ്രതിഭ തൂക്കി മക്കളേ!` },
-                    { film: 'ആറാം തമ്പുരാൻ (ജഗന്നാഥൻ)', style: 'villain', sound: 'thug', text: `ഉറവ ഫെസ്റ്റിന്റെ മണ്ണിൽ ${champTeamMl} ഒരുമ്പെട്ടിറങ്ങിയാൽ പിന്നെ ${loserTeamMl} ടീമിന് രക്ഷയില്ല മക്കളേ!` },
-                    { film: 'സി.ഐ.ഡി മൂസ (സഹദേവൻ)', style: 'comedy', sound: 'sad', text: `ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് ${loserTeamMl} കരുതണ്ട, കപ്പ് എന്നും ${champTeamMl}ക്ക് തന്നെയാണ്!` }
+                    { film: 'രാജമാണിക്യം (ബെല്ലാരി രാജ - മമ്മൂട്ടി)', style: 'bellary', sound: 'horn', text: `തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദി ടീമിന്റെ സീൻ കോൺട്രയാണ് മക്കളേ! ${sc.qPts} പോയിന്റും തൂക്കി ${sc.diff} പോയിന്റ് ലീഡിൽ കപ്പ് ഞങ്ങടെ അൽ ഖസ്‌വിനി അങ്ങ് എടുത്തു!` },
+                    { film: 'സ്ഫടികം (ആടുതോമ - മോഹൻലാൽ)', style: 'aaduthoma', sound: 'thug', text: `ഇതൊക്കെയെന്ത്! ${sc.qPts} പോയിന്റുള്ള അൽ ഖസ്‌വിനി ടീമിന്റെ കയ്യിൽ നിന്നും കപ്പ് തട്ടിയെടുക്കാൻ ${sc.mPts} പോയിന്റ് മാത്രമുള്ള അൽ മസൂദി ഇനി അടുത്ത ജന്മത്തിൽ ജനിക്കണം മക്കളേ!` },
+                    { film: 'പഞ്ചാബി ഹൗസ് (രമണൻ - ഹരിശ്രീ അശോകൻ)', style: 'ramanan', sound: 'laugh', text: `മുതലാളീ ജയിച്ചേ! ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ഭൂരിപക്ഷവും നോക്കി അൽ മസൂദി ടീമിന്റെ കണ്ണ് തള്ളിപ്പോയേ! രമണാ അൽ മസൂദിക്ക് സർബത്ത് കൊടുക്കൂ!` },
+                    { film: 'ചട്ടമ്പിനാട് (ദശമൂലം ദാമു - സുരാജ്)', style: 'damu', sound: 'laugh', text: `ദശമൂലം ദാമുവിനോടോ ബാലാ നിന്റെ കളി! വെറും ${sc.mPts} പോയിന്റ് കണ്ട് പേടിക്കണ്ട അൽ മസൂദി മക്കളേ, അടുത്ത സീസണിൽ നോക്കാം!` },
+                    { film: 'കിലുക്കം (കിട്ടുണ്ണി - ജഗതി)', style: 'kittunni', sound: 'sad', text: `എനിക്ക് വിശന്നിട്ട് കണ്ണ് കാണാൻ വയ്യേ... കപ്പും പോയി ${sc.diff} പോയിന്റ് ലീഡും പോയി അൽ മസൂദി ടീമിന്റെ അവസ്ഥ പരമ കഷ്ടം!` },
+                    { film: 'പുലിവാൽ കല്യാണം (മണവാളൻ - സലിം കുമാർ)', style: 'manavalan', sound: 'horn', text: `ഫോർട്ട് കൊച്ചിയിലെ മണവാളൻ പറയുകയാണ്: വെറും ${sc.mPts} പോയിന്റുള്ള അൽ മസൂദി ടീമിന് ഇനി ടാറ്റാ ബൈ ബൈ! ${sc.qPts} പോയിന്റിൽ കപ്പ് അൽ ഖസ്‌വിനി തൂക്കി മക്കളേ!` },
+                    { film: 'മന്നാർ മത്തായി സ്പീക്കിംഗ് (ഇന്നസെന്റ്)', style: 'innocent', sound: 'laugh', text: `അല്ല മക്കളേ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റ് അടിച്ചപ്പോൾ അൽ മസൂദി ${sc.mPts} പോയിന്റിൽ കുടുങ്ങിപ്പോയല്ലോ! ഇനി ഉറവ ഫെസ്റ്റ് കഴിഞ്ഞ് വീട്ടിൽ പോയി കിടന്നുറങ്ങിക്കോ!` },
+                    { film: 'സി.ഐ.ഡി മൂസ (സഹദേവൻ)', style: 'comedy', sound: 'sad', text: `ഒരു പ്രോഗ്രാം ക്യാൻസൽ ആയതുകൊണ്ട് രക്ഷപ്പെട്ടു എന്ന് അൽ മസൂദി കരുതണ്ട, ${sc.diff} പോയിന്റ് ലീഡിൽ കപ്പ് എന്നും അൽ ഖസ്‌വിനിക്ക് തന്നെയാണ്!` },
+                    { film: 'ലൂസിഫർ (സ്റ്റീഫൻ നെടുമ്പള്ളി - മോഹൻലാൽ)', style: 'aaduthoma', sound: 'thug', text: `അൽ മസൂദി കുട്ടികളേ, ഇത് അൽ ഖസ്‌വിനിയുടെ സാമ്രാജ്യമാണ്! ${sc.qPts} പോയിന്റും തൂക്കി ഗ്രൗണ്ടും തൂക്കി ഞങ്ങൾ പോവുകയാണ്!` },
+                    { film: 'ഗോഡ്ഫാദർ (അഞ്ഞൂറാൻ)', style: 'villain', sound: 'horn', text: `അൽ മസൂദി ടീം ഇനി കപ്പ് അടിക്കണമെങ്കിൽ അൽ ഖസ്‌വിനി സമ്മതിക്കണം! ${sc.qPts} പോയിന്റിൽ ഈ സീസൺ ഞങ്ങൾ അങ്ങ് എടുത്തു!` },
+                    { film: 'വെള്ളിമൂങ്ങ (മാമച്ചൻ)', style: 'comedy', sound: 'laugh', text: `അൽ മസൂദി ടീമിന്റെ തന്ത്രങ്ങളൊക്കെ ${sc.mPts} പോയിന്റിൽ പാളിപ്പോയി മക്കളേ! ബുദ്ധി ഉപയോഗിച്ച് ${sc.qPts} പോയിന്റിൽ അൽ ഖസ്‌വിനി കപ്പ് തൂക്കി!` },
+                    { film: 'നാടോടിക്കാറ്റ് (വിജയൻ - ശ്രീനിവാസൻ)', style: 'vijayan', sound: 'laugh', text: `ദാസാ, അൽ മസൂദിക്ക് കുറച്ചു ചോറും മോരും കൊടുക്കൂ മക്കളേ, ${sc.diff} പോയിന്റ് വ്യത്യാസം കണ്ട് തളർന്നു കിടക്കുകയാണ്!` },
+                    { film: 'ദേവാസുരം (മംഗലശ്ശേരി നീലകണ്ഠൻ)', style: 'aaduthoma', sound: 'thug', text: `അൽ മസൂദി ടീമിന്റെ അഹങ്കാരത്തിന് ${sc.qPts} പോയിന്റുകൊണ്ട് അൽ ഖസ്‌വിനി മറുപടി കൊടുത്തു കഴിഞ്ഞു മക്കളേ!` },
+                    { film: 'മീശമാധവൻ (പട്ടാളം പുരുഷു)', style: 'kittunni', sound: 'laugh', text: `അൽ മസൂദി വെടിവെക്കാൻ വന്നപ്പോൾ പീരങ്കി തിരിഞ്ഞു നിന്നു! ${sc.mPts} പോയിന്റിൽ അൽ മസൂദി പുകഞ്ഞുപോയി മക്കളേ!` }
                 ];
 
                 const multiSpeakerSkits = [
                     {
-                        title: '🎭 നാടോടിക്കാറ്റ് — ദാസനും വിജയനും (2 Original Voices)',
-                        script: `ദാസൻ: വിജയാ, ആ പോയിന്റ് ടേബിളിലേക്ക് ഒന്ന് നോക്കിയേ, എവിടെയോ എന്തോ തകരാറു പോലെ!\nവിജയൻ: തകരാറല്ല ദാസാ, ${champTeamMl} കപ്പും കൊണ്ട് പോയി! ${loserTeamMl} ടീമിന് ഇനി അടുത്ത സീസണിൽ നോക്കാം!`
+                        title: '🎭 നാടോടിക്കാറ്റ് — ദാസനും വിജയനും (കൃത്യമായ പോയിന്റ് തപ്പൽ)',
+                        script: `ദാസൻ: വിജയാ, ആ അൽ മസൂദിയുടെ പോയിന്റ് ടേബിളിലേക്ക് ഒന്ന് നോക്കിയേ, വെറും ${sc.mPts} പോയിന്റ്! എവിടെയോ എന്തോ തകരാറു പോലെ!\nവിജയൻ: തകരാറല്ല ദാസാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡുമായി കപ്പും കൊണ്ട് പോയി!`
                     },
                     {
-                        title: '🎭 പഞ്ചാബി ഹൗസ് — രമണനും മുതലാളിയും (2 Original Voices)',
-                        script: `ദാസൻ: രമണാ, ${loserTeamMl} ടീമിന്റെ പോയിന്റ് എവിടെപ്പോയി?\nവിജയൻ: മുതലാളീ, ${marginPts} പോയിന്റ് ലീഡിൽ ${champTeamMl} കപ്പും തൂക്കി ഗ്രൗണ്ടും തൂക്കി പോയേ!`
+                        title: '🎭 പഞ്ചാബി ഹൗസ് — രമണനും മുതലാളിയും (അൽ മസൂദി ബെഞ്ച്)',
+                        script: `ദാസൻ: രമണാ, അൽ മസൂദി ടീമിന്റെ പോയിന്റ് എവിടെപ്പോയി? ആകെ ${sc.mPts} പോയിന്റേ ഉള്ളല്ലോ!\nവിജയൻ: മുതലാളീ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും തൂക്കി ഗ്രൗണ്ടും തൂക്കി പോയേ! അൽ മസൂദിക്ക് ഇനി സർബത്ത് കൊടുക്കാം!`
+                    },
+                    {
+                        title: '🎭 മണിച്ചിത്രത്താഴ് — നകുലനും ഡോക്ടർ സണ്ണിയും (അൽ മസൂദി ഷോക്ക്)',
+                        script: `ദാസൻ: സണ്ണീ, അൽ മസൂദി ടീമിന് ഇതെന്തു പറ്റി? ${sc.mPts} പോയിന്റ് നോക്കി മിണ്ടാതെ ഇരിക്കുന്നല്ലോ!\nവിജയൻ: നകുലാ പേടിക്കണ്ട, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റിൽ കപ്പ് അടിച്ചതിന്റെ ചെറിയൊരു ഷോക്കാണ്! അടുത്ത വർഷം മാറിക്കോളും!`
+                    },
+                    {
+                        title: '🎭 ഇൻ ഹരിഹർ നഗർ — മഹാദേവനും അപ്പുക്കുട്ടനും (അൽ മസൂദി പണി പാളി)',
+                        script: `ദാസൻ: അപ്പുക്കുട്ടാ, അൽ മസൂദി കപ്പ് അടിക്കും എന്നല്ലേ നീ പറഞ്ഞത്?\nവിജയൻ: അയ്യോ മഹാദേവാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡും അടിച്ചുകയറ്റുമെന്ന് ഞാൻ സ്വപ്നത്തിൽ പോലും വിചാരിച്ചില്ല!`
+                    }
+                ];
+
+                const presetRoastSongs = [
+                    {
+                        title: `🎵 1. തരികിട താളം (${sc.qPts} vs ${sc.mPts} കണ്ണീർ ഗാനം)`,
+                        lyrics: `തരികിട തരികിട താളത്തിൽ ${sc.qPts} പോയിന്റിൽ അൽ ഖസ്‌വിനി!\nവെറും ${sc.mPts} പോയിന്റ് നോക്കിയിരുന്ന് കണ്ണീരൊഴുക്കി അൽ മസൂദി!\n${sc.diff} പോയിന്റ് ലീഡിൽ ഞങ്ങൾ രാജാവായി മുന്നേറി!\nഅടുത്ത സീസൺ വരുമ്പോഴെങ്കിലും ജയിക്കാൻ നോക്കണേ അൽ മസൂദി മക്കളേ!`
+                    },
+                    {
+                        title: `🎵 2. പണി പാളി റാപ്പ് (+${sc.diff} പോയിന്റ് ലീഡ്)`,
+                        lyrics: `കപ്പും പോയി ഗ്രൗണ്ടും പോയി അൽ മസൂദി ടീമിന് പണി പാളി!\n${sc.qPts} പോയിന്റ് വന്നപ്പോൾ അൽ ഖസ്‌വിനി കപ്പും കൊണ്ട് പറന്നു പോയി!\nമൂലയിലിരുന്ന് ${sc.mPts} പോയിന്റ് എണ്ണി അൽ മസൂദി തലയിൽ കൈ വെച്ചു!\nഇനി അടുത്ത വർഷം കാണാം അൽ മസൂദി മക്കളേ ടാറ്റാ ബൈ ബൈ!`
+                    },
+                    {
+                        title: '🎵 3. ചെണ്ട മേളം റോസ്റ്റ് (രമണന്റെ സർബത്ത്)',
+                        lyrics: `ചെണ്ടയും മേളവും കൊട്ടിപ്പാടി ${sc.qPts} പോയിന്റിൽ അൽ ഖസ്‌വിനി കപ്പും തൂക്കി!\nപോയിന്റ് ടേബിൾ നോക്കിയിരുന്ന് അൽ മസൂദി കണ്ണ് തള്ളിപ്പോയി!\nഇതൊക്കെയെന്ത് എന്ന് ചോദിച്ച് അൽ ഖസ്‌വിനി ഗ്രൗണ്ട് ഭരിച്ചു മക്കളേ!\nഅൽ മസൂദിക്ക് ഇനി രമണന്റെ സർബത്ത് കുടിച്ച് വിശ്രമിക്കാം!`
+                    },
+                    {
+                        title: '🎵 4. സീൻ കോൺട്ര പാരഡി (അൽ മസൂദി ടെന്റ് പൂട്ടി)',
+                        lyrics: `മാനത്തെ വെള്ളിത്തേരിൽ കപ്പും തൂക്കി അൽ ഖസ്‌വിനി വന്നു!\nതാഴെയിരുന്ന് ${sc.mPts} പോയിന്റ് തപ്പി അൽ മസൂദി വലഞ്ഞു പോയി!\nസീൻ കോൺട്രയായപ്പോൾ അൽ മസൂദി ടെന്റും പൂട്ടി സ്ഥലം വിട്ടു!\nഇനി ട്രോളുകളുടെ പൂരമാണ് ഉറവ ഫെസ്റ്റ് മക്കളേ!`
                     }
                 ];
 
                 content.innerHTML = `
                     <div class="max-w-5xl mx-auto space-y-5 fade-in">
-                        <div class="ag-card rounded-3xl p-5 sm:p-6 border border-pink-500/35 bg-gradient-to-br from-slate-900 via-pink-950/20 to-slate-950">
-                            <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
-                                <span class="text-[10px] font-black uppercase bg-pink-500/20 text-pink-300 px-3 py-1 rounded-full border border-pink-500/40">🎬 100% ഒറിജിനൽ മലയാളം ശബ്ദം (Original Malayalam Voice Engine)</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-bold text-amber-300">🏆 ചാമ്പ്യന്മാർ: ${champTeamMl} • 🎯 ട്രോൾ: ${loserTeamMl}</span>
-                                    <button onclick="window.stopAllTrollVoices()" class="bg-red-600/80 hover:bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg">⏹️ Stop Voice</button>
+                        <!-- 1. Official Victory & Exact Point Roast Scoreboard -->
+                        <div class="ag-card rounded-3xl p-5 sm:p-6 border-2 border-amber-400/70 bg-gradient-to-br from-slate-900 via-emerald-950/30 to-slate-950 shadow-[0_0_60px_rgba(16,185,129,0.2)]">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                                <span class="text-[10px] font-black uppercase bg-emerald-500 text-slate-950 px-3 py-1 rounded-full shadow">👑 OFFICIAL VICTORY & EXACT SCORE ROAST BOARD</span>
+                                <button onclick="window.stopAllTrollVoices()" class="bg-red-600 hover:bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-lg shadow">⏹️ ശബ്ദം നിർത്തുക (Stop Audio)</button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-5 text-center">
+                                <div class="bg-emerald-950/50 border-2 border-emerald-400/60 p-4 rounded-2xl shadow-lg">
+                                    <div class="text-[10px] font-black uppercase text-emerald-300 tracking-widest">🏆 CHAMPIONS • അൽ ഖസ്‌വിനി</div>
+                                    <div class="text-4xl sm:text-5xl font-black text-white num-font my-1">${sc.qPts} <span class="text-sm text-emerald-400">PTS</span></div>
+                                    <div class="text-[11px] text-emerald-200 font-bold">Junior: ${sc.junQ} • Senior: ${sc.senQ} • 🥇 ${sc.firstQ} Wins</div>
+                                </div>
+                                <div class="bg-amber-950/50 border-2 border-amber-400/60 p-4 rounded-2xl shadow-lg flex flex-col justify-center">
+                                    <div class="text-[10px] font-black uppercase text-amber-300 tracking-widest">⚡ VICTORY MARGIN • ഭൂരിപക്ഷം</div>
+                                    <div class="text-4xl sm:text-5xl font-black text-amber-400 num-font my-1">+${sc.diff} <span class="text-sm">PTS</span></div>
+                                    <div class="text-[11px] text-amber-200 font-bold">കപ്പും ഗ്രൗണ്ടും അൽ ഖസ്‌വിനി തൂക്കി!</div>
+                                </div>
+                                <div class="bg-pink-950/50 border-2 border-pink-500/60 p-4 rounded-2xl shadow-lg">
+                                    <div class="text-[10px] font-black uppercase text-pink-300 tracking-widest">😭 RUNNER-UP • അൽ മസൂദി</div>
+                                    <div class="text-4xl sm:text-5xl font-black text-slate-300 num-font my-1">${sc.mPts} <span class="text-sm text-pink-400">PTS</span></div>
+                                    <div class="text-[11px] text-pink-200 font-bold">Junior: ${sc.junM} • Senior: ${sc.senM} • 🥇 ${sc.firstM} Wins</div>
                                 </div>
                             </div>
-                            <h2 class="text-white font-black text-2xl sm:text-3xl mb-1">🎭 ഫുൾ മലയാളം ട്രോൾ സ്റ്റുഡിയോ & സിനിമാ ഡയലോഗുകൾ</h2>
-                            <p class="text-xs text-slate-300 mb-4">തനി നാടൻ മലയാളം ശബ്ദത്തിൽ <b>${loserTeamMl}</b> ടീമിനുള്ള കിടിലൻ ട്രോൾ പാട്ടുകളും സിനിമാ ഡയലോഗുകളും കേൾക്കാം!</p>
+
+                            <!-- 8 Malayalam Celebrity / Film Character Exact-Point Voice Clone Buttons -->
+                            <div class="bg-slate-950/90 border border-pink-500/40 rounded-2xl p-4 mb-5">
+                                <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase text-pink-400">🎙️ MALAYALAM CELEBRITY & CHARACTER VOICE ROASTS (WITH EXACT POINTS: ${sc.qPts} vs ${sc.mPts})</span>
+                                        <h3 class="text-sm sm:text-base font-black text-white">സൂപ്പർതാരങ്ങളുടെ സിനിമാ ശൈലിയിൽ കൃത്യമായ പോയിന്റ് വെച്ച് അൽ മസൂദിയെ ട്രോളാം!</h3>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                    ${celebRoastButtons.map(cb => `
+                                        <button onclick="window.speakLiveScoreRoast('${cb.key}')" class="p-3 rounded-xl border ${cb.color} hover:scale-[1.02] transition text-left flex flex-col justify-between gap-1 shadow">
+                                            <div class="flex justify-between items-center w-full">
+                                                <span class="text-lg">${cb.emoji}</span>
+                                                <span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded font-black">🔊 Play</span>
+                                            </div>
+                                            <div class="font-black text-xs text-white leading-tight mt-1">${cb.actor}</div>
+                                            <div class="text-[10px] opacity-85 font-bold leading-tight">${cb.role}</div>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
 
                             <!-- Instant Soundboard -->
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
                                 <button onclick="window.playTrollEffect('horn')" class="bg-slate-950 hover:bg-pink-950/60 border border-pink-500/40 text-pink-300 font-black py-2.5 rounded-xl text-xs transition">📯 മാസ്സ് ഹോൺ (Horn)</button>
-                                <button onclick="window.playTrollEffect('laugh')" class="bg-slate-950 hover:bg-amber-950/60 border border-amber-500/40 text-amber-300 font-black py-2.5 rounded-xl text-xs transition">😂 കൂട്ടച്ചിരി (Laugh)</button>
-                                <button onclick="window.playTrollEffect('sad')" class="bg-slate-950 hover:bg-sky-950/60 border border-sky-500/40 text-sky-300 font-black py-2.5 rounded-xl text-xs transition">🎻 ശോകം വയലിൻ (Sad)</button>
-                                <button onclick="window.playTrollEffect('thug')" class="bg-slate-950 hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-black py-2.5 rounded-xl text-xs transition">🕶️ തഗ് ലൈഫ് (Thug Drop)</button>
+                                <button onclick="window.playTrollEffect('laugh')" class="bg-slate-950 hover:bg-amber-950/60 border border-amber-500/40 text-amber-300 font-black py-2.5 rounded-xl text-xs transition">😂 അൽ മസൂദിക്ക് കൂട്ടച്ചിരി</button>
+                                <button onclick="window.playTrollEffect('sad')" class="bg-slate-950 hover:bg-sky-950/60 border border-sky-500/40 text-sky-300 font-black py-2.5 rounded-xl text-xs transition">🎻 അൽ മസൂദി ശോകം വയലിൻ</button>
+                                <button onclick="window.playTrollEffect('thug')" class="bg-slate-950 hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-black py-2.5 rounded-xl text-xs transition">🕶️ അൽ ഖസ്‌വിനി തഗ് ലൈഫ്</button>
                             </div>
 
-                            <!-- 2-Speaker Malayalam Comedy Conversation Skits -->
+                            <!-- 4 Multi-Speaker Malayalam Comedy Conversation Skits -->
                             <div class="bg-slate-950/90 border border-pink-500/40 rounded-2xl p-4 mb-5">
-                                <div class="text-[11px] font-black uppercase text-pink-400 mb-2.5">🗣️ 2-പേർ സംസാരിക്കുന്ന മലയാളം കോമഡി ട്രോൾ (Multi-Speaker Malayalam Skits)</div>
+                                <div class="text-[11px] font-black uppercase text-pink-400 mb-2.5">🗣️ 2-പേർ സംസാരിക്കുന്ന അൽ മസൂദി കോമഡി ട്രോൾ സ്കിറ്റുകൾ (Exact Score Skits)</div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     ${multiSpeakerSkits.map(sk => `
-                                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2">
+                                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-between gap-2.5 hover:border-pink-500/40 transition">
                                             <div>
                                                 <div class="text-xs font-black text-amber-300 mb-1">${sk.title}</div>
                                                 <p class="text-xs text-slate-200 whitespace-pre-line leading-relaxed">${sk.script}</p>
@@ -1580,29 +1872,38 @@
                                 </div>
                             </div>
 
-                            <!-- AI Troll Song Composer -->
+                            <!-- Al-Masūdi Parody Troll Song Jukebox -->
                             <div class="bg-slate-950/90 border border-amber-500/40 rounded-2xl p-4 mb-5">
                                 <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
                                     <div>
-                                        <span class="text-[10px] font-black uppercase text-amber-400">🎶 മലയാളം പാരഡി ട്രോൾ ഗാനം & താളം</span>
-                                        <h3 class="text-sm font-black text-white">${loserTeamMl} ടീമിനുള്ള സ്പെഷ്യൽ മലയാളം ട്രോൾ പാട്ട്</h3>
+                                        <span class="text-[10px] font-black uppercase text-amber-400">🎶 അൽ മസൂദി പാരഡി ട്രോൾ ഗാനമേള (Live Score: ${sc.qPts} vs ${sc.mPts})</span>
+                                        <h3 class="text-sm font-black text-white">അൽ മസൂദി ടീമിനുള്ള സ്പെഷ്യൽ മലയാളം ട്രോൾ പാട്ടുകൾ</h3>
                                     </div>
                                     <div class="flex flex-wrap gap-2">
-                                        <button id="aiGenSongBtn" onclick="window.generateAiTrollSongForLoser()" class="bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-400 hover:to-pink-400 text-slate-950 font-black px-3.5 py-1.5 rounded-xl text-xs uppercase shadow">🎵 മലയാളം ട്രോൾ പാട്ട് പാടുക</button>
+                                        <button id="aiGenSongBtn" onclick="window.generateAiTrollSongForLoser()" class="bg-gradient-to-r from-amber-500 to-pink-500 hover:from-amber-400 hover:to-pink-400 text-slate-950 font-black px-3.5 py-1.5 rounded-xl text-xs uppercase shadow">🎵 റാൻഡം ട്രോൾ പാട്ട് പാടുക</button>
                                         <button onclick="window.stopAllTrollVoices()" class="bg-slate-800 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl text-xs border border-slate-700">⏹️ നിർത്തുക</button>
                                     </div>
                                 </div>
-                                <div id="trollSongLyricsDisplay" class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm font-bold text-amber-200 whitespace-pre-line">തരികിട തരികിട താളത്തിൽ കപ്പും തൂക്കി ${champTeamMl}!
-പോയിന്റ് ടേബിൾ നോക്കിയിരുന്ന് കണ്ണീരൊഴുക്കി ${loserTeamMl}!
-അടുത്ത സീസൺ വരുമ്പോഴെങ്കിലും ജയിക്കാൻ നോക്കണേ മക്കളേ!</div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+                                    ${presetRoastSongs.map(sg => `
+                                        <button onclick="window.generateAiTrollSongForLoser('${sg.lyrics.replace(/\n/g, '\\n').replace(/'/g, "\\'")}', '${sg.title.replace(/'/g, "\\'")}')" class="text-left p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/30 transition">
+                                            <div class="flex justify-between items-center mb-1">
+                                                <span class="text-[11px] font-black text-amber-300">${sg.title}</span>
+                                                <span class="text-[9px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded">▶️ പാടുക</span>
+                                            </div>
+                                            <p class="text-[11px] text-slate-300 line-clamp-2">${sg.lyrics.replace(/\n/g, ' • ')}</p>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                                <div id="trollSongLyricsDisplay" class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-xs sm:text-sm font-bold text-amber-200 whitespace-pre-line">${presetRoastSongs[0].lyrics}</div>
                             </div>
 
-                            <!-- Famous Malayalam Cinema Dialogues -->
+                            <!-- 14 Famous Malayalam Cinema Dialogues Roasting Al-Masūdi -->
                             <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 mb-5">
-                                <div class="text-[11px] font-black uppercase text-sky-400 mb-3">🎬 പ്രശസ്ത മലയാളം സിനിമാ ട്രോൾ ഡയലോഗുകൾ (തൊട്ടാൽ മലയാളത്തിൽ സംസാരിക്കും)</div>
+                                <div class="text-[11px] font-black uppercase text-sky-400 mb-3">🎬 14 മാസ്സ് മലയാളം സിനിമാ ട്രോൾ ഡയലോഗുകൾ — കൃത്യമായ പോയിന്റോടെ (${sc.qPts} vs ${sc.mPts})</div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                     ${famousDialogues.map(d => `
-                                        <button onclick="window.speakPresetFilmDialogue('${d.text.replace(/'/g, "\\'")}', '${d.film.replace(/'/g, "\\'")}', '${d.style}', '${d.sound}', false)" class="text-left p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 transition flex flex-col justify-between gap-1.5">
+                                        <button onclick="window.speakPresetFilmDialogue('${d.text.replace(/'/g, "\\'")}', '${d.film.replace(/'/g, "\\'")}', '${d.style}', '${d.sound}', false)" class="text-left p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 hover:border-pink-500/50 transition flex flex-col justify-between gap-1.5">
                                             <div class="flex justify-between items-center w-full">
                                                 <span class="text-[10px] font-black text-pink-400 uppercase">🎞️ ${d.film}</span>
                                                 <span class="text-[10px] bg-pink-600 text-white px-2 py-0.5 rounded font-bold">🔊 കേൾക്കുക</span>
@@ -1613,37 +1914,45 @@
                                 </div>
                             </div>
 
-                            <!-- Custom Malayalam Voice Box -->
+                            <!-- Custom Malayalam Voice Box with Celebrity Selector -->
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-slate-950/90 p-3.5 rounded-2xl border border-sky-500/30">
-                                <input type="text" id="customTrollInput" placeholder="മലയാളത്തിൽ ട്രോൾ ഡയലോഗ് ഇവിടെ ടൈപ്പ് ചെയ്യുക..." value="അടുത്ത സീസണിൽ നോക്കാം മക്കളേ, കപ്പ് ഞങ്ങടെ ${champTeamMl}ക്ക് ഇരിക്കട്ടെ!" class="sm:col-span-6 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-xs font-bold outline-none">
+                                <input type="text" id="customTrollInput" placeholder="അൽ മസൂദിക്കുള്ള മലയാളം ട്രോൾ ഡയലോഗ് ഇവിടെ ടൈപ്പ് ചെയ്യുക..." value="അടുത്ത സീസണിൽ നോക്കാം അൽ മസൂദി മക്കളേ, ${sc.qPts} പോയിന്റോടെ കപ്പ് ഞങ്ങടെ അൽ ഖസ്‌വിനിക്ക് ഇരിക്കട്ടെ!" class="sm:col-span-6 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-xs font-bold outline-none">
                                 <select id="customTrollVoiceStyle" class="sm:col-span-3 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-pink-300 text-xs font-black">
-                                    <option value="mass">🕶️ മാസ്സ് ഹീറോ ശബ്ദം (Mass)</option>
-                                    <option value="comedy">😂 കോമഡി ശബ്ദം (Comedy)</option>
-                                    <option value="villain">🔥 വില്ലൻ ബേസ് ശബ്ദം (Villain)</option>
-                                    <option value="chipmunk">🐿️ ഫണ്ണി ചിപ്മങ്ക് (Funny)</option>
+                                    <option value="bellary">🕶️ ബെല്ലാരി രാജ (മമ്മൂട്ടി സ്റ്റൈൽ)</option>
+                                    <option value="aaduthoma">🔥 ആടുതോമ (മോഹൻലാൽ സ്റ്റൈൽ)</option>
+                                    <option value="damu">💪 ദശമൂലം ദാമു (സുരാജ് സ്റ്റൈൽ)</option>
+                                    <option value="ramanan">😂 രമണൻ (ഹരിശ്രീ അശോകൻ സ്റ്റൈൽ)</option>
+                                    <option value="manavalan">👑 മണവാളൻ (സലിം കുമാർ സ്റ്റൈൽ)</option>
+                                    <option value="innocent">🎭 മന്നാർ മത്തായി (ഇന്നസെന്റ് സ്റ്റൈൽ)</option>
+                                    <option value="kittunni">🎻 കിട്ടുണ്ണി (ജഗതി സ്റ്റൈൽ)</option>
+                                    <option value="vijayan">🕵️‍♂️ വിജയൻ (ശ്രീനിവാസൻ സ്റ്റൈൽ)</option>
                                 </select>
                                 <button onclick="window.speakCustomTrollInput()" class="sm:col-span-3 bg-gradient-to-r from-pink-600 to-amber-500 text-slate-950 font-black py-2.5 px-4 rounded-xl text-xs uppercase shadow-lg">🔊 മലയാളത്തിൽ പറയുക</button>
                             </div>
                         </div>
 
-                        <!-- Published Committee Troll Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            ${trolls.map((t, idx) => `
-                                <div class="ag-card rounded-3xl p-5 border border-slate-800 flex flex-col justify-between">
-                                    <div>
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="text-[10px] font-black uppercase bg-pink-500/20 text-pink-300 px-3 py-1 rounded-full border border-pink-500/30">🎯 ${window.toPureMalayalamScript(t.target)}</span>
-                                            <span class="text-[10px] font-bold text-amber-300">🎬 മലയാളം ട്രോൾ</span>
+                        <!-- 10+ Huge Al-Masūdi Troll Cards -->
+                        <div>
+                            <h3 class="text-white font-black text-lg mb-3 flex items-center gap-2">🔥 അൽ മസൂദി വോയിസ് ട്രോൾ കാർഡുകൾ (${trolls.length} Mega Trolls • ${sc.qPts} vs ${sc.mPts} PTS)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                ${trolls.map((t, idx) => `
+                                    <div class="ag-card rounded-3xl p-5 border border-pink-500/30 flex flex-col justify-between hover:border-pink-500/60 transition">
+                                        <div>
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-[10px] font-black uppercase bg-pink-500/20 text-pink-300 px-3 py-1 rounded-full border border-pink-500/30">🎯 ${window.toPureMalayalamScript(t.target)}</span>
+                                                <span class="text-[10px] font-bold text-amber-300">🎬 ${t.style || 'മലയാളം സിനിമാ ട്രോൾ'}</span>
+                                            </div>
+                                            <p class="text-white font-black text-base my-3 leading-relaxed">${window.toPureMalayalamScript(t.text)}</p>
+                                            <div class="text-[11px] font-bold text-emerald-400 mb-3 bg-slate-950/70 px-3 py-1.5 rounded-xl border border-slate-800">🏆 അൽ ഖസ്‌വിനി: ${sc.qPts} PTS • 😭 അൽ മസൂദി: ${sc.mPts} PTS (ലീഡ്: +${sc.diff})</div>
                                         </div>
-                                        <p class="text-white font-black text-base my-3 leading-relaxed">${window.toPureMalayalamScript(t.text)}</p>
+                                        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80">
+                                            <button onclick="window.speakTrollCard(${idx}, 'bellary')" class="bg-pink-600 hover:bg-pink-500 text-white font-black py-2 rounded-xl text-[10px]">🕶️ മമ്മൂട്ടി സ്റ്റൈൽ</button>
+                                            <button onclick="window.speakTrollCard(${idx}, 'damu')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-xl text-[10px]">😂 സുരാജ് / രമണൻ</button>
+                                            <button onclick="window.speakTrollCard(${idx}, 'aaduthoma')" class="bg-sky-600 hover:bg-sky-500 text-white font-black py-2 rounded-xl text-[10px]">🔥 മോഹൻലാൽ സ്റ്റൈൽ</button>
+                                        </div>
                                     </div>
-                                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80">
-                                        <button onclick="window.speakTrollCard(${idx}, 'mass')" class="bg-pink-600 hover:bg-pink-500 text-white font-black py-2 rounded-xl text-[11px]">🕶️ മാസ്സ് ശബ്ദം</button>
-                                        <button onclick="window.speakTrollCard(${idx}, 'comedy')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-xl text-[11px]">😂 കോമഡി</button>
-                                        <button onclick="window.speakTrollCard(${idx}, 'villain')" class="bg-sky-600 hover:bg-sky-500 text-white font-black py-2 rounded-xl text-[11px]">🔥 വില്ലൻ ശബ്ദം</button>
-                                    </div>
-                                </div>
-                            `).join('')}
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1813,37 +2122,42 @@
             if (!rawSelectedPhotoUrl) return;
             const cropModalEl = document.getElementById('cropModal');
             const imgEl = document.getElementById('cropImageTarget');
-            if (!cropModalEl || !imgEl) return;
-            
-            imgEl.src = rawSelectedPhotoUrl;
-            cropModalEl.style.display = 'flex';
+            if (!cropModalEl || !imgEl || typeof imgEl.getBoundingClientRect !== 'function') return;
             
             if (cropperInstance) {
-                cropperInstance.destroy();
+                try { cropperInstance.destroy(); } catch (err) {}
                 cropperInstance = null;
             }
-            
-            setTimeout(() => {
-                if (imgEl && imgEl.complete && imgEl.naturalWidth > 0) {
+
+            cropModalEl.style.display = 'flex';
+
+            const initSafeCropper = () => {
+                if (!imgEl || typeof imgEl.getBoundingClientRect !== 'function') return;
+                if (cropperInstance) {
+                    try { cropperInstance.destroy(); } catch (err) {}
+                    cropperInstance = null;
+                }
+                try {
                     cropperInstance = new Cropper(imgEl, {
                         aspectRatio: 1,
                         viewMode: 1,
                         dragMode: 'move',
                         autoCropArea: 0.9,
-                        guides: true
+                        guides: true,
+                        responsive: true
                     });
-                } else if (imgEl) {
-                    imgEl.onload = () => {
-                        cropperInstance = new Cropper(imgEl, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                            dragMode: 'move',
-                            autoCropArea: 0.9,
-                            guides: true
-                        });
-                    };
+                } catch (err) {
+                    console.warn('Cropper init warning:', err);
                 }
-            }, 120);
+            };
+
+            imgEl.onload = () => {
+                requestAnimationFrame(() => setTimeout(initSafeCropper, 80));
+            };
+            imgEl.src = rawSelectedPhotoUrl;
+            if (imgEl.complete && imgEl.naturalWidth > 0) {
+                requestAnimationFrame(() => setTimeout(initSafeCropper, 80));
+            }
         };
 
         window.closeCropModal = () => {
@@ -1896,7 +2210,7 @@
                 if (posterShape === 'circle') {
                     ctx.arc(pX, pY, radius, 0, Math.PI * 2);
                 } else if (posterShape === 'rounded') {
-                    ctx.roundRect(pX - radius, pY - radius, radius * 2, radius * 2, radius * 0.22);
+                    drawRoundedRectPath(ctx, pX - radius, pY - radius, radius * 2, radius * 2, radius * 0.22);
                 } else {
                     ctx.rect(pX - radius, pY - radius, radius * 2, radius * 2);
                 }
@@ -1908,7 +2222,7 @@
                     ctx.save();
                     ctx.beginPath();
                     if (posterShape === 'circle') ctx.arc(pX, pY, radius, 0, Math.PI * 2);
-                    else ctx.roundRect(pX - radius, pY - radius, radius * 2, radius * 2, radius * 0.22);
+                    else drawRoundedRectPath(ctx, pX - radius, pY - radius, radius * 2, radius * 2, radius * 0.22);
                     ctx.lineWidth = Math.max(4, W * 0.006);
                     ctx.strokeStyle = '#0284c7';
                     ctx.stroke();
@@ -2063,7 +2377,7 @@
                 if (cardTheme === 'dark') {
                     ctx.save();
                     ctx.beginPath();
-                    ctx.roundRect(boxX, y, boxW, boxH, 22 * s);
+                    drawRoundedRectPath(ctx, boxX, y, boxW, boxH, 22 * s);
                     ctx.fillStyle = p.bg;
                     ctx.fill();
                     ctx.lineWidth = 3 * s;
