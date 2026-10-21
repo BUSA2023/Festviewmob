@@ -1136,148 +1136,15 @@
             window.showAppToast(`🎬 ${film} (${prof.label})`, pureMl, "🔊");
             setTimeout(() => window.speakMalayalamText(pureMl, style || 'bellary', '', isMulti, { s1Name: 'ദാസൻ', s2Name: 'വിജയൻ', s1Voice, s2Voice }), 250);
         };
-            const text = templates[celebKey] || templates.bellary;
-            window.playTrollEffect(celebKey === 'ramanan' || celebKey === 'damu' ? 'laugh' : 'horn');
-            window.showAppToast(`🎤 ${prof.label}`, text, "🔊");
-            setTimeout(() => window.speakMalayalamText(text, celebKey), 220);
-        };
-
-        const fetchGeminiMalayalamVoiceUrl = async (malayalamText, style = 'mass', isMultiSpeaker = false) => {
-            const apiKey = "";
-            if (!apiKey) return null;
-
-            const cacheKey = `${style}_${isMultiSpeaker}_${malayalamText}`;
-            if (malayalamAudioCache.has(cacheKey)) return malayalamAudioCache.get(cacheKey);
-
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.mass;
-            const voiceName = prof.voiceName || 'Fenrir';
-            const stylePrompt = prof.prompt || CELEBRITY_VOICE_PROFILES.mass.prompt;
-
-            let payload;
-            if (isMultiSpeaker) {
-                payload = {
-                    contents: [{
-                        parts: [{ text: `താഴെ കാണുന്ന സംഭാഷണം തനി മലയാളം സിനിമാ കോമഡി ശൈലിയിൽ സംസാരിക്കുക:\n${malayalamText}` }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            multiSpeakerVoiceConfig: {
-                                speakerVoiceConfigs: [
-                                    { speaker: "ദാസൻ", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Orus" } } },
-                                    { speaker: "വിജയൻ", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } }
-                                ]
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-            } else {
-                payload = {
-                    contents: [{
-                        parts: [{ text: `${stylePrompt} "${malayalamText}"` }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: { voiceName }
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-            }
-
-            const resp = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!resp.ok) return null;
-            const result = await resp.json();
-            const part = result?.candidates?.[0]?.content?.parts?.[0];
-            const audioData = part?.inlineData?.data;
-            const mimeType = part?.inlineData?.mimeType || 'audio/L16;rate=24000';
-            if (!audioData) return null;
-
-            const rateMatch = mimeType.match(/rate=(\d+)/);
-            const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
-            const pcmBuffer = base64ToArrayBuffer(audioData);
-            const pcm16 = new Int16Array(pcmBuffer);
-            const wavBlob = pcmToWav(pcm16, sampleRate);
-            const wavUrl = URL.createObjectURL(wavBlob);
-            malayalamAudioCache.set(cacheKey, wavUrl);
-            return wavUrl;
-        };
-        window.speakMalayalamText = async (rawText, style = 'mass', customAudioUrl = '', isMultiSpeaker = false) => {
-            window.stopAllTrollVoices();
-            const pureMlText = window.toPureMalayalamScript(rawText);
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.mass;
-
-            if (customAudioUrl) {
-                try {
-                    activeTrollAudio = new Audio(customAudioUrl);
-                    await activeTrollAudio.play();
-                    return;
-                } catch(e) {}
-            }
-
-            try {
-                const geminiWavUrl = await fetchGeminiMalayalamVoiceUrl(pureMlText, style, isMultiSpeaker);
-                if (geminiWavUrl) {
-                    activeTrollAudio = new Audio(geminiWavUrl);
-                    if (style === 'chipmunk') activeTrollAudio.playbackRate = 1.25;
-                    await activeTrollAudio.play();
-                    return;
-                }
-            } catch(e) {}
-
-            if ('speechSynthesis' in window) {
-                try {
-                    window.speechSynthesis.cancel();
-                    const voices = window.speechSynthesis.getVoices() || [];
-                    const mlVoice = voices.find(v => v.lang && (v.lang.toLowerCase().includes('ml') || v.name.toLowerCase().includes('malayalam')));
-                    const utter = new SpeechSynthesisUtterance(pureMlText.replace(/ദാസൻ:|വിജയൻ:/g, ''));
-                    utter.lang = 'ml-IN';
-                    if (mlVoice) utter.voice = mlVoice;
-                    utter.pitch = prof.pitch || 1.0;
-                    utter.rate = prof.rate || 1.0;
-                    window.speechSynthesis.speak(utter);
-                    return;
-                } catch (e) {}
-            }
-        };
-
-        window.speakTrollCard = (idx, style = 'bellary') => {
-            const trolls = state.finaleConfig?.trolls || DEFAULT_FINALE_CONFIG.trolls;
-            const item = trolls[idx];
-            if (!item) return;
-            const sc = window.getAccurateScoreMetrics();
-            window.playTrollEffect(item.soundType || 'laugh');
-            const rawText = (item.voiceText || item.text) + ` അൽ ഖസ്‌വിനിക്ക് ${sc.qPts} പോയിന്റ്, അൽ മസൂദിക്ക് വെറും ${sc.mPts} പോയിന്റ്!`;
-            const mlDialogue = window.toPureMalayalamScript(rawText);
-            window.showAppToast(`🎭 ${item.target}`, mlDialogue, "🔊");
-            setTimeout(() => window.speakMalayalamText(mlDialogue, style, item.audioUrl), 220);
-        };
-
-        window.speakPresetFilmDialogue = (text, film, style, sound, isMulti = false) => {
-            const pureMl = window.toPureMalayalamScript(text);
-            const inp = document.getElementById('customTrollInput');
-            if (inp) inp.value = pureMl;
-            window.playTrollEffect(sound || 'horn');
-            window.showAppToast(`🎬 ${film}`, pureMl, "🔊");
-            setTimeout(() => window.speakMalayalamText(pureMl, style || 'mass', '', isMulti), 250);
-        };
 
         window.speakCustomTrollInput = () => {
             const txt = document.getElementById('customTrollInput')?.value?.trim();
-            const style = document.getElementById('customTrollVoiceStyle')?.value || 'mass';
+            const style = document.getElementById('customTrollVoiceStyle')?.value || 'bellary';
             if (!txt) return window.showAppToast("മലയാളം ഡയലോഗ്", "ദയവായി ഒരു മലയാളം ട്രോൾ ഡയലോഗ് ടൈപ്പ് ചെയ്യുക!", "⚠️");
             const pureMl = window.toPureMalayalamScript(txt);
-            window.playTrollEffect(style === 'comedy' ? 'laugh' : 'horn');
-            window.showAppToast("🔊 മലയാളം വോയിസ് പ്ലേ ചെയ്യുന്നു...", pureMl, "🎤");
+            window.playTrollEffect(style === 'ramanan' || style === 'damu' || style === 'comedy' ? 'laugh' : 'horn');
+            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
+            window.showAppToast(`🔊 ${prof.label}`, pureMl, "🎤");
             setTimeout(() => window.speakMalayalamText(pureMl, style), 220);
         };
 
