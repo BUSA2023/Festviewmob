@@ -829,6 +829,58 @@
             }
         };
 
+        // Distinct Male Voice Acoustic Profiles (guarantees deep Male timbre even if a device's default TTS is female!)
+        const MALE_ACTOR_DSP_PROFILES = {
+            bellary:     { sysPitch: 0.58, sysRate: 0.96, streamRate: 0.78, label: '🕶️ മമ്മൂട്ടി (ബെല്ലാരി രാജ - Deep Male Baritone)' },
+            aaduthoma:   { sysPitch: 0.46, sysRate: 0.86, streamRate: 0.71, label: '🔥 മോഹൻലാൽ (ആടുതോമ - Heavy Male Bass)' },
+            sureshgopi:  { sysPitch: 0.54, sysRate: 1.12, streamRate: 0.82, label: '⚡ സുരേഷ് ഗോപി (ഭരത്ചന്ദ്രൻ - Fast Commanding Male)' },
+            damu:        { sysPitch: 0.82, sysRate: 1.14, streamRate: 0.92, label: '💪 സുരാജ് (ദശമൂലം ദാമു - Energetic Male Comedy)' },
+            ramanan:     { sysPitch: 0.88, sysRate: 1.18, streamRate: 0.95, label: '😂 ഹരിശ്രീ അശോകൻ (രമണൻ - Fast Male Comedy)' },
+            manavalan:   { sysPitch: 0.76, sysRate: 1.08, streamRate: 0.88, label: '👑 സലിം കുമാർ (മണവാളൻ - Kochi Male Slang)' },
+            innocent:    { sysPitch: 0.62, sysRate: 0.84, streamRate: 0.75, label: '🎭 ഇന്നസെന്റ് (മന്നാർ മത്തായി - Slow Thrissur Male)' },
+            kittunni:    { sysPitch: 0.72, sysRate: 1.06, streamRate: 0.85, label: '🎻 ജഗതി (കിട്ടുണ്ണി - Dramatic Male Voice)' },
+            vijayan:     { sysPitch: 0.66, sysRate: 0.98, streamRate: 0.80, label: '🕵️‍♂️ ശ്രീനിവാസൻ (വിജയൻ - Witty Male Voice)' },
+            ponjikara:   { sysPitch: 0.84, sysRate: 1.15, streamRate: 0.93, label: '🥁 പൊന്ജിക്കര (സലിം കുമാർ - Loud Male Comedy)' },
+            mamachan:    { sysPitch: 0.42, sysRate: 0.88, streamRate: 0.68, label: '🦉 ബിജു മേനോൻ (മാമച്ചൻ - Ultra Deep Male Bass)' },
+            mass:        { sysPitch: 0.52, sysRate: 0.95, streamRate: 0.76, label: '🕶️ മാസ്സ് ഹീറോ (Deep Male Voice)' },
+            comedy:      { sysPitch: 0.80, sysRate: 1.12, streamRate: 0.90, label: '😂 കോമഡി പുരുഷ ശബ്ദം' },
+            villain:     { sysPitch: 0.40, sysRate: 0.84, streamRate: 0.66, label: '🔥 വില്ലൻ ബേസ് പുരുഷ ശബ്ദം' },
+            song:        { sysPitch: 0.68, sysRate: 1.04, streamRate: 0.83, label: '🎶 ട്രോൾ ഗാനമേള പുരുഷ ശബ്ദം' }
+        };
+
+        // Pre-warm browser speech voices on load so there is zero delay on first tap
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+
+        // Helper: Find the best Male Malayalam / Indian Male voice on the device
+        const selectMaleSystemVoice = (preferAltMale = false) => {
+            if (!('speechSynthesis' in window)) return { voice: null, isFemaleFallback: true };
+            const voices = window.speechSynthesis.getVoices() || [];
+            const mlVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().includes('ml') || v.name.toLowerCase().includes('malayalam')));
+            
+            // Look for explicitly male Malayalam voices (e.g. ml-IN-Wavenet-B, ml-IN-Standard-B, Subhash, Valluvar, etc.)
+            const maleMl = mlVoices.filter(v => /male|wavenet-b|wavenet-d|standard-b|standard-d|subhash|prabhat|madhur|hemant|kumar|raj/i.test(v.name));
+            if (maleMl.length > 0) {
+                return { voice: maleMl[preferAltMale && maleMl.length > 1 ? 1 : 0], isFemaleFallback: false };
+            }
+            if (mlVoices.length > 1 && preferAltMale) {
+                return { voice: mlVoices[1], isFemaleFallback: true };
+            }
+            if (mlVoices.length > 0) {
+                return { voice: mlVoices[0], isFemaleFallback: true };
+            }
+
+            // Fallback to Indian Male voices if no Malayalam tag found
+            const inVoices = voices.filter(v => v.lang && v.lang.toLowerCase().includes('in'));
+            const maleIn = inVoices.filter(v => /male|ravi|prabhat|madhur|hemant|wavenet-b|wavenet-d|standard-b/i.test(v.name));
+            if (maleIn.length > 0) {
+                return { voice: maleIn[preferAltMale && maleIn.length > 1 ? 1 : 0], isFemaleFallback: false };
+            }
+            return { voice: inVoices[0] || voices[0] || null, isFemaleFallback: true };
+        };
+
         window.getAccurateScoreMetrics = () => {
             let teamTotals = { 'Al-Masūdi': 0, 'Al-Qazwini': 0 };
             let catTotals = {
@@ -898,7 +950,7 @@
 
         window.speakLiveScoreRoast = (celebKey = 'bellary') => {
             const sc = window.getAccurateScoreMetrics();
-            const prof = CELEBRITY_VOICE_PROFILES[celebKey] || CELEBRITY_VOICE_PROFILES.bellary;
+            const prof = MALE_ACTOR_DSP_PROFILES[celebKey] || MALE_ACTOR_DSP_PROFILES.bellary;
             const templates = {
                 bellary: `തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദി ടീമിന്റെ സീൻ കോൺട്രയാണ് മക്കളേ! ${sc.qPts} പോയിന്റും നേടി ${sc.diff} പോയിന്റ് ലീഡിൽ നമ്മുടെ അൽ ഖസ്‌വിനി കപ്പ് അങ്ങ് തൂക്കി! വെറും ${sc.mPts} പോയിന്റിൽ അൽ മസൂദി ഒതുങ്ങിപ്പോയി!`,
                 aaduthoma: `മോനേ അൽ മസൂദീ, ഇതൊക്കെയെന്ത്! ${sc.qPts} പോയിന്റ് അടിച്ചുകയറ്റി അൽ ഖസ്‌വിനി കപ്പും ഗ്രൗണ്ടും തൂക്കി! ${sc.mPts} പോയിന്റ് മാത്രമുള്ള അൽ മസൂദി ടീമിന് ${sc.diff} പോയിന്റ് വ്യത്യാസത്തിൽ വൻ പരാജയം!`,
@@ -914,204 +966,124 @@
             const text = templates[celebKey] || templates.bellary;
             window.playTrollEffect(celebKey === 'ramanan' || celebKey === 'damu' ? 'laugh' : (celebKey === 'aaduthoma' || celebKey === 'mamachan' ? 'thug' : 'horn'));
             window.showAppToast(`🎤 ${prof.label}`, text, "🔊");
-            setTimeout(() => window.speakMalayalamText(text, celebKey), 220);
+            window.speakMalayalamText(text, celebKey);
         };
 
-        const playWavThroughCelebrityDSP = async (wavUrl, style = 'bellary') => {
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
+        // Instant Male Malayalam Speech & Man-to-Man Conversation Engine (Zero API Wait Delay + Deep Male Pitch Shifting)
+        let activeSpeechTimeoutIds = [];
+
+        const clearSpeechQueue = () => {
+            activeSpeechTimeoutIds.forEach(id => clearTimeout(id));
+            activeSpeechTimeoutIds = [];
             try {
-                const ctx = getSharedAudioCtx();
-                if (!ctx) {
-                    activeTrollAudio = new Audio(wavUrl);
-                    activeTrollAudio.playbackRate = prof.playbackRate || 1.0;
-                    await activeTrollAudio.play();
-                    return;
+                if (activeTrollAudio) {
+                    activeTrollAudio.pause();
+                    activeTrollAudio = null;
                 }
-                const resp = await fetch(wavUrl);
-                const arrayBuf = await resp.arrayBuffer();
-                const audioBuf = await ctx.decodeAudioData(arrayBuf);
-
-                const source = ctx.createBufferSource();
-                source.buffer = audioBuf;
-                source.playbackRate.value = prof.playbackRate || 1.0;
-
-                // Bass EQ for deep male voices (Mohanlal, Suresh Gopi, Biju Menon, Mammootty) vs Comedy voices
-                const lowShelf = ctx.createBiquadFilter();
-                lowShelf.type = 'lowshelf';
-                lowShelf.frequency.value = 240;
-                lowShelf.gain.value = prof.bassBoost || 0;
-
-                // Vocal Formant Mid-Band shaping so each actor has a distinct vocal resonance
-                const formantFilter = ctx.createBiquadFilter();
-                formantFilter.type = 'peaking';
-                formantFilter.frequency.value = prof.midFreq || 1100;
-                formantFilter.Q.value = 1.4;
-                formantFilter.gain.value = prof.midGain || 2;
-
-                // Compressor for punchy cinema dialogue loudness
-                const compressor = ctx.createDynamicsCompressor();
-                compressor.threshold.value = -18;
-                compressor.ratio.value = 4;
-
-                source.connect(lowShelf);
-                lowShelf.connect(formantFilter);
-                formantFilter.connect(compressor);
-                compressor.connect(ctx.destination);
-
-                activeTrollAudio = {
-                    pause: () => { try { source.stop(); } catch(e) {} }
-                };
-                source.start(0);
-            } catch (err) {
-                activeTrollAudio = new Audio(wavUrl);
-                activeTrollAudio.playbackRate = prof.playbackRate || 1.0;
-                await activeTrollAudio.play();
-            }
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
+            } catch (e) {}
         };
 
-        const fetchGeminiMalayalamVoiceUrl = async (malayalamText, style = 'bellary', isMultiSpeaker = false, speakerPair = null) => {
-            const apiKey = "";
-            const pairKey = speakerPair ? `${speakerPair.s1Voice}_${speakerPair.s2Voice}` : 'default';
-            const cacheKey = `${style}_${isMultiSpeaker}_${pairKey}_${malayalamText}`;
-            if (malayalamAudioCache.has(cacheKey)) return malayalamAudioCache.get(cacheKey);
+        window.stopAllTrollVoices = () => {
+            clearSpeechQueue();
+            window.stopTrollSongBeat();
+        };
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
-            const voiceName = prof.voiceName || 'Fenrir';
-            const stylePrompt = prof.prompt || CELEBRITY_VOICE_PROFILES.bellary.prompt;
+        // Plays a single Malayalam line using deep Male pitch transformation so it NEVER sounds like a female voice
+        const speakSingleMalayalamMaleLine = (textLine, actorStyle = 'bellary', isSecondMaleSpeaker = false, onLineDone = null) => {
+            const cleanText = window.toPureMalayalamScript(textLine)
+                .replace(/^[^:]+:\s*/, '')
+                .replace(/[🏆😂🔥😎🤣🎤👑🎺🌟🕵️‍♂️🎶🎵🎬⚡💪🎭🎻🦉🥁🕶️😭]/g, '')
+                .trim();
 
-            let payload;
-            if (isMultiSpeaker) {
-                const s1Name = speakerPair?.s1Name || "ദാസൻ";
-                const s2Name = speakerPair?.s2Name || "വിജയൻ";
-                const s1Voice = speakerPair?.s1Voice || "Orus";
-                const s2Voice = speakerPair?.s2Voice || "Puck";
-                payload = {
-                    contents: [{
-                        parts: [{ text: `Act out this Malayalam cinema comedy conversation with two distinct male voices (${s1Name} with a deep authoritative voice, and ${s2Name} with an excited high-pitched comedy voice):\n${malayalamText}` }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            multiSpeakerVoiceConfig: {
-                                speakerVoiceConfigs: [
-                                    { speaker: s1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: s1Voice } } },
-                                    { speaker: s2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: s2Voice } } }
-                                ]
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
-            } else {
-                payload = {
-                    contents: [{
-                        parts: [{ text: `${stylePrompt} "${malayalamText}"` }]
-                    }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: { voiceName }
-                            }
-                        }
-                    },
-                    model: "gemini-2.5-flash-preview-tts"
-                };
+            if (!cleanText) {
+                if (onLineDone) onLineDone();
+                return;
             }
 
-            for (let attempt = 0; attempt < 3; attempt++) {
+            const dsp = MALE_ACTOR_DSP_PROFILES[actorStyle] || MALE_ACTOR_DSP_PROFILES.bellary;
+
+            if ('speechSynthesis' in window) {
                 try {
-                    const resp = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!resp.ok) {
-                        await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
-                        continue;
-                    }
-                    const result = await resp.json();
-                    const part = result?.candidates?.[0]?.content?.parts?.[0];
-                    const audioData = part?.inlineData?.data;
-                    const mimeType = part?.inlineData?.mimeType || 'audio/L16;rate=24000';
-                    if (!audioData) break;
+                    const { voice, isFemaleFallback } = selectMaleSystemVoice(isSecondMaleSpeaker);
+                    const utter = new SpeechSynthesisUtterance(cleanText);
+                    utter.lang = 'ml-IN';
+                    if (voice) utter.voice = voice;
 
-                    const rateMatch = mimeType.match(/rate=(\d+)/);
-                    const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
-                    const pcmBuffer = base64ToArrayBuffer(audioData);
-                    const pcm16 = new Int16Array(pcmBuffer);
-                    const wavBlob = pcmToWav(pcm16, sampleRate);
-                    const wavUrl = URL.createObjectURL(wavBlob);
-                    malayalamAudioCache.set(cacheKey, wavUrl);
-                    return wavUrl;
-                } catch (e) {
-                    await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
-                }
+                    // CRITICAL FIX: Mobile phones often default `ml-IN` to a female voice at pitch 1.0.
+                    // Dropping pitch to 0.42 - 0.78 shifts the vocal formants into a deep, resonant MALE baritone/bass!
+                    let targetPitch = dsp.sysPitch;
+                    let targetRate = dsp.sysRate;
+
+                    if (isSecondMaleSpeaker) {
+                        // Man #2 in Man-to-Man Conversation: Distinct higher-energy male voice (e.g. Vijayan / Ramanan / Sunny)
+                        targetPitch = isFemaleFallback ? 0.78 : 1.05;
+                        targetRate = 1.12;
+                    } else {
+                        // Man #1 in Man-to-Man Conversation or Solo Celebrity: Deep authoritative male voice (e.g. Dasan / Mohanlal / Mammootty)
+                        targetPitch = isFemaleFallback ? Math.min(0.64, dsp.sysPitch) : dsp.sysPitch;
+                    }
+
+                    utter.pitch = Math.max(0.35, Math.min(1.2, targetPitch));
+                    utter.rate = Math.max(0.80, Math.min(1.28, targetRate));
+                    utter.volume = 1.0;
+
+                    if (onLineDone) {
+                        utter.onend = () => onLineDone();
+                        utter.onerror = () => onLineDone();
+                    }
+
+                    window.speechSynthesis.speak(utter);
+                    return;
+                } catch (e) {}
             }
-            return null;
+
+            if (onLineDone) onLineDone();
         };
 
         window.speakMalayalamText = async (rawText, style = 'bellary', customAudioUrl = '', isMultiSpeaker = false, speakerPair = null) => {
-            window.stopAllTrollVoices();
+            clearSpeechQueue();
             const pureMlText = window.toPureMalayalamScript(rawText);
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
 
+            // 1. If a custom MP3 audio link was provided by admin, play it immediately
             if (customAudioUrl) {
                 try {
                     activeTrollAudio = new Audio(customAudioUrl);
                     await activeTrollAudio.play();
                     return;
-                } catch(e) {}
-            }
-
-            try {
-                const geminiWavUrl = await fetchGeminiMalayalamVoiceUrl(pureMlText, style, isMultiSpeaker, speakerPair);
-                if (geminiWavUrl) {
-                    if (isMultiSpeaker) {
-                        activeTrollAudio = new Audio(geminiWavUrl);
-                        await activeTrollAudio.play();
-                    } else {
-                        await playWavThroughCelebrityDSP(geminiWavUrl, style);
-                    }
-                    return;
-                }
-            } catch(e) {}
-
-            // Multi-voice Web Speech fallback: cycles across different available voices & extreme pitch/rate profiles
-            if ('speechSynthesis' in window) {
-                try {
-                    window.speechSynthesis.cancel();
-                    const voices = window.speechSynthesis.getVoices() || [];
-                    const mlVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().includes('ml') || v.name.toLowerCase().includes('malayalam')));
-                    const inVoices = voices.filter(v => v.lang && v.lang.toLowerCase().includes('in'));
-                    const pool = mlVoices.length > 0 ? mlVoices : (inVoices.length > 0 ? inVoices : voices);
-
-                    if (isMultiSpeaker && pureMlText.includes('\n')) {
-                        const lines = pureMlText.split('\n').filter(Boolean);
-                        lines.forEach((line, idx) => {
-                            const cleanLine = line.replace(/^[^:]+:\s*/, '');
-                            const utter = new SpeechSynthesisUtterance(cleanLine);
-                            utter.lang = 'ml-IN';
-                            if (pool.length > 0) utter.voice = pool[idx % pool.length];
-                            utter.pitch = idx % 2 === 0 ? 0.68 : 1.42;
-                            utter.rate = idx % 2 === 0 ? 0.90 : 1.16;
-                            window.speechSynthesis.speak(utter);
-                        });
-                        return;
-                    }
-
-                    const utter = new SpeechSynthesisUtterance(pureMlText.replace(/ദാസൻ:|വിജയൻ:/g, ''));
-                    utter.lang = 'ml-IN';
-                    const styleKeys = Object.keys(CELEBRITY_VOICE_PROFILES);
-                    const voiceIdx = Math.max(0, styleKeys.indexOf(style));
-                    if (pool.length > 0) utter.voice = pool[voiceIdx % pool.length];
-                    utter.pitch = Math.max(0.5, Math.min(2.0, prof.pitch || 1.0));
-                    utter.rate = Math.max(0.6, Math.min(1.6, prof.rate || 1.0));
-                    window.speechSynthesis.speak(utter);
-                    return;
                 } catch (e) {}
             }
+
+            // 2. Man-to-Man 2-Speaker Conversation Mode: Alternate between Deep Male #1 and Energetic Male #2
+            if (isMultiSpeaker || pureMlText.includes('\n')) {
+                const lines = pureMlText.split('\n').map(l => l.trim()).filter(Boolean);
+                let idx = 0;
+
+                const playNextConversationTurn = () => {
+                    if (idx >= lines.length) return;
+                    const currentLine = lines[idx];
+                    const isManTwo = idx % 2 === 1;
+                    const lineStyle = isManTwo
+                        ? (speakerPair?.s2Style || 'ramanan')
+                        : (speakerPair?.s1Style || 'aaduthoma');
+                    idx++;
+
+                    // Subtle cinema BGM thud between the two men speaking
+                    if (isManTwo) window.playTrollEffect('laugh');
+                    speakSingleMalayalamMaleLine(currentLine, lineStyle, isManTwo, () => {
+                        const tid = setTimeout(playNextConversationTurn, 180);
+                        activeSpeechTimeoutIds.push(tid);
+                    });
+                };
+
+                playNextConversationTurn();
+                return;
+            }
+
+            // 3. Single Male Celebrity Voice — Instant playback with zero network wait!
+            speakSingleMalayalamMaleLine(pureMlText, style, false);
         };
 
         window.speakTrollCard = (idx, style = 'bellary') => {
@@ -1119,22 +1091,22 @@
             const item = trolls[idx];
             if (!item) return;
             const sc = window.getAccurateScoreMetrics();
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
+            const prof = MALE_ACTOR_DSP_PROFILES[style] || MALE_ACTOR_DSP_PROFILES.bellary;
             window.playTrollEffect(item.soundType || 'laugh');
             const rawText = (item.voiceText || item.text) + ` അൽ ഖസ്‌വിനിക്ക് ${sc.qPts} പോയിന്റ്, അൽ മസൂദിക്ക് വെറും ${sc.mPts} പോയിന്റ്!`;
             const mlDialogue = window.toPureMalayalamScript(rawText);
             window.showAppToast(`🎭 ${prof.label}`, mlDialogue, "🔊");
-            setTimeout(() => window.speakMalayalamText(mlDialogue, style, item.audioUrl), 220);
+            window.speakMalayalamText(mlDialogue, style, item.audioUrl);
         };
 
-        window.speakPresetFilmDialogue = (text, film, style, sound, isMulti = false, s1Voice = 'Orus', s2Voice = 'Puck') => {
+        window.speakPresetFilmDialogue = (text, film, style, sound, isMulti = false, s1Style = 'aaduthoma', s2Style = 'vijayan') => {
             const pureMl = window.toPureMalayalamScript(text);
             const inp = document.getElementById('customTrollInput');
             if (inp) inp.value = pureMl;
             window.playTrollEffect(sound || 'horn');
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
-            window.showAppToast(`🎬 ${film} (${prof.label})`, pureMl, "🔊");
-            setTimeout(() => window.speakMalayalamText(pureMl, style || 'bellary', '', isMulti, { s1Name: 'ദാസൻ', s2Name: 'വിജയൻ', s1Voice, s2Voice }), 250);
+            const prof = MALE_ACTOR_DSP_PROFILES[style] || MALE_ACTOR_DSP_PROFILES.bellary;
+            window.showAppToast(`🎬 ${film}`, `${prof.label}: ${pureMl}`, "🔊");
+            window.speakMalayalamText(pureMl, style || 'bellary', '', isMulti, { s1Style, s2Style });
         };
 
         window.speakCustomTrollInput = () => {
@@ -1143,9 +1115,9 @@
             if (!txt) return window.showAppToast("മലയാളം ഡയലോഗ്", "ദയവായി ഒരു മലയാളം ട്രോൾ ഡയലോഗ് ടൈപ്പ് ചെയ്യുക!", "⚠️");
             const pureMl = window.toPureMalayalamScript(txt);
             window.playTrollEffect(style === 'ramanan' || style === 'damu' || style === 'comedy' ? 'laugh' : 'horn');
-            const prof = CELEBRITY_VOICE_PROFILES[style] || CELEBRITY_VOICE_PROFILES.bellary;
+            const prof = MALE_ACTOR_DSP_PROFILES[style] || MALE_ACTOR_DSP_PROFILES.bellary;
             window.showAppToast(`🔊 ${prof.label}`, pureMl, "🎤");
-            setTimeout(() => window.speakMalayalamText(pureMl, style), 220);
+            window.speakMalayalamText(pureMl, style);
         };
 
         let trollSongBeatInterval = null;
@@ -1944,28 +1916,40 @@
 
                 const multiSpeakerSkits = [
                     {
-                        title: '🎭 നാടോടിക്കാറ്റ് — ദാസനും വിജയനും (മോഹൻലാൽ & ശ്രീനിവാസൻ ശബ്ദങ്ങൾ)',
-                        s1Voice: 'Orus',
-                        s2Voice: 'Puck',
-                        script: `ദാസൻ: വിജയാ, ആ അൽ മസൂദിയുടെ പോയിന്റ് ടേബിളിലേക്ക് ഒന്ന് നോക്കിയേ, വെറും ${sc.mPts} പോയിന്റ്! എവിടെയോ എന്തോ തകരാറു പോലെ!\nവിജയൻ: തകരാറല്ല ദാസാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡുമായി കപ്പും കൊണ്ട് പോയി!`
+                        title: '🎭 നാടോടിക്കാറ്റ് — ദാസനും വിജയനും (Man-to-Man: മോഹൻലാൽ & ശ്രീനിവാസൻ)',
+                        s1Style: 'aaduthoma',
+                        s2Style: 'vijayan',
+                        script: `ദാസൻ: വിജയാ, ആ അൽ മസൂദിയുടെ പോയിന്റ് ടേബിളിലേക്ക് ഒന്ന് നോക്കിയേ, വെറും ${sc.mPts} പോയിന്റ്! എവിടെയോ എന്തോ തകരാറു പോലെ!\nവിജയൻ: തകരാറല്ല ദാസാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡുമായി കപ്പും കൊണ്ട് പോയി!\nദാസൻ: അപ്പോൾ അൽ മസൂദിക്ക് ഇനി എന്ത് ചെയ്യാൻ പറ്റും വിജയാ?\nവിജയൻ: അടുത്ത സീസൺ വരെ അൽ മസൂദിക്ക് കാത്തിരിക്കാം ദാസാ!`
                     },
                     {
-                        title: '🎭 പഞ്ചാബി ഹൗസ് — മുതലാളിയും രമണനും (ഇന്നസെന്റ് & ഹരിശ്രീ അശോകൻ ശബ്ദങ്ങൾ)',
-                        s1Voice: 'Charon',
-                        s2Voice: 'Sadachbia',
-                        script: `ദാസൻ: രമണാ, അൽ മസൂദി ടീമിന്റെ പോയിന്റ് എവിടെപ്പോയി? ആകെ ${sc.mPts} പോയിന്റേ ഉള്ളല്ലോ!\nവിജയൻ: മുതലാളീ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും തൂക്കി ഗ്രൗണ്ടും തൂക്കി പോയേ! അൽ മസൂദിക്ക് ഇനി സർബത്ത് കൊടുക്കാം!`
+                        title: '🎭 പഞ്ചാബി ഹൗസ് — മുതലാളിയും രമണനും (Man-to-Man: ഇന്നസെന്റ് & ഹരിശ്രീ അശോകൻ)',
+                        s1Style: 'innocent',
+                        s2Style: 'ramanan',
+                        script: `മുതലാളി: രമണാ, അൽ മസൂദി ടീമിന്റെ പോയിന്റ് എവിടെപ്പോയി? ആകെ ${sc.mPts} പോയിന്റേ ഉള്ളല്ലോ!\nരമണൻ: മുതലാളീ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും തൂക്കി ഗ്രൗണ്ടും തൂക്കി പോയേ!\nമുതലാളി: അപ്പോൾ അൽ മസൂദി ബെഞ്ചിൽ ആകെ കൂട്ടക്കരച്ചിലാണല്ലോ രമണാ!\nരമണൻ: പേടിക്കണ്ട മുതലാളീ, ഞാൻ ഇപ്പോൾ തന്നെ അൽ മസൂദിക്ക് തണുത്ത സർബത്ത് കൊടുക്കാം!`
                     },
                     {
-                        title: '🎭 മണിച്ചിത്രത്താഴ് — നകുലനും ഡോക്ടർ സണ്ണിയും (സുരേഷ് ഗോപി & മോഹൻലാൽ ശബ്ദങ്ങൾ)',
-                        s1Voice: 'Alnilam',
-                        s2Voice: 'Fenrir',
-                        script: `ദാസൻ: സണ്ണീ, അൽ മസൂദി ടീമിന് ഇതെന്തു പറ്റി? ${sc.mPts} പോയിന്റ് നോക്കി മിണ്ടാതെ ഇരിക്കുന്നല്ലോ!\nവിജയൻ: നകുലാ പേടിക്കണ്ട, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റിൽ കപ്പ് അടിച്ചതിന്റെ ചെറിയൊരു ഷോക്കാണ്! അടുത്ത വർഷം മാറിക്കോളും!`
+                        title: '🎭 മണിച്ചിത്രത്താഴ് — നകുലനും ഡോക്ടർ സണ്ണിയും (Man-to-Man: സുരേഷ് ഗോപി & മോഹൻലാൽ)',
+                        s1Style: 'sureshgopi',
+                        s2Style: 'aaduthoma',
+                        script: `നകുലൻ: സണ്ണീ, അൽ മസൂദി ടീമിന് ഇതെന്തു പറ്റി? ${sc.mPts} പോയിന്റ് നോക്കി മിണ്ടാതെ ഇരിക്കുന്നല്ലോ!\nസണ്ണി: നകുലാ പേടിക്കണ്ട, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റിൽ കപ്പ് അടിച്ചതിന്റെ ചെറിയൊരു ഷോക്കാണ്!\nനകുലൻ: ഇതിന് മരുന്ന് വല്ലതുമുണ്ടോ സണ്ണീ?\nസണ്ണി: വിട്ടുകള നകുലാ, ${sc.diff} പോയിന്റ് ലീഡ് കണ്ടാൽ ആരായാലും ഒന്ന് ഞെട്ടും!`
                     },
                     {
-                        title: '🎭 കല്യാണരാമൻ — പൊന്ജിക്കരയും രാമൻകുട്ടിയും (സലിം കുമാർ & ദിലീപ് ശബ്ദങ്ങൾ)',
-                        s1Voice: 'Zubenelgenubi',
-                        s2Voice: 'Iapetus',
-                        script: `ദാസൻ: തമ്പീ, അൽ മസൂദി കപ്പ് അടിക്കും എന്നല്ലേ നീ പറഞ്ഞത്?\nവിജയൻ: അയ്യോ പൊന്ജിക്കര ചേട്ടാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡും അടിച്ചുകയറ്റുമെന്ന് ഞാൻ സ്വപ്നത്തിൽ പോലും വിചാരിച്ചില്ല!`
+                        title: '🎭 രാജമാണിക്യം vs ദശമൂലം — ബെല്ലാരി രാജയും ദാമുവും (Man-to-Man: മമ്മൂട്ടി & സുരാജ്)',
+                        s1Style: 'bellary',
+                        s2Style: 'damu',
+                        script: `രാജ: ഡേയ് ദാമൂ, തിരുവനന്തപുരം ഭാഷയിൽ പറഞ്ഞാൽ അൽ മസൂദിയുടെ സീൻ കോൺട്രയാണല്ലോ മക്കളേ!\nദാമു: അയ്യോ രാജണ്ണാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റ് അടിച്ചപ്പോൾ അൽ മസൂദി വെറും ${sc.mPts} പോയിന്റിൽ മൂലയ്ക്ക് ഇരുന്നു പോയി!\nരാജ: എന്നാ പിന്നെ കപ്പും തൂക്കി നമുക്ക് അങ്ങ് പോയാലോ മക്കളേ!\nദാമു: പോവാം രാജണ്ണാ, അൽ ഖസ്‌വിനി രാജാക്കന്മാർ കപ്പ് തൂക്കി!`
+                    },
+                    {
+                        title: '🎭 കല്യാണരാമൻ — പൊന്ജിക്കരയും മണവാളനും (Man-to-Man: കൊച്ചി തഗ് സംഭാഷണം)',
+                        s1Style: 'mamachan',
+                        s2Style: 'ponjikara',
+                        script: `മാമച്ചൻ: എടാ പൊന്ജിക്കരേ, അൽ മസൂദി കപ്പ് അടിക്കും എന്നല്ലേ നീ പറഞ്ഞത്?\nപൊന്ജിക്കര: അയ്യോ ചേട്ടാ, അൽ ഖസ്‌വിനി ${sc.qPts} പോയിന്റും ${sc.diff} പോയിന്റ് ലീഡും അടിച്ചുകയറ്റുമെന്ന് ഞാൻ സ്വപ്നത്തിൽ പോലും വിചാരിച്ചില്ല!\nമാമച്ചൻ: ഇനി പറഞ്ഞിട്ട് കാര്യമില്ല മക്കളേ, കളി അൽ ഖസ്‌വിനി തൂക്കി!\nപൊന്ജിക്കര: ശരിയാണ് ചേട്ടാ, അൽ മസൂദിക്ക് ഇനി ടാറ്റാ ബൈ ബൈ!`
+                    },
+                    {
+                        title: '🎭 ഗോഡ്ഫാദർ vs കിലുക്കം — അഞ്ഞൂറാനും കിട്ടുണ്ണിയും (Man-to-Man: ബേസ് & കോമഡി)',
+                        s1Style: 'villain',
+                        s2Style: 'kittunni',
+                        script: `അഞ്ഞൂറാൻ: എടാ കിട്ടുണ്ണീ, അൽ മസൂദി ടീമിന്റെ പോയിന്റ് ടേബിൾ കണ്ടോ നീ?\nകിട്ടുണ്ണി: അയ്യോ എനിക്ക് വിശന്നിട്ട് കണ്ണ് കാണാൻ വയ്യേ, വെറും ${sc.mPts} പോയിന്റേ ഉള്ളൂ!\nഅഞ്ഞൂറാൻ: ${sc.qPts} പോയിന്റും നേടി അൽ ഖസ്‌വിനി ഈ സീസൺ അങ്ങ് എടുത്തു മക്കളേ!\nകിട്ടുണ്ണി: കപ്പും പോയി പോയിന്റും പോയി അൽ മസൂദിയുടെ അവസ്ഥ പരമ കഷ്ടം!`
                     }
                 ];
 
@@ -2040,22 +2024,22 @@
                             <!-- Instant Soundboard -->
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
                                 <button onclick="window.playTrollEffect('horn')" class="bg-slate-950 hover:bg-pink-950/60 border border-pink-500/40 text-pink-300 font-black py-2.5 rounded-xl text-xs transition">📯 മാസ്സ് ഹോൺ (Horn)</button>
-                                <button onclick="window.playTrollEffect('laugh')" class="bg-slate-950 hover:bg-amber-950/60 border border-amber-500/40 text-amber-300 font-black py-2.5 rounded-xl text-xs transition">😂 അൽ മസൂദിക്ക് കൂട്ടച്ചിരി</button>
-                                <button onclick="window.playTrollEffect('sad')" class="bg-slate-950 hover:bg-sky-950/60 border border-sky-500/40 text-sky-300 font-black py-2.5 rounded-xl text-xs transition">🎻 അൽ മസൂദി ശോകം വയലിൻ</button>
-                                <button onclick="window.playTrollEffect('thug')" class="bg-slate-950 hover:bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-black py-2.5 rounded-xl text-xs transition">🕶️ അൽ ഖസ്‌വിനി തഗ് ലൈഫ്</button>
-                            </div>
-
-                            <!-- 4 Multi-Speaker Malayalam Comedy Conversation Skits -->
-                            <div class="bg-slate-950/90 border border-pink-500/40 rounded-2xl p-4 mb-5">
-                                <div class="text-[11px] font-black uppercase text-pink-400 mb-2.5">🗣️ 2-പേർ വ്യത്യസ്ത പുരുഷ ശബ്ദങ്ങളിൽ സംസാരിക്കുന്ന കോമഡി സ്കിറ്റുകൾ (2-Male Voice Skits)</div>
+                            <!-- 6 Multi-Speaker Malayalam Man-to-Man Comedy Conversation Skits -->
+                            <div class="bg-slate-950/90 border-2 border-pink-500/50 rounded-2xl p-4 mb-5 shadow-lg">
+                                <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase bg-pink-600 text-white px-2.5 py-0.5 rounded-full">🗣️ INSTANT MAN-TO-MAN 2-VOICE CONVERSATIONS</span>
+                                        <h3 class="text-sm sm:text-base font-black text-white mt-1">രണ്ട് പുരുഷ കഥാപാത്രങ്ങൾ തമ്മിലുള്ള മാസ്സ് മലയാളം ട്രോൾ സംഭാഷണങ്ങൾ (4-Line Man-to-Man Skits)</h3>
+                                    </div>
+                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     ${multiSpeakerSkits.map(sk => `
-                                        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex flex-col justify-between gap-2.5 hover:border-pink-500/40 transition">
+                                        <div class="bg-slate-900/95 border border-slate-700/80 rounded-xl p-3.5 flex flex-col justify-between gap-2.5 hover:border-pink-500/60 transition shadow">
                                             <div>
-                                                <div class="text-xs font-black text-amber-300 mb-1">${sk.title}</div>
-                                                <p class="text-xs text-slate-200 whitespace-pre-line leading-relaxed">${sk.script}</p>
+                                                <div class="text-xs font-black text-amber-300 mb-1.5">${sk.title}</div>
+                                                <p class="text-xs text-slate-200 whitespace-pre-line leading-relaxed bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">${sk.script}</p>
                                             </div>
-                                            <button onclick="window.speakPresetFilmDialogue('${sk.script.replace(/\n/g, '\\n').replace(/'/g, "\\'")}', '${sk.title.replace(/'/g, "\\'")}', 'comedy', 'laugh', true, '${sk.s1Voice}', '${sk.s2Voice}')" class="w-full bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-500 hover:to-rose-400 text-white font-black py-2 rounded-lg text-xs shadow">🔊 രണ്ട് വ്യത്യസ്ത ശബ്ദത്തിൽ കേൾക്കുക (Play 2-Voice Skit)</button>
+                                            <button onclick="window.speakPresetFilmDialogue('${sk.script.replace(/\n/g, '\\n').replace(/'/g, "\\'")}', '${sk.title.replace(/'/g, "\\'")}', '${sk.s1Style}', 'laugh', true, '${sk.s1Style}', '${sk.s2Style}')" class="w-full bg-gradient-to-r from-pink-600 to-amber-500 hover:from-pink-500 hover:to-amber-400 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase shadow-md transition">🔊 രണ്ട് പുരുഷ ശബ്ദത്തിൽ ഉടൻ കേൾക്കുക (Instant Man-to-Man Play)</button>
                                         </div>
                                     `).join('')}
                                 </div>
